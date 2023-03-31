@@ -1,0 +1,5 @@
+acquia/drupal-recommended-settings:
+  type: composer-plugin
+
+# Do not install blt
+acquia/blt: ~

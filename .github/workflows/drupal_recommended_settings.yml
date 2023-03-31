@@ -1,0 +1,61 @@
+name: drupal-recommended-settings CI
+on:
+  schedule:
+    # "At minute 0 past hour 4 and 8 UTC."
+    - cron:  '0 4,8 * * *'
+  push:
+    branches:
+      - '*'
+      - '*/*'
+      - '!develop'  # Exclude `develop` branch as CI for PR already covers that.
+      - '!main'  # Exclude `main` branch as CI for PR already covers that.
+    paths-ignore:
+      - README.md
+  pull_request:
+    branches: [ develop, main ]
+    paths-ignore:
+      - README.md
+env:
+  ORCA_SUT_NAME: acquia/drupal-recommended-settings
+  ORCA_SUT_BRANCH: develop
+  ORCA_VERSION: ^3
+  ORCA_PACKAGES_CONFIG_ALTER: ../drupal-recommended-settings/tests/packages_alter.yml
+  ORCA_ENABLE_NIGHTWATCH: "FALSE"
+  DB_DATABASE: drupal
+  DB_USER: drupal
+  DB_PASSWORD: drupal
+  ORCA_PHPCS_STANDARD: AcquiaPHP
+  COMPOSER_PROCESS_TIMEOUT: 1800
+jobs:
+  # @todo add tests to validate each starter-kit use case.
+  STATIC_CODE_ANALYSIS:
+    name: "Static Code Analysis"
+    runs-on: ubuntu-latest
+    env:
+      ORCA_JOB: STATIC_CODE_ANALYSIS
+    steps:
+      - uses: actions/checkout@v3
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          coverage: xdebug
+      - name: Download ORCA
+        run: composer create-project --no-dev --ignore-platform-req=php acquia/orca ../orca "$ORCA_VERSION" -n
+      - name: Run GrumpPHP tests
+        run: |
+          composer install
+          ./vendor/bin/grumphp run
+      - name: Before Install
+        run: ../orca/bin/ci/before_install.sh
+      - name: Install
+        shell: 'script -q -e -c "bash {0}"'
+        run: ../orca/bin/ci/install.sh
+      - name: Before script
+        run: ../orca/bin/ci/before_script.sh
+      - name: Script
+        run: ../orca/bin/ci/script.sh
+      - name: After script
+        run: |
+          ../orca/bin/ci/after_success.sh
+          ../orca/bin/ci/after_failure.sh
+          ../orca/bin/ci/after_script.sh
