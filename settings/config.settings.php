@@ -20,15 +20,6 @@ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
  * settings.php, and we will not overwrite it.
  */
 // phpcs:ignore
-if (!isset($blt_override_config_directories)) {
-  $blt_override_config_directories = TRUE;
-}
-
-// Configuration directories.
-if ($blt_override_config_directories) {
-    // phpcs:ignore
-    $settings['config_sync_directory'] = $repo_root . "/config/default";
-}
 
 $split_filename_prefix = 'config_split.config_split';
 

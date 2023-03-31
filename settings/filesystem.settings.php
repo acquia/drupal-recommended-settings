@@ -15,7 +15,6 @@ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
  * This is always set and exposed by the Drupal Kernel.
  */
 // phpcs:ignore
-$settings['file_public_path'] = "sites/" . EnvironmentDetector::getSiteName($site_path) . "/files";
 
 try {
   $acsf_db_name = EnvironmentDetector::getAcsfDbName();

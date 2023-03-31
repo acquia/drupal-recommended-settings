@@ -1,3 +1,6 @@
+# drupal-recommended-settings
+The composer plugin to add Acquia's drupal recommended settings in your drupal project.
+
 # Acquia Drupal Recommended Settings
 This plugin adds the Acquia's recommended settings in your Drupal project, so that you don't need to worry about making any changes in your settings.php file.
 This plugin uses the complete settings.php file generation logic from [Acquia Blt](https://github.com/acquia/blt) project.
