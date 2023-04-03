@@ -131,8 +131,8 @@ WARNING;
 
     // Generate sites/settings/default.global.settings.php.
     $blt_glob_settings_file = $this->getSettingsPackagePath() . '/settings/default.global.settings.php';
-    $default_glob_settings_file = $this->getSettingsPackagePath() . "/sites/settings/default.global.settings.php";
-    $global_settings_file = $this->getSettingsPackagePath() . "/sites/settings/global.settings.php";
+    $default_glob_settings_file = "$multisite_dir/settings/default.global.settings.php";
+    $global_settings_file = "$multisite_dir/settings/global.settings.php";
 
     // Generate local.drush.yml.
     // phpcs:ignore
