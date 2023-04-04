@@ -75,6 +75,20 @@ WARNING;
   protected PackageInterface $settingsPackage;
 
   /**
+   * The site name.
+   *
+   * @var string
+   */
+  protected $siteName;
+
+  /**
+   * The site name.
+   *
+   * @var string
+   */
+  protected $getWebRootPath;
+
+  /**
    * Constructs the plugin object.
    */
   public function __construct(Composer $composer, IOInterface $io, PackageInterface $package) {
@@ -82,6 +96,8 @@ WARNING;
     $this->io = $io;
     $this->fileSystem = new SymfonyFilesystem();
     $this->settingsPackage = $package;
+    $this->siteName = 'default';
+    $this->getWebRootPath = $this->getWebRootPath();
   }
 
   /**
@@ -111,58 +127,70 @@ WARNING;
   }
 
   /**
-   * Generate the settings files.
+   * Get the settings files.
+   *
+   * @return array
+   *   A settings files.
    */
-  public function generateSettings(): void {
-    $multisite_dir = "default";
+  public function getSettings(): array {
     // Generate settings.php.
-    $multisite_dir = $this->getWebRootPath() . "/sites/default";
-    $project_default_settings_file = "$multisite_dir/default.settings.php";
-    $project_settings_file = "$multisite_dir/settings.php";
+    $settings[$this->siteName] = $this->getWebRootPath . "/sites/default";
+    $settings['project_default_settings_file'] = $settings[$this->siteName] . "/default.settings.php";
+    $settings['project_settings_file'] = $settings[$this->siteName] . "/settings.php";
 
     // Generate local.settings.php.
-    $blt_local_settings_file = $this->getSettingsPackagePath() . '/settings/default.local.settings.php';
-    $default_local_settings_file = "$multisite_dir/settings/default.local.settings.php";
-    $project_local_settings_file = "$multisite_dir/settings/local.settings.php";
+    $settings['recommended_local_settings_file'] = $this->getSettingsPackagePath() . '/settings/default.local.settings.php';
+    $settings['default_local_settings_file'] = $settings[$this->siteName] . "/settings/default.local.settings.php";
+    $settings['project_local_settings_file'] = $settings[$this->siteName] . "/settings/local.settings.php";
 
     // Generate default.includes.settings.php.
-    $blt_includes_settings_file = $this->getSettingsPackagePath() . '/settings/default.includes.settings.php';
-    $default_includes_settings_file = "$multisite_dir/settings/default.includes.settings.php";
+    $settings['recommended_includes_settings_file'] = $this->getSettingsPackagePath() . '/settings/default.includes.settings.php';
+    $settings['default_includes_settings_file'] = $settings[$this->siteName] . "/settings/default.includes.settings.php";
 
     // Generate sites/settings/default.global.settings.php.
-    $blt_glob_settings_file = $this->getSettingsPackagePath() . '/settings/default.global.settings.php';
-    $default_glob_settings_file = "$multisite_dir/settings/default.global.settings.php";
-    $global_settings_file = "$multisite_dir/settings/global.settings.php";
+    $settings['recommended_glob_settings_file'] = $this->getSettingsPackagePath() . '/settings/default.global.settings.php';
+    $settings['default_glob_settings_file'] = $this->getWebRootPath . "/sites/settings/default.global.settings.php";
+    $settings['global_settings_file'] = $this->getWebRootPath . "/sites/settings/global.settings.php";
 
     // Generate local.drush.yml.
     // phpcs:ignore
-    // $blt_local_drush_file = $this->getSettingsPackagePath() . '/settings/default.local.drush.yml'; // phpcs:ignore
-    // $default_local_drush_file = "$multisite_dir/default.local.drush.yml";
-    // $project_local_drush_file = "$multisite_dir/local.drush.yml";.
+    // $settings['recommended_local_drush_file'] = $this->getSettingsPackagePath() . '/settings/default.local.drush.yml'; // phpcs:ignore
+    // $settings['default_local_drush_file'] = $settings[$this->siteName] . "/default.local.drush.yml";
+    // $settings['project_local_drush_file'] = $settings[$this->siteName] . "/local.drush.yml";.
+    return $settings;
+  }
+
+  /**
+   * Generate the settings files.
+   */
+  public function generateSettings(): void {
+    $setting_files = $this->getSettings();
+
     $copy_map = [
-      $blt_local_settings_file => $default_local_settings_file,
-      $default_local_settings_file => $project_local_settings_file,
-      $blt_includes_settings_file => $default_includes_settings_file,
+      $setting_files['recommended_local_settings_file'] => $setting_files['default_local_settings_file'],
+      $setting_files['default_local_settings_file'] => $setting_files['project_local_settings_file'],
+      $setting_files['recommended_includes_settings_file'] => $setting_files['default_includes_settings_file'],
     ];
     // Define an array of files that require property expansion.
     // phpcs:ignore
-    // $expand_map = [$default_local_settings_file => $project_local_settings_file];
+    // $expand_map = [$settings['default_local_settings_file'] => $settings['project_local_settings_file']];
 
     // Add default.global.settings.php if global.settings.php does not exist.
-    if (!$this->fileSystem->exists($global_settings_file)) {
-      $copy_map[$blt_glob_settings_file] = $default_glob_settings_file;
+    if (!$this->fileSystem->exists($setting_files['global_settings_file'])) {
+      $copy_map[$setting_files['recommended_glob_settings_file']] = $setting_files['default_glob_settings_file'];
     }
 
     // Only add the settings file if the default exists.
-    if (file_exists($project_default_settings_file)) {
-      $copy_map[$project_default_settings_file] = $project_settings_file;
+    if (file_exists($setting_files['project_default_settings_file'])) {
+      $copy_map[$setting_files['project_default_settings_file']] = $setting_files['project_settings_file'];
     }
-    elseif (!file_exists($project_default_settings_file)) {
-      $this->io->write("<comment>No $project_default_settings_file file found.</comment>");
+    elseif (!file_exists($setting_files['project_default_settings_file'])) {
+      $this->io->write("<comment>No " . $setting_files['project_default_settings_file'] . " file found.</comment>");
     }
-    $this->fileSystem->chmod($multisite_dir, 0755, 0000, TRUE);
 
-    $config = new ConfigInitializer($this->getRootPath(), $this->getWebRootPath(), $this->getVendorPath() . "/" . $this->settingsPackage->getName());
+    $this->fileSystem->chmod($setting_files[$this->siteName], 0755, 0000, TRUE);
+
+    $config = new ConfigInitializer($this->getRootPath(), $this->getWebRootPath, $this->getVendorPath() . "/" . $this->settingsPackage->getName());
     $config = $config->initialize();
     $settings = new SettingsConfig($config->export());
 
@@ -173,8 +201,8 @@ WARNING;
         $settings->expandFileProperties($to);
       }
     }
-    $this->appendIfMatchesCollect($project_settings_file, '#vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php#', 'require DRUPAL_ROOT . "/../vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php";' . "\n");
-    $this->appendIfMatchesCollect($project_settings_file, '#Do not include additional settings here#', $this->settingsWarning . "\n");
+    $this->appendIfMatchesCollect($setting_files['project_settings_file'], '#vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php#', 'require DRUPAL_ROOT . "/../vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php";' . "\n");
+    $this->appendIfMatchesCollect($setting_files['project_settings_file'], '#Do not include additional settings here#', $this->settingsWarning . "\n");
   }
 
   /**
