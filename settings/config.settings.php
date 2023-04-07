@@ -31,9 +31,9 @@ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
  $site_name = EnvironmentDetector::getSiteName($site_path);
 // phpcs:ignore
 // Config sync settings.
-$settings['config_sync_directory'] = $repo_root . "/config/" . $site_name . "/sync";
+$settings['config_sync_directory'] = "../config/" . $site_name . "/sync";
 // Site Studio sync settings.
-$settings['site_studio_sync'] = $repo_root . "/config/" . $site_name . "/sitestudio";
+$settings['site_studio_sync'] = "../config/" . $site_name . "/sitestudio";
 
 $split_filename_prefix = 'config_split.config_split';
 
