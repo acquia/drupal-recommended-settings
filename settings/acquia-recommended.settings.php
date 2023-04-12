@@ -108,8 +108,8 @@ $acquia_settings_files = [
   'filesystem',
   'misc',
 ];
-foreach ($acquia_settings_files as $blt_settings_file) {
-  $settings_files[] = __DIR__ . "/$blt_settings_file.settings.php";
+foreach ($acquia_settings_files as $recommended_settings_file) {
+  $settings_files[] = __DIR__ . "/$recommended_settings_file.settings.php";
 }
 
 // Custom global and site-specific settings.

@@ -19,16 +19,21 @@ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
  * $settings['config_sync_directory'] = $dir . "/config/$site_dir" in
  * settings.php, and we will not overwrite it.
  */
-// phpcs:ignore
-if (!isset($blt_override_config_directories)) {
-  $blt_override_config_directories = TRUE;
-}
 
-// Configuration directories.
-if ($blt_override_config_directories) {
-    // phpcs:ignore
-    $settings['config_sync_directory'] = $repo_root . "/config/default";
-}
+
+ /**
+  * Site path.
+  *
+  * @var string $site_path
+  * This is always set and exposed by the Drupal Kernel.
+  */
+ // phpcs:ignore
+ $site_name = EnvironmentDetector::getSiteName($site_path);
+// phpcs:ignore
+// Config sync settings.
+$settings['config_sync_directory'] = "../config/" . $site_name . "/sync";
+// Site Studio sync settings.
+$settings['site_studio_sync'] = "../config/" . $site_name . "/sitestudio";
 
 $split_filename_prefix = 'config_split.config_split';
 
@@ -40,20 +45,12 @@ foreach ($split_envs as $split_env => $status) {
   $config["$split_filename_prefix.$split_env"]['status'] = $status;
 }
 
-/**
- * Set multisite split.
- */
-/**
- * Site path.
- *
- * @var string $site_path
- * This is always set and exposed by the Drupal Kernel.
- */
-// phpcs:ignore
-$site_name = EnvironmentDetector::getSiteName($site_path);
 // phpcs:ignore
 $config["$split_filename_prefix.$site_name"]['status'] = TRUE;
 
+/**
+ * Set multisite split.
+ */
 // Set acsf site split if explicit global exists.
 global $_acsf_site_name;
 if (isset($_acsf_site_name)) {
