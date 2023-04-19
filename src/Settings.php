@@ -133,6 +133,7 @@ WARNING;
    *   A settings files.
    */
   public function getSettings(): array {
+
     // Generate settings.php.
     $settings[$this->siteName] = $this->getWebRootPath . "/sites/default";
     $settings['project_default_settings_file'] = $settings[$this->siteName] . "/default.settings.php";
@@ -201,8 +202,8 @@ WARNING;
         $settings->expandFileProperties($to);
       }
     }
-    $this->appendIfMatchesCollect($setting_files['project_settings_file'], '#vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php#', 'require DRUPAL_ROOT . "/../vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php";' . "\n");
-    $this->appendIfMatchesCollect($setting_files['project_settings_file'], '#Do not include additional settings here#', $this->settingsWarning . "\n");
+    $this->appendIfMatchesCollect($setting_files['project_default_settings_file'], '#vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php#', 'require DRUPAL_ROOT . "/../vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php";' . "\n");
+    $this->appendIfMatchesCollect($setting_files['project_default_settings_file'], '#Do not include additional settings here#', $this->settingsWarning . "\n");
   }
 
   /**
