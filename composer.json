@@ -27,6 +27,9 @@
         "symfony/filesystem": "^6.2",
         "symfony/yaml": "^4.4 || ^5 || ^6"
     },
+    "conflict": {
+        "acquia/blt": "*"
+    },
     "require-dev": {
         "acquia/coding-standards": "^1.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
