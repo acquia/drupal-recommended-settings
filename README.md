@@ -11,6 +11,38 @@ composer config repositories.recommended vcs git@github.com:acquia/drupal-recomm
 composer require acquia/drupal-recommended-settings
 ```
 
+## Steps to switch from BLT to Acquia Drupal Recommended Settings
+
+- Remove BLT plugin using
+```
+composer remove acquia/blt
+```
+
+- Remove BLT reference from settings.php file located at
+``/docroot/sites/default/settings.php``.
+```
+require DRUPAL_ROOT . "/../vendor/acquia/blt/settings/blt.settings.php";
+/**
+ * IMPORTANT.
+ *
+ * Do not include additional settings here. Instead, add them to settings
+ * included by `blt.settings.php`. See BLT's documentation for more detail.
+ *
+ * @link https://docs.acquia.com/blt/
+ */
+ ```
+
+ - Require Acquia Drupal Recommended Settings plugin using
+ ```
+ composer require acquia/drupal-recommended-settings
+ ```
+ 
+- Update BLT references from below settings files with Recommended Settings:
+  - default.local.settings.php
+  - local.settings.php update use statement from
+  ``use Acquia\Blt\Robo\Common\EnvironmentDetector;`` to
+  ``use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;``
+
 # License
 
 Copyright (C) 2023 Acquia, Inc.
