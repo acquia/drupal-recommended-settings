@@ -5,7 +5,7 @@ namespace Acquia\Drupal\RecommendedSettings\Exceptions;
 /**
  * Custom reporting and error handling for exceptions.
  *
- * @package Acquia\Blt\Robo\Exceptions
+ * @package Acquia\Drupal\RecommendedSettings\Exceptions
  */
 class SettingsException extends \Exception {
 
@@ -17,8 +17,8 @@ class SettingsException extends \Exception {
         $code = 0,
         \Throwable $previous = NULL
     ) {
-
-    $message .= "\nFor troubleshooting guidance and support, see https://docs.acquia.com/blt/support/";
+    // @todo: need
+    $message .= "\nFor troubleshooting guidance and support, see https://github.com/acquia/drupal-recommended-settings";
     parent::__construct($message, $code, $previous);
 
     $this->transmitAnalytics();
@@ -28,7 +28,7 @@ class SettingsException extends \Exception {
    * Transmit anonymous data about Exception.
    */
   protected function transmitAnalytics() {
-    // Create new BltAnalyticsData class.
+    // Create new drsAnalyticsData class.
   }
 
 }

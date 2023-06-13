@@ -44,7 +44,7 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
   /**
    * Get the settings file include for the current CI environment.
    *
-   * This may be provided by BLT, or via a Composer package that has provided
+   * This may be provided by DRS, or via a Composer package that has provided
    * its own environment detector. In the case of multiple detectors providing a
    * settings file, the first one wins.
    *
@@ -54,7 +54,7 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
    * @throws \ReflectionException
    */
   public static function getCiSettingsFile(): string {
-    return sprintf("%s/vendor/acquia/blt/settings/%s.settings.php", dirname(DRUPAL_ROOT), self::getCiEnv());
+    return sprintf("%s/vendor/acquia/drupal-recommended-settings/settings/%s.settings.php", dirname(DRUPAL_ROOT), self::getCiEnv());
   }
 
   /**
@@ -228,14 +228,14 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
       // under the multisites key.
       $input = new ArgvInput($argv);
       $config_initializer = new ConfigInitializer(self::getRepoRoot(), $input);
-      $blt_config = $config_initializer->initialize();
+      $drs_config = $config_initializer->initialize();
 
       // The hostname must match the pattern local.[site-name].com, where
       // [site-name] is a value in the multisites array.
       $domain_fragments = explode('.', getenv('HTTP_HOST'));
       if (isset($domain_fragments[1])) {
         $name = $domain_fragments[1];
-        $acsf_sites = $blt_config->get('multisites');
+        $acsf_sites = $drs_config->get('multisites');
         if (in_array($name, $acsf_sites, TRUE)) {
           return $name;
         }
@@ -252,7 +252,7 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
    * This isn't as trivial as it sounds, since a simple relative path
    * (__DIR__ . '/../../../../../../') won't work if this package is symlinked
    * using a Composer path repository, and this file can be invoked from both
-   * web requests and BLT CLI calls.
+   * web requests and DRS CLI calls.
    *
    * @return string
    *   The repo root as an absolute path.
@@ -262,11 +262,7 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
       // This is a web or Drush request.
       return dirname(DRUPAL_ROOT);
     }
-
-    // This is a BLT CLI call. Get the $repo_root that was set in
-    // bin/blt-robo.php.
-        // phpcs:ignore
-        global $repo_root;
+    global $repo_root;
     return $repo_root;
   }
 

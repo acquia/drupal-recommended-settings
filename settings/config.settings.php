@@ -10,12 +10,12 @@ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
 /**
  * Override config directories.
  *
- * BLT makes the assumption that, if using multisite, the default configuration
+ * DRS makes the assumption that, if using multisite, the default configuration
  * directory should be shared between all multi-sites, and each multisite will
  * override this selectively using configuration splits. However, some
  * applications may prefer to manage the configuration for each multisite
  * completely separately. If this is the case, they can set
- * $blt_override_config_directories to FALSE and
+ * $drs_override_config_directories to FALSE and
  * $settings['config_sync_directory'] = $dir . "/config/$site_dir" in
  * settings.php, and we will not overwrite it.
  */

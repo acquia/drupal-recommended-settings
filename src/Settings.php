@@ -25,7 +25,7 @@ class Settings {
    * Settings warning.
    *
    * @var string
-   * Warning text added to the end of settings.php to point people to the BLT
+   * Warning text added to the end of settings.php to point people to the drs
    * docs on how to include settings.
    */
   private $settingsWarning = <<<WARNING
@@ -143,20 +143,11 @@ WARNING;
     $settings['default_local_settings_file'] = $settings[$this->siteName] . "/settings/default.local.settings.php";
     $settings['project_local_settings_file'] = $settings[$this->siteName] . "/settings/local.settings.php";
 
-    // Generate default.includes.settings.php.
-    $settings['recommended_includes_settings_file'] = $this->getSettingsPackagePath() . '/settings/default.includes.settings.php';
-    $settings['default_includes_settings_file'] = $settings[$this->siteName] . "/settings/default.includes.settings.php";
-
     // Generate sites/settings/default.global.settings.php.
     $settings['recommended_glob_settings_file'] = $this->getSettingsPackagePath() . '/settings/default.global.settings.php';
     $settings['default_glob_settings_file'] = $this->getWebRootPath . "/sites/settings/default.global.settings.php";
     $settings['global_settings_file'] = $this->getWebRootPath . "/sites/settings/global.settings.php";
 
-    // Generate local.drush.yml.
-    // phpcs:ignore
-    // $settings['recommended_local_drush_file'] = $this->getSettingsPackagePath() . '/settings/default.local.drush.yml'; // phpcs:ignore
-    // $settings['default_local_drush_file'] = $settings[$this->siteName] . "/default.local.drush.yml";
-    // $settings['project_local_drush_file'] = $settings[$this->siteName] . "/local.drush.yml";.
     return $settings;
   }
 
