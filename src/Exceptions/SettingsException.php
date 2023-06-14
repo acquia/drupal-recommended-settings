@@ -17,7 +17,6 @@ class SettingsException extends \Exception {
         $code = 0,
         \Throwable $previous = NULL
     ) {
-    // @todo: need
     $message .= "\nFor troubleshooting guidance and support, see https://github.com/acquia/drupal-recommended-settings";
     parent::__construct($message, $code, $previous);
 

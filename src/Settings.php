@@ -160,7 +160,6 @@ WARNING;
     $copy_map = [
       $setting_files['recommended_local_settings_file'] => $setting_files['default_local_settings_file'],
       $setting_files['default_local_settings_file'] => $setting_files['project_local_settings_file'],
-      $setting_files['recommended_includes_settings_file'] => $setting_files['default_includes_settings_file'],
     ];
     // Define an array of files that require property expansion.
     // phpcs:ignore
