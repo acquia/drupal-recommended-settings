@@ -10,7 +10,8 @@ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
 /**
  * Override config directories.
  *
- * DRS makes the assumption that, if using multisite, the default configuration
+ * Acquia Drupal Recommended Settings makes the assumption that,
+ * if using multisite, the default configuration
  * directory should be shared between all multi-sites, and each multisite will
  * override this selectively using configuration splits. However, some
  * applications may prefer to manage the configuration for each multisite

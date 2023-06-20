@@ -44,7 +44,8 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
   /**
    * Get the settings file include for the current CI environment.
    *
-   * This may be provided by DRS, or via a Composer package that has provided
+   * This may be provided by Acquia Drupal Recommended Settings,
+   * or via a Composer package that has provided
    * its own environment detector. In the case of multiple detectors providing a
    * settings file, the first one wins.
    *
@@ -252,7 +253,7 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
    * This isn't as trivial as it sounds, since a simple relative path
    * (__DIR__ . '/../../../../../../') won't work if this package is symlinked
    * using a Composer path repository, and this file can be invoked from both
-   * web requests and DRS CLI calls.
+   * web requests and Acquia Drupal Recommended Settings CLI calls.
    *
    * @return string
    *   The repo root as an absolute path.

@@ -27,7 +27,7 @@ class SettingsException extends \Exception {
    * Transmit anonymous data about Exception.
    */
   protected function transmitAnalytics() {
-    // Create new drsAnalyticsData class.
+    // Create new AcquiaDrupalRecommendedSettingsAnalyticsData class.
   }
 
 }

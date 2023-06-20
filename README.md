@@ -1,6 +1,6 @@
 # Acquia Drupal Recommended Settings
 This plugin adds the Acquia's recommended settings in your Drupal project, so that you don't need to worry about making any changes in your settings.php file.
-This plugin uses the complete settings.php file generation logic from [Acquia DRS](https://github.com/acquia/drupal-recommended-settings) project.
+This plugin uses the complete settings.php file generation logic from [Acquia Drupal Recommended Settings](https://github.com/acquia/drupal-recommended-settings) project.
 
 ## Installation and usage
 

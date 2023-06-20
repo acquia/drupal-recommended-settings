@@ -25,7 +25,8 @@ class Settings {
    * Settings warning.
    *
    * @var string
-   * Warning text added to the end of settings.php to point people to the drs
+   * Warning text added to the end of settings.php to point people
+   * to the Acquia Drupal Recommended Settings
    * docs on how to include settings.
    */
   private $settingsWarning = <<<WARNING

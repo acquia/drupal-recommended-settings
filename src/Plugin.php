@@ -83,7 +83,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   }
 
   /**
-   * Marks drs to be processed after an install or update command.
+   * Marks Acquia Drupal Recommended Settings to be processed after an install or update command.
    *
    * @param \Composer\Installer\PackageEvent $event
    *   Event.
@@ -91,19 +91,19 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   public function onPostPackageEvent(PackageEvent $event) {
     $package = $this->getSettingsPackage($event->getOperation());
     if ($package) {
-      // By explicitly setting the drs package, the onPostCmdEvent() will
-      // process the update automatically.
+      // By explicitly setting the Acquia Drupal Recommended Settings package,
+      // the onPostCmdEvent() will process the update automatically.
       $this->settingsPackage = $package;
     }
   }
 
   /**
-   * Execute drs drs:update after update command has been executed.
+   * Execute Acquia Drupal Recommended Settings drs:update after update command has been executed.
    *
    * @throws \Exception
    */
   public function onPostCmdEvent() {
-    // Only install the template files if acquia/drs was installed.
+    // Only install the template files if acquia/drupal-recommended-settings was installed.
     if (isset($this->settingsPackage)) {
       $settings = new Settings($this->composer, $this->io, $this->settingsPackage);
       $settings->hashSalt();
