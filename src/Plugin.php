@@ -47,7 +47,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    *
    * @var bool
    */
-  protected $bltIncluded;
+  protected $drsIncluded;
 
   /**
    * {@inheritdoc}
@@ -55,7 +55,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   public function activate(Composer $composer, IOInterface $io) {
     $this->composer = $composer;
     $this->io = $io;
-    $this->bltIncluded = FALSE;
+    $this->drsIncluded = FALSE;
   }
 
   /**
@@ -83,7 +83,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   }
 
   /**
-   * Marks blt to be processed after an install or update command.
+   * Marks Acquia Drupal Recommended Settings to be processed after an install or update command.
    *
    * @param \Composer\Installer\PackageEvent $event
    *   Event.
@@ -91,19 +91,19 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   public function onPostPackageEvent(PackageEvent $event) {
     $package = $this->getSettingsPackage($event->getOperation());
     if ($package) {
-      // By explicitly setting the blt package, the onPostCmdEvent() will
-      // process the update automatically.
+      // By explicitly setting the Acquia Drupal Recommended Settings package,
+      // the onPostCmdEvent() will process the update automatically.
       $this->settingsPackage = $package;
     }
   }
 
   /**
-   * Execute blt blt:update after update command has been executed.
+   * Execute Acquia Drupal Recommended Settings drs:update after update command has been executed.
    *
    * @throws \Exception
    */
   public function onPostCmdEvent() {
-    // Only install the template files if acquia/blt was installed.
+    // Only install the template files if acquia/drupal-recommended-settings was installed.
     if (isset($this->settingsPackage)) {
       $settings = new Settings($this->composer, $this->io, $this->settingsPackage);
       $settings->hashSalt();
@@ -137,7 +137,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    * Hook for pre-package install.
    */
   public function prePackageInstall(PackageEvent $event) {
-    if (!$this->bltIncluded) {
+    if (!$this->drsIncluded) {
       $operations = $event->getOperations();
       foreach ($operations as $operation) {
         if ($operation instanceof InstallOperation) {
@@ -146,8 +146,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
         elseif ($operation instanceof UpdateOperation) {
           $package = $operation->getTargetPackage();
         }
-        if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'acquia/blt') {
-          $this->bltIncluded = TRUE;
+        if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'acquia/drupal-recommended-settings') {
+          $this->drsIncluded = TRUE;
           break;
         }
       }

@@ -28,7 +28,7 @@ class ConfigInitializer {
   /**
    * Processor.
    *
-   * @var \Acquia\Blt\Robo\Config\YamlConfigProcessor
+   * @var Acquia\Drupal\RecommendedSettings\Config\YamlConfigProcessor
    */
   protected $processor;
 
@@ -132,9 +132,6 @@ class ConfigInitializer {
    */
   public function loadConfigFiles(): ConfigInitializer {
     $this->loadDefaultConfig();
-    // $this->loadProjectConfig();
-    $this->loadSiteConfig();
-
     return $this;
   }
 
@@ -147,23 +144,6 @@ class ConfigInitializer {
   public function loadDefaultConfig(): ConfigInitializer {
     $this->processor->add($this->config->export());
     $this->processor->extend($this->loader->load($this->settingsRoot . '/config/build.yml'));
-    return $this;
-  }
-
-  /**
-   * Load config.
-   *
-   * @return $this
-   *   Config.
-   */
-  public function loadSiteConfig(): ConfigInitializer {
-    if ($this->site) {
-      // Since docroot can change in the project, we need to respect that here.
-      $this->config->replace($this->processor->export());
-      $this->processor->extend($this->loader->load($this->webRoot . "/sites/{$this->site}/blt.yml"));
-      $this->processor->extend($this->loader->load($this->webRoot . "/sites/{$this->site}/{$this->environment}.blt.yml"));
-    }
-
     return $this;
   }
 
