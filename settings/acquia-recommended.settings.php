@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Setup BLT utility variables, include required files.
+ * Setup Acquia Drupal Recommended Settings utility variables, include required files.
  */
 
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
@@ -65,9 +65,9 @@ if ($ip) {
  * a global (all sites) and site-specific component. The entire order is:
  *
  * 1. Acquia Cloud settings (including secret settings)
- * 2. Default general settings (provided by BLT)
+ * 2. Default general settings (provided by Acquia Drupal Recommended Settings)
  * 3. Custom general settings (provided by the project)
- * 4. Default CI settings (provided by BLT)
+ * 4. Default CI settings (provided by Acquia Drupal Recommended Settings)
  * 5. Custom CI settings (provided by the project)
  * 6. Local settings (provided by the project)
  */

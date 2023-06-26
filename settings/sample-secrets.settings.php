@@ -25,7 +25,7 @@ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
  * @see https://anavarre.net/from-conf-to-config-and-settings-in-drupal-8
  *
  * In addition to $ah_env, you can use other variables defined in
- * blt.settings.php such as $is_dev_env, $is_prod_env, and $ah_site.
+ * drs.settings.php such as $is_dev_env, $is_prod_env, and $ah_site.
  */
 switch (EnvironmentDetector::getAhEnv()) {
   case 'dev':
