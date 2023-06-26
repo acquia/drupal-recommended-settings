@@ -36,18 +36,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   protected $io;
 
   /**
-   * The Composer Scaffold handler.
+   * Stores this plugin package object.
    *
-   * @var \Drupal\Composer\Plugin\Scaffold\Handler
+   * @var mixed|null
    */
-  protected $handler;
-
-  /**
-   * Record whether the 'require' command was called.
-   *
-   * @var bool
-   */
-  protected $drsIncluded;
+  protected $settingsPackage;
 
   /**
    * {@inheritdoc}
@@ -55,7 +48,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   public function activate(Composer $composer, IOInterface $io) {
     $this->composer = $composer;
     $this->io = $io;
-    $this->drsIncluded = FALSE;
   }
 
   /**
@@ -83,7 +75,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   }
 
   /**
-   * Marks Acquia Drupal Recommended Settings to be processed after an install or update command.
+   * Marks this plugin to be processed after package install or update event.
    *
    * @param \Composer\Installer\PackageEvent $event
    *   Event.
@@ -98,13 +90,14 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   }
 
   /**
-   * Execute Acquia Drupal Recommended Settings drs:update after update command has been executed.
+   * Includes Acquia recommended settings post composer update/install command.
    *
    * @throws \Exception
    */
   public function onPostCmdEvent() {
-    // Only install the template files if acquia/drupal-recommended-settings was installed.
-    if (isset($this->settingsPackage)) {
+    // Only install the template files, if the drupal-recommended-settings
+    // plugin is installed.
+    if ($this->settingsPackage) {
       $settings = new Settings($this->composer, $this->io, $this->settingsPackage);
       $settings->hashSalt();
       $settings->generateSettings();
@@ -131,27 +124,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
       return $package;
     }
     return NULL;
-  }
-
-  /**
-   * Hook for pre-package install.
-   */
-  public function prePackageInstall(PackageEvent $event) {
-    if (!$this->drsIncluded) {
-      $operations = $event->getOperations();
-      foreach ($operations as $operation) {
-        if ($operation instanceof InstallOperation) {
-          $package = $operation->getPackage();
-        }
-        elseif ($operation instanceof UpdateOperation) {
-          $package = $operation->getTargetPackage();
-        }
-        if (isset($package) && $package instanceof PackageInterface && $package->getName() == 'acquia/drupal-recommended-settings') {
-          $this->drsIncluded = TRUE;
-          break;
-        }
-      }
-    }
   }
 
 }

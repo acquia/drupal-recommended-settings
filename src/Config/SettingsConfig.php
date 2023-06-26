@@ -12,6 +12,13 @@ use Psr\Log\NullLogger;
 class SettingsConfig extends Config {
 
   /**
+   * Holds the YamlExpander class object.
+   *
+   * @var \Grasmash\YamlExpander\YamlExpander
+   */
+  protected $expander;
+
+  /**
    * Config Constructor.
    *
    * @param array $data
@@ -29,7 +36,7 @@ class SettingsConfig extends Config {
    * @param string $filename
    *   The file in which placeholders should be expanded.
    */
-  public function expandFileProperties($filename) {
+  public function expandFileProperties(string $filename) {
     $expanded_contents = $this->expander->expandArrayProperties(file($filename), $this->export());
     file_put_contents($filename, implode("", $expanded_contents));
   }
