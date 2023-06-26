@@ -50,6 +50,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   protected $drsIncluded;
 
   /**
+   * Stores this plugin package object.
+   *
+   * @var mixed|null
+   */
+  protected $settingsPackage;
+
+  /**
    * {@inheritdoc}
    */
   public function activate(Composer $composer, IOInterface $io) {
@@ -104,7 +111,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    */
   public function onPostCmdEvent() {
     // Only install the template files if acquia/drupal-recommended-settings was installed.
-    if (isset($this->settingsPackage)) {
+    if ($this->settingsPackage) {
       $settings = new Settings($this->composer, $this->io, $this->settingsPackage);
       $settings->hashSalt();
       $settings->generateSettings();
