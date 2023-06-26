@@ -28,7 +28,7 @@ class ConfigInitializer {
   /**
    * Processor.
    *
-   * @var Acquia\Drupal\RecommendedSettings\Config\YamlConfigProcessor
+   * @var \Acquia\Drupal\RecommendedSettings\Config\YamlConfigProcessor
    */
   protected $processor;
 
