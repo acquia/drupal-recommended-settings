@@ -1,19 +1,27 @@
 # Acquia Drupal Recommended Settings
-This plugin adds the Acquia's recommended settings in your Drupal project, so that you don't need to worry about making any changes in your settings.php file.
-This plugin uses the complete settings.php file generation logic from [Acquia Drupal Recommended Settings](https://github.com/acquia/drupal-recommended-settings) project.
+The Acquia Drupal Recommended Settings plugin adds the recommended settings to the Drupal project, so developers won't have to edit settings.php manually.
 
-## Installation and usage
+The recommended settings includes:
+- the required database credentials
+- configuration sync directory path.
+- public/private etc. file directory path.
+- Acquia site studio sync directory path.
+- Includes Drupal module [Config sync without site uuid](https://www.drupal.org/project/config_sync_without_site_uuid) features. 
 
-In your project, add the repository and require the plugin with Composer:
+It allows your websites to be easily installed in both Acquia Cloud IDE & local and deployable on Acquia Cloud.
+
+## Installation
+
+You can also install this using Composer like so:
 
 ```
-composer config repositories.recommended vcs git@github.com:acquia/drupal-recommended-settings.git
 composer require acquia/drupal-recommended-settings
 ```
 
 ## Steps to switch from BLT to Acquia Drupal Recommended Settings
+This plugin doesn't work with the acquia/blt plugin. If the plugin exists, it must be removed.
 
-- Remove BLT plugin using
+- Remove BLT plugin using below command
 ```
 composer remove acquia/blt
 ```
