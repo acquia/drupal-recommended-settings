@@ -149,6 +149,10 @@ WARNING;
     $settings['default_glob_settings_file'] = $this->getWebRootPath . "/sites/settings/default.global.settings.php";
     $settings['global_settings_file'] = $this->getWebRootPath . "/sites/settings/global.settings.php";
 
+    // Generate default.includes.settings.php.
+    $settings['recommended_includes_settings_file'] = $this->getSettingsPackagePath() . '/settings/default.includes.settings.php';
+    $settings['default_includes_settings_file'] = $this->getWebRootPath . "/sites/settings/default.includes.settings.php";
+
     return $settings;
   }
 
@@ -161,6 +165,7 @@ WARNING;
     $copy_map = [
       $setting_files['recommended_local_settings_file'] => $setting_files['default_local_settings_file'],
       $setting_files['default_local_settings_file'] => $setting_files['project_local_settings_file'],
+      $setting_files['recommended_includes_settings_file'] => $setting_files['default_includes_settings_file'],
     ];
     // Define an array of files that require property expansion.
     // phpcs:ignore
