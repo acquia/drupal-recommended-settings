@@ -21,7 +21,6 @@
         "composer/composer": "^2.5",
         "consolidation/config": "^1.0.0 || ^2.0.0",
         "dflydev/dot-access-data": "^1.1.0 || ^2 || ^3",
-        "drupal/config_sync_without_site_uuid": "^1.0",
         "grasmash/yaml-expander": "^3",
         "loophp/phposinfo": "^1.7.1",
         "symfony/filesystem": "^6.2",
