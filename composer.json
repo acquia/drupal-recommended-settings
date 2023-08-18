@@ -18,7 +18,6 @@
         "php": ">=7.4",
         "composer-plugin-api": "^2",
         "acquia/drupal-environment-detector": "^1.5.3",
-        "acquia/memcache-settings": "^1.2",
         "composer/composer": "^2.5",
         "consolidation/config": "^1.0.0 || ^2.0.0",
         "dflydev/dot-access-data": "^1.1.0 || ^2 || ^3",
@@ -50,12 +49,6 @@
     "autoload": {
         "psr-4": {
             "Acquia\\Drupal\\RecommendedSettings\\": "src/"
-        }
-    },
-    "repositories": {
-        "drupal": {
-            "type": "composer",
-            "url": "https://packages.drupal.org/8"
         }
     },
     "minimum-stability": "dev",
