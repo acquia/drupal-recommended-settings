@@ -28,7 +28,7 @@ composer remove acquia/blt
 
 - Remove BLT reference from settings.php file located at
 ``/docroot/sites/default/settings.php``.
-```
+```php
 require DRUPAL_ROOT . "/../vendor/acquia/blt/settings/blt.settings.php";
 /**
  * IMPORTANT.
@@ -38,18 +38,18 @@ require DRUPAL_ROOT . "/../vendor/acquia/blt/settings/blt.settings.php";
  *
  * @link https://docs.acquia.com/blt/
  */
- ```
+```
 
- - Require Acquia Drupal Recommended Settings plugin using
- ```
- composer require acquia/drupal-recommended-settings
- ```
+- Require Acquia Drupal Recommended Settings plugin using
+```
+composer require acquia/drupal-recommended-settings
+```
  
-- Update BLT references from below settings files with Recommended Settings:
-  - default.local.settings.php
-  - local.settings.php update use statement from
-  ``use Acquia\Blt\Robo\Common\EnvironmentDetector;`` to
-  ``use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;``
+- Update `default.local.settings.php` and `local.settings.php` to use the Environment Detector provided by this plugin instead of BLT:
+```diff
+- use Acquia\Blt\Robo\Common\EnvironmentDetector;
++ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
+```
 
 # License
 
