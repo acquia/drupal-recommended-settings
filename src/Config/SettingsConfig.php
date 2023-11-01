@@ -31,12 +31,12 @@ class SettingsConfig extends Config {
   }
 
   /**
-   * Expands YAML placeholders in a given file, using config object.
+   * Replace YAML placeholders in a given file, using config object.
    *
    * @param string $filename
    *   The file in which placeholders should be expanded.
    */
-  public function expandFileProperties(string $filename) {
+  public function replaceFileVariables(string $filename) {
     $expanded_contents = $this->expander->expandArrayProperties(file($filename), $this->export());
     file_put_contents($filename, implode("", $expanded_contents));
   }

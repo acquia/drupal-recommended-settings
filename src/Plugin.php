@@ -2,6 +2,7 @@
 
 namespace Acquia\Drupal\RecommendedSettings;
 
+use Acquia\Drupal\RecommendedSettings\Helpers\HashGenerator;
 use Composer\Composer;
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\OperationInterface;
@@ -98,9 +99,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     // Only install the template files, if the drupal-recommended-settings
     // plugin is installed.
     if ($this->settingsPackage) {
-      $settings = new Settings($this->composer, $this->io, $this->settingsPackage);
-      $settings->hashSalt();
-      $settings->generateSettings();
+      HashGenerator::generate($this->getProjectRoot(), $this->io);
+      $settings = new Settings($this->getDrupalRoot());
+      $settings->generate();
     }
   }
 
@@ -124,6 +125,22 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
       return $package;
     }
     return NULL;
+  }
+
+  /**
+   * Returns the project directory path.
+   */
+  protected function getProjectRoot(): string {
+    return dirname($this->composer->getConfig()->get('vendor-dir'));
+  }
+
+  /**
+   * Returns the drupal root directory path.
+   */
+  protected function getDrupalRoot(): string {
+    $extra = $this->composer->getPackage()->getExtra();
+    $docroot = $extra['drupal-scaffold']['locations']['web-root'] ?? "";
+    return realpath($this->getProjectRoot() . "/" . $docroot);
   }
 
 }
