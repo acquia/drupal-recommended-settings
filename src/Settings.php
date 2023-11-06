@@ -133,6 +133,11 @@ WARNING;
     }
     $settings = new SettingsConfig($config->processConfig()->export());
     $settings->replaceFileVariables($this->drupalRoot . "/sites/$site/settings/local.settings.php");
+
+    // The config directory for given site must exists, otherwise Drupal will
+    // add database credentials to settings.php.
+    // @todo Using hardcoded sync directory path. Need to better optimise it.
+    $this->fileSystem->ensureDirectoryExists($this->drupalRoot . "/../config/$site");
   }
 
   /**

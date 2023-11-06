@@ -24,14 +24,14 @@ class HashGenerator {
       if (!file_exists($hash_salt_file)) {
         $io->write("Generating hash salt...");
         $fileSystem->appendToFile($hash_salt_file, RandomString::string(55));
-        $io->write("Hash salt written on <info>" . $hash_salt_file . "</info>.");
+        $io->write("<fg=white;bg=green;options=bold>[success]</> Hash salt written on <info>" . $hash_salt_file . "</info>.");
       }
       else {
-        $io->write("<comment>Hash salt already exists.</comment>");
+        $io->write("<fg=white;bg=cyan;options=bold>[notice]</> Hash salt already exists.");
       }
     }
     catch (\RuntimeException $e) {
-      $io->write("<error>" . $e->getMessage() . "</error>");
+      $io->write("<fg=white;bg=red;options=bold>[error]</> " . $e->getMessage());
     }
   }
 

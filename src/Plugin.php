@@ -99,9 +99,14 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     // Only install the template files, if the drupal-recommended-settings
     // plugin is installed.
     if ($this->settingsPackage) {
-      HashGenerator::generate($this->getProjectRoot(), $this->io);
-      $settings = new Settings($this->getDrupalRoot());
-      $settings->generate();
+      try {
+        HashGenerator::generate($this->getProjectRoot(), $this->io);
+        $settings = new Settings($this->getDrupalRoot());
+        $settings->generate();
+      }
+      catch (\Exception $e) {
+        $this->io->write("<fg=white;bg=red;options=bold>[error]</> " . $e->getMessage());
+      }
     }
   }
 
