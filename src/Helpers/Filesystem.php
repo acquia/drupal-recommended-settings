@@ -116,7 +116,7 @@ class Filesystem {
       }
     }
     else {
-      throw new \RuntimeException("Source field doesn't exist at path: $destination.");
+      throw new \RuntimeException(sprintf("Source file `%s` doesn't exist.", $source));
     }
     return TRUE;
   }
