@@ -263,7 +263,9 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
       // This is a web or Drush request.
       return dirname(DRUPAL_ROOT);
     }
+    // phpcs:ignore
     global $repo_root;
+    // phpcs:enable
     return $repo_root;
   }
 
