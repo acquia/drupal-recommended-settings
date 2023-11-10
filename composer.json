@@ -35,9 +35,6 @@
         "ergebnis/composer-normalize": "~2.21.0",
         "phpro/grumphp-shim": "^1.5"
     },
-    "conflict": {
-        "acquia/blt": "*"
-    },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {

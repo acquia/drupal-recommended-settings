@@ -2,7 +2,9 @@
 
 /**
  * @file
- * Setup Acquia Drupal Recommended Settings utility variables, include required files.
+ * Setup Acquia Drupal Recommended Settings utility variables.
+ *
+ * Includes required settings files.
  */
 
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
