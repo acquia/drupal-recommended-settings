@@ -13,6 +13,18 @@ and deployable on Acquia Cloud.
 
 ## Installation
 
+### Include Acquia Global Command in DRS for multisite functionality
+To use global command with DRS for multisite functionality please add below in
+your root composer.json file.
+```
+"repositories": {
+    "acquia_global_commands": {
+        "type": "vcs",
+        "url": "git@github.com:vishalkhode1/acquia_global_commands.git"
+    }
+}
+```
+
 You can also install this using Composer like so:
 
 ```
