@@ -33,7 +33,8 @@
         "acquia/coding-standards": "^1.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
         "ergebnis/composer-normalize": "~2.21.0",
-        "phpro/grumphp-shim": "^1.5"
+        "phpro/grumphp-shim": "^1.5",
+        "phpunit/phpunit": "^9 || ^10"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
