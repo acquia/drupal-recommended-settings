@@ -48,7 +48,17 @@ class SettingsTest extends TestCase {
     $this->fileSystem = new Filesystem();
     $this->fileSystem->touch($docroot . '/sites/default/default.settings.php');
     $this->settings = new Settings($docroot, "default");
-    $this->settings->generate();
+    $this->settings->generate([
+      'drupal' => [
+        'db' => [
+          'database' => 'drs',
+          'username' => 'drupal',
+          'password' => 'drupal',
+          'host' => 'localhost',
+          'port' => '3306',
+        ],
+      ],
+    ]);
   }
 
   /**
@@ -78,6 +88,14 @@ require DRUPAL_ROOT . "/../vendor/acquia/drupal-recommended-settings/settings/ac
     $this->assertTrue($this->fileSystem->exists($this->drupalRoot . '/docroot/sites/default/settings/default.local.settings.php'));
     // Assert that local.settings.php file exist.
     $this->assertTrue($this->fileSystem->exists($this->drupalRoot . '/docroot/sites/default/settings/local.settings.php'));
+    // Get the local.settings.php file content.
+    $localSettings = file_get_contents($this->drupalRoot . '/docroot/sites/default/settings/local.settings.php');
+    // Verify database credentials.
+    $this->assertStringContainsString("db_name = 'drs'", $localSettings, "The local.settings.php doesn't contains the 'drs' database.");
+    $this->assertStringContainsString("'username' => 'drupal'", $localSettings, "The local.settings.php doesn't contains the 'drupal' username.");
+    $this->assertStringContainsString("'password' => 'drupal'", $localSettings, "The local.settings.php doesn't contains the 'drupal' password.");
+    $this->assertStringContainsString("'host' => 'localhost'", $localSettings, "The local.settings.php doesn't contains the 'localhost' host.");
+    $this->assertStringContainsString("'port' => '3306'", $localSettings, "The local.settings.php doesn't contains the '3306' port.");
   }
 
   public function tearDown(): void {
