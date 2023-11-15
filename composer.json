@@ -33,7 +33,7 @@
     "require-dev": {
         "acquia/coding-standards": "^2.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
-        "ergebnis/composer-normalize": "~2.21.0",
+        "ergebnis/composer-normalize": "~2.28.3",
         "phpro/grumphp-shim": "^1.5"
     },
     "conflict": {
