@@ -154,7 +154,7 @@ WARNING;
    * @param bool $shouldMatch
    *   Decides when to append if match found.
    */
-  protected function appendIfMatchesCollect(string $file, string $pattern, string $text, bool $shouldMatch = FALSE): void {
+  public function appendIfMatchesCollect(string $file, string $pattern, string $text, bool $shouldMatch = FALSE): void {
     $contents = file_get_contents($file);
     if (preg_match($pattern, $contents) == $shouldMatch) {
       $contents .= $text;
