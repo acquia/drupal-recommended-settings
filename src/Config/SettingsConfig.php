@@ -40,16 +40,9 @@ class SettingsConfig extends Config {
   }
 
   /**
-   * Set a config value.
-   *
-   * @param string $key
-   *   The config key.
-   * @param mixed $value
-   *   The config value.
-   *
-   * @return $this
+   * {@inheritdoc}
    */
-  public function set(string $key, mixed $value) {
+  public function set($key, $value) {
     if ($value === 'false') {
       $value = FALSE;
     }
@@ -70,18 +63,9 @@ class SettingsConfig extends Config {
   }
 
   /**
-   * Fetch a configuration value.
-   *
-   * @param string $key
-   *   Which config item to look up.
-   * @param string|null $defaultOverride
-   *   Override usual default value with a different default. Deprecated;
-   *   provide defaults to the config processor instead.
-   *
-   * @return mixed
-   *   Mixed.
+   * {@inheritdoc}
    */
-  public function get(string $key, ?string $defaultOverride = NULL): mixed {
+  public function get($key, $defaultOverride = NULL) {
     $value = parent::get($key, $defaultOverride);
 
     // Last ditch effort to expand properties that may not have been processed.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests;
+namespace Acquia\Drupal\RecommendedSettings\Tests\unit;
 
 use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem as DrsFilesystem;
 use Acquia\Drupal\RecommendedSettings\Settings;
@@ -12,7 +12,7 @@ class SettingsTest extends TestCase {
   /**
    * The recommended settings object.
    */
-  protected string $settings;
+  protected Settings $settings;
 
   /**
    * The path to drupal webroot directory.

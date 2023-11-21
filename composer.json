@@ -42,6 +42,11 @@
             "Acquia\\Drupal\\RecommendedSettings\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Acquia\\Drupal\\RecommendedSettings\\Tests\\": "tests/src"
+        }
+    },
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
