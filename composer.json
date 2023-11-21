@@ -24,8 +24,7 @@
         "acquia/drupal-environment-detector": "^1.5.3",
         "consolidation/config": "^2.0.0",
         "grasmash/yaml-expander": "^3.0",
-        "loophp/phposinfo": "^1.7.1",
-        "symfony/yaml": "^6"
+        "loophp/phposinfo": "^1.7.1"
     },
     "require-dev": {
         "acquia/coding-standards": "^2.0",
