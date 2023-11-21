@@ -15,31 +15,23 @@ class ConfigInitializer {
 
   /**
    * Config.
-   *
-   * @var \Consolidation\Config\Config
    */
-  protected $config;
+  protected Config $config;
 
   /**
    * Loader.
-   *
-   * @var \Consolidation\Config\Loader\YamlConfigLoader
    */
-  protected $loader;
+  protected YamlConfigLoader $loader;
 
   /**
    * Processor.
-   *
-   * @var \Acquia\Drupal\RecommendedSettings\Config\YamlConfigProcessor
    */
-  protected $processor;
+  protected YamlConfigProcessor $processor;
 
   /**
    * Site.
-   *
-   * @var string
    */
-  protected $site;
+  protected string $site;
 
   /**
    * ConfigInitializer constructor.
@@ -96,7 +88,7 @@ class ConfigInitializer {
   /**
    * Add/Overrides the config data.
    *
-   * @param array $data
+   * @param string[] $data
    *   An array of data.
    */
   public function addConfig(array $data): Config {

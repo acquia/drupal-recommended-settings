@@ -19,41 +19,8 @@ You can also install this using Composer like so:
 composer require acquia/drupal-recommended-settings
 ```
 
-## Steps to use Acquia Drupal Recommended Settings with BLT.
-This plugin works with acquia/blt plugin.
-
-- Update BLT plugin to latest release.
-```
-composer update acquia/blt -W
-```
-
-- Remove BLT reference from settings.php file located at
-  ``/docroot/sites/default/settings.php``.
-```php
-require DRUPAL_ROOT . "/../vendor/acquia/blt/settings/blt.settings.php";
-/**
- * IMPORTANT.
- *
- * Do not include additional settings here. Instead, add them to settings
- * included by `blt.settings.php`. See BLT's documentation for more detail.
- *
- * @link https://docs.acquia.com/blt/
- */
-```
-
-- Require Acquia Drupal Recommended Settings plugin using
-```
-composer require acquia/drupal-recommended-settings
-```
-
-- Update `default.local.settings.php` and `local.settings.php` to use the Environment Detector provided by this plugin instead of BLT:
-```diff
-- use Acquia\Blt\Robo\Common\EnvironmentDetector;
-+ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
-```
-
-## Steps to use Acquia Drupal Recommended Settings with BLT.
- - Create an Settings object & call generate method.
+# Quick examples.
+## Generate settings for a given site.
  ```
 <?php
 
@@ -62,31 +29,57 @@ composer require acquia/drupal-recommended-settings
  * Include DRS settings.
  */
 
+use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Settings;
 
 // Create settings object.
-$settings = new Settings(DRUPAL_ROOT, 'site-uri');
+$siteUri = "site1";
+$settings = new Settings(DRUPAL_ROOT, $siteUri);
+
+try {
+  // Call generate method.
+  $settings->generate();
+} catch (SettingsException $e) {
+  echo $e->getMessage();
+}
+```
+
+## Generate settings for a given site passing database credentials.
+
+```
+<?php
+
+/**
+ * @file
+ * Include DRS settings.
+ */
+
+use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
+use Acquia\Drupal\RecommendedSettings\Settings;
+
+// Create settings object.
+$siteUri = "site1";
+$settings = new Settings(DRUPAL_ROOT, $siteUri);
 
 // Database details.
 $dbSpec = [
   'drupal' => [
     'db' => [
-// Database name.
       'database' => 'drupal',
-// Mysql database login username.
       'username' => 'drupal',
-// Mysql database login password.
       'password' => 'drupal',
-// Mysql host.
       'host' => 'localhost',
-// Mysql port.
       'port' => '3306',
     ],
   ],
 ];
 
-// Call generate method with database details.
-$settings->generate($dbSpec);
+try {
+  // Call generate method passing database details.
+  $settings->generate($dbSpec);
+} catch (SettingsException $e) {
+  echo $e->getMessage();
+}
 ```
 
 # License

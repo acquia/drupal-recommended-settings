@@ -10,7 +10,7 @@ namespace Acquia\Drupal\RecommendedSettings\Exceptions;
 class SettingsException extends \Exception {
 
   /**
-   * Report exception.
+   * {@inheritdoc}
    */
   public function __construct(
         $message = "",
@@ -26,7 +26,7 @@ class SettingsException extends \Exception {
   /**
    * Transmit anonymous data about Exception.
    */
-  protected function transmitAnalytics() {
+  protected function transmitAnalytics(): void {
     // Create new AcquiaDrupalRecommendedSettingsAnalyticsData class.
   }
 
