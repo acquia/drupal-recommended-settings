@@ -19,8 +19,8 @@ You can also install this using Composer like so:
 composer require acquia/drupal-recommended-settings
 ```
 
-# Quick examples.
-## Generate settings for a given site.
+# Quick examples
+## Generate settings for a given site
  ```
 <?php
 
@@ -44,7 +44,7 @@ try {
 }
 ```
 
-## Generate settings for a given site passing database credentials.
+## Generate settings for a given site passing database credentials
 
 ```
 <?php

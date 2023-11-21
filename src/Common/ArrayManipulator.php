@@ -117,7 +117,7 @@ class ArrayManipulator {
    *   The multi-dimensional array.
    *
    * @return string[]
-   *   The human-readble, flat array.
+   *   The human-readable, flat array.
    */
   public static function convertArrayToFlatTextArray(array $array): array {
     $rows = [];
