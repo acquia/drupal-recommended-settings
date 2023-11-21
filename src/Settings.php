@@ -4,6 +4,7 @@ namespace Acquia\Drupal\RecommendedSettings;
 
 use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
 use Acquia\Drupal\RecommendedSettings\Config\SettingsConfig;
+use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem;
 
 /**
@@ -96,8 +97,11 @@ WARNING;
    *
    * @param array $overrideData
    *   An array of data to override.
+   *
+   * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
   public function generate(array $overrideData = []): void {
+   try {
     $site = $this->site;
     $this->copyGlobalSettings();
     $this->copySiteSettings();
@@ -137,6 +141,10 @@ WARNING;
     // The config directory for given site must exists, otherwise Drupal will
     // add database credentials to settings.php.
     $this->fileSystem->ensureDirectoryExists($this->drupalRoot . "/../config/$site");
+   } catch (\Exception $e) {
+     throw new SettingsException($e);
+   }
+
   }
 
   /**

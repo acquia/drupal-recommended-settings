@@ -3,6 +3,7 @@
 namespace Acquia\Drupal\RecommendedSettings\Helpers;
 
 use Acquia\Drupal\RecommendedSettings\Common\RandomString;
+use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 
 /**
  * Class to generate salt hash.
@@ -16,6 +17,8 @@ class HashGenerator {
    *   Given directory.
    * @param mixed $io
    *   Given io object to print message to terminal.
+   *
+   * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
   public static function generate(string $directory, $io): void {
     try {
@@ -30,8 +33,8 @@ class HashGenerator {
         $io->write("<fg=white;bg=cyan;options=bold>[notice]</> Hash salt already exists.");
       }
     }
-    catch (\RuntimeException $e) {
-      $io->write("<fg=white;bg=red;options=bold>[error]</> " . $e->getMessage());
+    catch (\Exception $e) {
+      throw new SettingsException($e);
     }
   }
 

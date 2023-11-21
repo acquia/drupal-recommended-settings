@@ -52,8 +52,8 @@ composer require acquia/drupal-recommended-settings
 + use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
 ```
 
-## Steps to use Acquia Drupal Recommended Settings with BLT.
- - Create an Settings object & call generate method.
+# Quick examples.
+## Generate settings for a given site.
  ```
 <?php
 
@@ -63,30 +63,56 @@ composer require acquia/drupal-recommended-settings
  */
 
 use Acquia\Drupal\RecommendedSettings\Settings;
+use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 
 // Create settings object.
-$settings = new Settings(DRUPAL_ROOT, 'site-uri');
+$siteUri = "site1";
+$settings = new Settings(DRUPAL_ROOT, $siteUri);
+
+try {
+  // Call generate method.
+  $settings->generate();
+} catch (SettingsException $e) {
+  echo $e->getMessage();
+}
+```
+
+## Generate settings for a given site passing database credentials.
+
+```
+<?php
+
+/**
+ * @file
+ * Include DRS settings.
+ */
+
+use Acquia\Drupal\RecommendedSettings\Settings;
+use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
+
+// Create settings object.
+$siteUri = "site1";
+$settings = new Settings(DRUPAL_ROOT, $siteUri);
 
 // Database details.
 $dbSpec = [
   'drupal' => [
     'db' => [
-// Database name.
       'database' => 'drupal',
-// Mysql database login username.
       'username' => 'drupal',
-// Mysql database login password.
       'password' => 'drupal',
-// Mysql host.
       'host' => 'localhost',
-// Mysql port.
       'port' => '3306',
     ],
   ],
 ];
 
-// Call generate method with database details.
-$settings->generate($dbSpec);
+try {
+  // Call generate method passing database details.
+  $settings->generate($dbSpec);
+} catch (SettingsException $e) {
+  echo $e->getMessage();
+}
 ```
 
 # License

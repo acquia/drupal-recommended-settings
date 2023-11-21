@@ -2,6 +2,7 @@
 
 namespace Acquia\Drupal\RecommendedSettings;
 
+use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Helpers\HashGenerator;
 use Composer\Composer;
 use Composer\DependencyResolver\Operation\InstallOperation;
@@ -93,7 +94,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   /**
    * Includes Acquia recommended settings post composer update/install command.
    *
-   * @throws \Exception
+   * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
   public function onPostCmdEvent() {
     // Only install the template files, if the drupal-recommended-settings
@@ -104,7 +105,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
         $settings = new Settings($this->getDrupalRoot());
         $settings->generate();
       }
-      catch (\Exception $e) {
+      catch (SettingsException $e) {
         $this->io->write("<fg=white;bg=red;options=bold>[error]</> " . $e->getMessage());
       }
     }
