@@ -19,7 +19,7 @@
         "docs": "https://docs.acquia.com/drupal-recommended-settings/"
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.1",
         "composer-plugin-api": "^2",
         "acquia/drupal-environment-detector": "^1.5.3",
         "composer/composer": "^2.2",

@@ -12,6 +12,9 @@ class Filesystem {
    *
    * @param string $directory
    *   Given directory to load all files.
+   *
+   * @return string[]
+   *   Returns an array of files.
    */
   public function loadFilesFromDirectory(string $directory): array {
     // Check if the directory exists.

@@ -11,29 +11,21 @@ class SettingsTest extends TestCase {
 
   /**
    * The recommended settings object.
-   *
-   * @var string
    */
-  protected $settings;
+  protected string $settings;
 
   /**
    * The path to drupal webroot directory.
-   *
-   * @var string
    */
-  protected $drupalRoot;
+  protected string $drupalRoot;
 
   /**
    * The symfony file-system object.
-   *
-   * @var \Symfony\Component\Filesystem\Filesystem
    */
   protected Filesystem $fileSystem;
 
   /**
    * The symfony file-system object.
-   *
-   * @var \Acquia\Drupal\RecommendedSettings\Helpers\Filesystem
    */
   protected DrsFilesystem $drsFileSystem;
 
@@ -64,7 +56,7 @@ class SettingsTest extends TestCase {
   /**
    * Test that the file is created.
    */
-  public function testFileIsCreated() {
+  public function testFileIsCreated(): void {
     // Assert that settings/default.global.settings.php file exist.
     $this->assertTrue($this->fileSystem->exists($this->drupalRoot . '/docroot/sites/settings/default.global.settings.php'));
     // Assert that settings.php file exist.

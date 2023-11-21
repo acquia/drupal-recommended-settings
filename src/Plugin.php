@@ -25,24 +25,18 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 
   /**
    * The Composer service.
-   *
-   * @var \Composer\Composer
    */
-  protected $composer;
+  protected Composer $composer;
 
   /**
    * Composer's I/O service.
-   *
-   * @var \Composer\IO\IOInterface
    */
-  protected $io;
+  protected IOInterface $io;
 
   /**
    * Stores this plugin package object.
-   *
-   * @var mixed|null
    */
-  protected $settingsPackage;
+  protected mixed $settingsPackage = NULL;
 
   /**
    * {@inheritdoc}
@@ -82,7 +76,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    * @param \Composer\Installer\PackageEvent $event
    *   Event.
    */
-  public function onPostPackageEvent(PackageEvent $event) {
+  public function onPostPackageEvent(PackageEvent $event): void {
     $package = $this->getSettingsPackage($event->getOperation());
     if ($package) {
       // By explicitly setting the Acquia Drupal Recommended Settings package,
@@ -96,7 +90,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    *
    * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
-  public function onPostCmdEvent() {
+  public function onPostCmdEvent(): void {
     // Only install the template files, if the drupal-recommended-settings
     // plugin is installed.
     if ($this->settingsPackage) {
@@ -120,7 +114,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    * @return mixed|null
    *   Returns mixed or NULL.
    */
-  protected function getSettingsPackage(OperationInterface $operation) {
+  protected function getSettingsPackage(OperationInterface $operation): mixed {
     if ($operation instanceof InstallOperation) {
       $package = $operation->getPackage();
     }

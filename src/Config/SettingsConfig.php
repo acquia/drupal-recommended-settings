@@ -13,15 +13,13 @@ class SettingsConfig extends Config {
 
   /**
    * Holds the YamlExpander class object.
-   *
-   * @var \Grasmash\YamlExpander\YamlExpander
    */
-  protected $expander;
+  protected YamlExpander $expander;
 
   /**
    * Config Constructor.
    *
-   * @param array $data
+   * @param string[] $data
    *   Data array, if available.
    */
   public function __construct(array $data = []) {
@@ -36,7 +34,7 @@ class SettingsConfig extends Config {
    * @param string $filename
    *   The file in which placeholders should be expanded.
    */
-  public function replaceFileVariables(string $filename) {
+  public function replaceFileVariables(string $filename): void {
     $expanded_contents = $this->expander->expandArrayProperties(file($filename), $this->export());
     file_put_contents($filename, implode("", $expanded_contents));
   }
@@ -51,7 +49,7 @@ class SettingsConfig extends Config {
    *
    * @return $this
    */
-  public function set($key, $value) {
+  public function set(string $key, mixed $value) {
     if ($value === 'false') {
       $value = FALSE;
     }
@@ -83,7 +81,7 @@ class SettingsConfig extends Config {
    * @return mixed
    *   Mixed.
    */
-  public function get($key, $defaultOverride = NULL) {
+  public function get(string $key, ?string $defaultOverride = NULL): mixed {
     $value = parent::get($key, $defaultOverride);
 
     // Last ditch effort to expand properties that may not have been processed.

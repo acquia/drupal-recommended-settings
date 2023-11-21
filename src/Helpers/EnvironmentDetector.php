@@ -19,10 +19,8 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
    *
    * In the case of multiple environment detectors declaring a CI env name, the
    * first one wins.
-   *
-   * @throws \ReflectionException
    */
-  public static function getCiEnv() {
+  public static function getCiEnv(): string|bool {
     if (getenv('PIPELINE_ENV')) {
       return 'pipelines';
     }
@@ -68,7 +66,7 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
   /**
    * Get Pantheon.
    */
-  public static function getPantheonEnv() {
+  public static function getPantheonEnv(): array|string|false {
     return getenv('PANTHEON_ENVIRONMENT');
   }
 
@@ -271,6 +269,9 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
 
   /**
    * List detectable environments and whether they are currently active.
+   *
+   * @return string[]
+   *   Returns an array of environments.
    *
    * @throws \ReflectionException
    */

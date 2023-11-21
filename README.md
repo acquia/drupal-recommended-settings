@@ -62,8 +62,8 @@ composer require acquia/drupal-recommended-settings
  * Include DRS settings.
  */
 
-use Acquia\Drupal\RecommendedSettings\Settings;
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
+use Acquia\Drupal\RecommendedSettings\Settings;
 
 // Create settings object.
 $siteUri = "site1";
@@ -87,8 +87,8 @@ try {
  * Include DRS settings.
  */
 
-use Acquia\Drupal\RecommendedSettings\Settings;
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
+use Acquia\Drupal\RecommendedSettings\Settings;
 
 // Create settings object.
 $siteUri = "site1";

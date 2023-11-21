@@ -20,7 +20,7 @@ class HashGenerator {
    *
    * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
-  public static function generate(string $directory, $io): void {
+  public static function generate(string $directory, mixed $io): void {
     try {
       $fileSystem = new Filesystem();
       $hash_salt_file = $directory . '/salt.txt';
