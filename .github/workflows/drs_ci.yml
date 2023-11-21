@@ -60,10 +60,16 @@ jobs:
           coverage: xdebug
       - name: Download ORCA
         run: composer create-project --no-dev --ignore-platform-req=php acquia/orca ../orca "$ORCA_VERSION" -n
+      - name: Before Install
+        run: ../orca/bin/ci/before_install.sh
+      - name: Install
+        run: ../orca/bin/ci/install.sh
       - name: Before script
         run: ../orca/bin/ci/before_script.sh
-      - name: Script
-        run: ../orca/bin/ci/script.sh
+      - name: Run PHPUnit tests
+        run: |
+          composer install
+          ./vendor/bin/phpunit tests
       - name: After script
         run: |
           ../orca/bin/ci/after_success.sh

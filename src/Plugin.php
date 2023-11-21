@@ -2,6 +2,8 @@
 
 namespace Acquia\Drupal\RecommendedSettings;
 
+use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
+use Acquia\Drupal\RecommendedSettings\Helpers\HashGenerator;
 use Composer\Composer;
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\OperationInterface;
@@ -23,24 +25,18 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 
   /**
    * The Composer service.
-   *
-   * @var \Composer\Composer
    */
-  protected $composer;
+  protected Composer $composer;
 
   /**
    * Composer's I/O service.
-   *
-   * @var \Composer\IO\IOInterface
    */
-  protected $io;
+  protected IOInterface $io;
 
   /**
    * Stores this plugin package object.
-   *
-   * @var mixed|null
    */
-  protected $settingsPackage;
+  protected mixed $settingsPackage = NULL;
 
   /**
    * {@inheritdoc}
@@ -80,7 +76,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    * @param \Composer\Installer\PackageEvent $event
    *   Event.
    */
-  public function onPostPackageEvent(PackageEvent $event) {
+  public function onPostPackageEvent(PackageEvent $event): void {
     $package = $this->getSettingsPackage($event->getOperation());
     if ($package) {
       // By explicitly setting the Acquia Drupal Recommended Settings package,
@@ -92,15 +88,20 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   /**
    * Includes Acquia recommended settings post composer update/install command.
    *
-   * @throws \Exception
+   * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
-  public function onPostCmdEvent() {
+  public function onPostCmdEvent(): void {
     // Only install the template files, if the drupal-recommended-settings
     // plugin is installed.
     if ($this->settingsPackage) {
-      $settings = new Settings($this->composer, $this->io, $this->settingsPackage);
-      $settings->hashSalt();
-      $settings->generateSettings();
+      try {
+        HashGenerator::generate($this->getProjectRoot(), $this->io);
+        $settings = new Settings($this->getDrupalRoot());
+        $settings->generate();
+      }
+      catch (SettingsException $e) {
+        $this->io->write("<fg=white;bg=red;options=bold>[error]</> " . $e->getMessage());
+      }
     }
   }
 
@@ -113,7 +114,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    * @return mixed|null
    *   Returns mixed or NULL.
    */
-  protected function getSettingsPackage(OperationInterface $operation) {
+  protected function getSettingsPackage(OperationInterface $operation): mixed {
     if ($operation instanceof InstallOperation) {
       $package = $operation->getPackage();
     }
@@ -124,6 +125,22 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
       return $package;
     }
     return NULL;
+  }
+
+  /**
+   * Returns the project directory path.
+   */
+  protected function getProjectRoot(): string {
+    return dirname($this->composer->getConfig()->get('vendor-dir'));
+  }
+
+  /**
+   * Returns the drupal root directory path.
+   */
+  protected function getDrupalRoot(): string {
+    $extra = $this->composer->getPackage()->getExtra();
+    $docroot = $extra['drupal-scaffold']['locations']['web-root'] ?? "";
+    return realpath($this->getProjectRoot() . "/" . $docroot);
   }
 
 }
