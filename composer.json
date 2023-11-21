@@ -22,17 +22,16 @@
         "php": ">=8.1",
         "composer-plugin-api": "^2",
         "acquia/drupal-environment-detector": "^1.5.3",
-        "composer/composer": "^2.2",
-        "consolidation/config": "^1.0.0 || ^2.0.0",
-        "dflydev/dot-access-data": "^1.1.0 || ^2 || ^3",
-        "grasmash/yaml-expander": "^3",
+        "consolidation/config": "^2.0.0",
+        "grasmash/yaml-expander": "^3.0",
         "loophp/phposinfo": "^1.7.1",
-        "symfony/yaml": "^4.4 || ^5 || ^6"
+        "symfony/yaml": "^6"
     },
     "require-dev": {
         "acquia/coding-standards": "^2.0",
+        "composer/composer": "^2.2",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
-        "ergebnis/composer-normalize": "~2.21.0",
+        "ergebnis/composer-normalize": "^2.30.2",
         "phpro/grumphp-shim": "^1.5",
         "phpunit/phpunit": "^9 || ^10"
     },
