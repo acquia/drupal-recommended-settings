@@ -21,6 +21,7 @@
     "require": {
         "php": ">=8.1",
         "composer-plugin-api": "^2",
+        "acquia/acquia_global_commands": "dev-develop",
         "acquia/drupal-environment-detector": "^1.5.3",
         "consolidation/config": "^2.0.0",
         "grasmash/yaml-expander": "^3.0",
