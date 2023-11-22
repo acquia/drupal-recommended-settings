@@ -31,7 +31,7 @@
         "composer/composer": "^2.2",
         "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
         "ergebnis/composer-normalize": "^2.30.2",
-        "phpro/grumphp-shim": "^1.5",
+        "phpro/grumphp-shim": "^2.2",
         "phpunit/phpunit": "^9 || ^10"
     },
     "minimum-stability": "dev",
