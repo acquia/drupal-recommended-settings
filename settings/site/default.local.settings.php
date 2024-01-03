@@ -45,8 +45,22 @@ $settings['update_free_access'] = TRUE;
  *
  * @see https://wiki.php.net/rfc/expectations
  */
-assert_options(ASSERT_ACTIVE, TRUE);
-Handle::register();
+/*
+ * If you are using php 8.3 and above assertions options
+ * usage is deprecated.
+ * @see https://www.drupal.org/node/3391611
+ *
+ * If you are using php 8.3 and less
+ * Drupal\Component\Assertion\Handle is deprecated.
+ * @see https://www.drupal.org/node/3105918
+ */
+if (phpversion() >= 8.3 ) {
+  ini_set('zend.assertions', 1);
+}
+else {
+  assert_options(ASSERT_ACTIVE, TRUE);
+  assert_options(ASSERT_EXCEPTION, TRUE);
+}
 
 /**
  * Show all error messages, with backtrace information.
