@@ -12,24 +12,22 @@ It allows your websites to be easily installed in both Acquia Cloud IDE & local
 and deployable on Acquia Cloud.
 
 ## Installation
-
-### Include Acquia Global Command in DRS for multisite functionality
-To use global command with DRS for multisite functionality please add below in
-your root composer.json file.
-```
-"repositories": {
-    "acquia_global_commands": {
-        "type": "vcs",
-        "url": "git@github.com:vishalkhode1/acquia_global_commands.git"
-    }
-}
-```
-
-You can also install this using Composer like so:
+### Install using Composer
 
 ```
 composer require acquia/drupal-recommended-settings
 ```
+### Multi-site features with Acquia DRS
+The Drupal Recommended Settings offer the multi-site feature out of the box.
+To configure a multi-site, run the following command, and the plugin will
+automatically generate the settings.php in the backend.
+```
+drush site:install --uri site1
+```
+
+The plugin offers various events that allow you to implement custom logic based
+on when these events are triggered. You can find the examples of such
+implementations from [here](examples).
 
 # Quick examples
 ## Generate settings for a given site
@@ -51,7 +49,8 @@ $settings = new Settings(DRUPAL_ROOT, $siteUri);
 try {
   // Call generate method.
   $settings->generate();
-} catch (SettingsException $e) {
+}
+catch (SettingsException $e) {
   echo $e->getMessage();
 }
 ```
@@ -77,7 +76,7 @@ $settings = new Settings(DRUPAL_ROOT, $siteUri);
 $dbSpec = [
   'drupal' => [
     'db' => [
-      'database' => 'drupal',
+      'database' => 'drupal', // In case of multi-site database name is replaced with the site name.
       'username' => 'drupal',
       'password' => 'drupal',
       'host' => 'localhost',
@@ -89,7 +88,8 @@ $dbSpec = [
 try {
   // Call generate method passing database details.
   $settings->generate($dbSpec);
-} catch (SettingsException $e) {
+}
+catch (SettingsException $e) {
   echo $e->getMessage();
 }
 ```

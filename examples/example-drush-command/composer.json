@@ -1,0 +1,22 @@
+{
+  "name":  "example/example-drush-command",
+  "description":  "Example custom drush commands.",
+  "keywords":  [
+    "drush",
+    "drupal"
+  ],
+  "license":  "GPL-2.0-or-later",
+  "require": {
+    "acquia/drupal-recommended-settings": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Example\\": "src"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "acquia/drupal-recommended-settings": true
+    }
+  }
+}
