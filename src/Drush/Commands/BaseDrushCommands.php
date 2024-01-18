@@ -1,0 +1,104 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Acquia\Drupal\RecommendedSettings\Drush\Commands;
+
+use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
+use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
+use Acquia\Drupal\RecommendedSettings\Robo\Tasks\LoadTasks;
+use Consolidation\AnnotatedCommand\AnnotationData;
+use Consolidation\AnnotatedCommand\Hooks\HookManager;
+use Drush\Attributes as Cli;
+use Drush\Commands\DrushCommands;
+use Drush\Drush;
+use League\Container\ContainerAwareInterface;
+use League\Container\ContainerAwareTrait;
+use Psr\Log\LoggerAwareInterface;
+use Robo\Contract\BuilderAwareInterface;
+use Robo\Contract\ConfigAwareInterface;
+use Robo\Contract\IOAwareInterface;
+use Robo\LoadAllTasks;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Process\Process;
+
+/**
+ * A Base Drush command.
+ */
+class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, LoggerAwareInterface, BuilderAwareInterface, IOAwareInterface, ContainerAwareInterface {
+
+  use ContainerAwareTrait;
+  use LoadAllTasks;
+  use ConfigAwareTrait;
+  use LoadTasks;
+
+  /**
+   * {@inheritdoc}
+   */
+  #[CLI\Hook(type: HookManager::INITIALIZE)]
+  public function init(InputInterface $input, AnnotationData $annotationData): void {
+    if ($this->getConfig()->get("options.uri")) {
+      $this->getConfig()->setDefault('drush.uri', $this->getConfig()->get("options.uri"));
+    }
+    if ($this->getConfig()->get("options.ansi")) {
+      $this->getConfig()->setDefault('drush.ansi', $this->getConfig()->get("options.ansi"));
+    }
+    $this->getConfig()->setDefault('drush.bin', $this->getConfig()->get("runtime.drush-script"));
+  }
+
+  /**
+   * Invokes an array of Drush commands.
+   *
+   * @param array $commands
+   *   An array of Symfony commands to invoke, e.g., 'tests:behat:run'.
+   *
+   * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
+   */
+  protected function invokeCommands(array $commands) {
+    foreach ($commands as $key => $value) {
+      if (is_numeric($key)) {
+        $command = $value;
+        $args = [];
+      }
+      else {
+        $command = $key;
+        $args = $value;
+      }
+      $this->invokeCommand($command, $args);
+    }
+  }
+
+  /**
+   * Invokes a single Drush command.
+   *
+   * @param string $command_name
+   *   The name of the command, e.g., 'tests:behat:run'.
+   * @param array $args
+   *   An array of arguments to pass to the command.
+   *
+   * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
+   */
+  protected function invokeCommand(string $command_name, array $args = []): void {
+    $options = $this->input()->getOptions();
+    foreach ($options as $key => $value) {
+      if ($value === NULL || $key === "define") {
+        unset($options[$key]);
+      }
+    }
+    $process = Drush::drush(Drush::aliasManager()->getSelf(), $command_name, $args, $options);
+    $this->output->writeln("<comment> > " . $process->getCommandLine() . "</comment>");
+    $process->run($process->showRealtime()->hideStderr());
+    $errorOutput = $process->getErrorOutput();
+    if ($errorOutput) {
+      if (!$process->isSuccessful()) {
+        $errorOutput = preg_replace("/^\s+|\s+$/", "", $errorOutput);
+        throw new SettingsException($errorOutput);
+      }
+      else {
+        $errorOutput = str_replace("[success]", "<bg=green;options=bold;fg=white>[success]</>", $errorOutput);
+        $this->io()->write($errorOutput);
+      }
+    }
+  }
+
+}
