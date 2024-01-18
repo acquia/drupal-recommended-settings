@@ -20,7 +20,10 @@ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
  * $settings['config_sync_directory'] = $dir . "/config/$site_dir" in
  * settings.php, and we will not overwrite it.
  */
-
+// phpcs:ignore
+if (!isset($drs_override_config_directories)) {
+  $drs_override_config_directories = TRUE;
+}
 
 /**
  * Site path.
@@ -28,13 +31,16 @@ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
  * @var string $site_path
  * This is always set and exposed by the Drupal Kernel.
  */
- // phpcs:ignore
- $site_name = EnvironmentDetector::getSiteName($site_path);
 // phpcs:ignore
-// Config sync settings.
-$settings['config_sync_directory'] = "../config/" . $site_name;
-// Site Studio sync settings.
-$settings['site_studio_sync'] = "../sitestudio/" . $site_name;
+$site_name = EnvironmentDetector::getSiteName($site_path);
+
+// phpcs:ignore
+if ($drs_override_config_directories) {
+  // Config sync settings.
+  $settings['config_sync_directory'] = "../config/" . $site_name;
+  // Site Studio sync settings.
+  $settings['site_studio_sync'] = "../sitestudio/" . $site_name;
+}
 
 $split_filename_prefix = 'config_split.config_split';
 
