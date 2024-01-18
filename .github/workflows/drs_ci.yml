@@ -1,0 +1,77 @@
+name: drupal-recommended-settings CI
+on:
+  # schedule:
+    # "At minute 0 past hour 4 and 8 UTC."
+    # - cron:  '0 4,8 * * *'
+  push:
+    branches: [ develop, main, ACMS* ]
+    paths-ignore:
+      - README.md
+  pull_request:
+    branches: [ develop ]
+    paths-ignore:
+      - README.md
+env:
+  ORCA_SUT_NAME: acquia/drupal-recommended-settings
+  ORCA_SUT_BRANCH: develop
+  ORCA_VERSION: ^4
+  ORCA_PACKAGES_CONFIG_ALTER: ../drupal-recommended-settings/tests/packages_alter.yml
+  ORCA_ENABLE_NIGHTWATCH: "FALSE"
+  ORCA_PHPCS_STANDARD: AcquiaPHP
+  COMPOSER_PROCESS_TIMEOUT: 1800
+jobs:
+ STATIC_CODE_ANALYSIS:
+   name: "Static Code Analysis"
+   runs-on: ubuntu-latest
+   env:
+     ORCA_JOB: STATIC_CODE_ANALYSIS
+   steps:
+     - uses: actions/checkout@v3
+     - uses: shivammathur/setup-php@v2
+       with:
+         php-version: 8.2
+         coverage: xdebug
+     - name: Download ORCA
+       run: composer create-project --no-dev --ignore-platform-req=php acquia/orca ../orca "$ORCA_VERSION" -n
+     - name: Before Install
+       run: ../orca/bin/ci/before_install.sh
+     - name: Install
+       run: ../orca/bin/ci/install.sh
+     - name: Before script
+       run: ../orca/bin/ci/before_script.sh
+     - name: Script
+       run: ../orca/bin/ci/script.sh
+     - name: After script
+       run: |
+         ../orca/bin/ci/after_success.sh
+         ../orca/bin/ci/after_failure.sh
+         ../orca/bin/ci/after_script.sh
+ PHPUNIT_TESTS:
+    name: "Execute PHPUnit tests"
+    runs-on: ubuntu-latest
+    env:
+      ORCA_FIXTURE_DIR: "/home/runner/work/drupal-recommended-settings/orca-build"
+      CI: TRUE
+    steps:
+      - uses: actions/checkout@v3
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          coverage: xdebug
+      - name: Download ORCA
+        run: composer create-project --no-dev --ignore-platform-req=php acquia/orca ../orca "$ORCA_VERSION" -n
+      - name: Before Install
+        run: ../orca/bin/ci/before_install.sh
+      - name: Install
+        run: ../orca/bin/ci/install.sh
+      - name: Before script
+        run: ../orca/bin/ci/before_script.sh
+      - name: Run PHPUnit tests
+        run: |
+          composer install
+          ./vendor/bin/phpunit tests
+      - name: After script
+        run: |
+          ../orca/bin/ci/after_success.sh
+          ../orca/bin/ci/after_failure.sh
+          ../orca/bin/ci/after_script.sh

@@ -11,147 +11,93 @@ use Consolidation\Config\Loader\YamlConfigLoader;
  */
 class ConfigInitializer {
 
+  const DEFAULT_CONFIG_FILE_PATH = "/config/build.yml";
+
   /**
    * Config.
-   *
-   * @var \Consolidation\Config\Config
    */
-  protected $config;
+  protected Config $config;
 
   /**
    * Loader.
-   *
-   * @var \Consolidation\Config\Loader\YamlConfigLoader
    */
-  protected $loader;
+  protected YamlConfigLoader $loader;
 
   /**
    * Processor.
-   *
-   * @var Acquia\Drupal\RecommendedSettings\Config\YamlConfigProcessor
    */
-  protected $processor;
+  protected YamlConfigProcessor $processor;
 
   /**
    * Site.
-   *
-   * @var string
    */
-  protected $site;
-
-  /**
-   * Environment.
-   *
-   * @var string
-   */
-  protected $environment;
-
-  /**
-   * Repo root.
-   *
-   * @var string
-   */
-  protected $webRoot;
-
-  /**
-   * Web root of the project.
-   *
-   * @var string
-   */
-  protected $repoRoot;
-
-  /**
-   * Path to this project.
-   *
-   * @var string
-   */
-  protected $settingsRoot;
+  protected string $site;
 
   /**
    * ConfigInitializer constructor.
    *
-   * @param string $repo_root
-   *   Repo root.
-   * @param string $web_root
-   *   Web root of the project.
-   * @param string $settings_root
-   *   Path to this project.
+   * @param string $site
+   *   Drupal site uri. Ex: site1, site2 etc.
    */
-  public function __construct(string $repo_root, string $web_root, string $settings_root) {
-    $this->webRoot = $web_root;
-    $this->repoRoot = $repo_root;
-    $this->settingsRoot = $settings_root;
+  public function __construct(string $site = "default") {
     $this->config = new Config();
     $this->loader = new YamlConfigLoader();
     $this->processor = new YamlConfigProcessor();
+    $this->setSite($site);
+    $this->initialize();
   }
 
   /**
    * Set site.
    *
-   * @param mixed $site
-   *   Site.
+   * @param string $site
+   *   Given Site.
    */
-  public function setSite($site): void {
+  public function setSite(string $site): void {
     $this->site = $site;
     $this->config->set('site', $site);
   }
 
   /**
-   * Determine site.
-   *
-   * @return mixed|string
-   *   Site.
-   */
-  protected function determineSite() {
-    return 'default';
-  }
-
-  /**
    * Initialize.
    */
-  public function initialize(): Config {
-    if (!$this->site) {
-      $site = $this->determineSite();
-      $this->setSite($site);
-    }
+  public function initialize(): ConfigInitializer {
     $environment = $this->determineEnvironment();
-    $this->environment = $environment;
     $this->config->set('environment', $environment);
-    $this->loadConfigFiles();
-    $this->processConfigFiles();
-
-    return $this->config;
+    return $this;
   }
 
   /**
    * Load config.
-   *
-   * @return $this
-   *   Config.
    */
-  public function loadConfigFiles(): ConfigInitializer {
+  public function loadAllConfig(): ConfigInitializer {
     $this->loadDefaultConfig();
     return $this;
   }
 
   /**
    * Load config.
-   *
-   * @return $this
-   *   Config.
    */
-  public function loadDefaultConfig(): ConfigInitializer {
-    $this->processor->add($this->config->export());
-    $this->processor->extend($this->loader->load($this->settingsRoot . '/config/build.yml'));
+  protected function loadDefaultConfig(): ConfigInitializer {
+    $this->addConfig($this->config->export());
+    $drsDirectory = dirname(__FILE__, 3);
+    $this->processor->extend($this->loader->load($drsDirectory . self::DEFAULT_CONFIG_FILE_PATH));
     return $this;
   }
 
   /**
-   * Determine env.
+   * Add/Overrides the config data.
    *
-   * @return string|bool
-   *   Env.
+   * @param string[] $data
+   *   An array of data.
+   */
+  public function addConfig(array $data): Config {
+    $this->processor->add($data);
+    return $this->config;
+  }
+
+  /**
+   * Determine env.
    *
    * @throws \ReflectionException
    */
@@ -164,13 +110,10 @@ class ConfigInitializer {
 
   /**
    * Process config.
-   *
-   * @return $this
-   *   Config.
    */
-  public function processConfigFiles(): ConfigInitializer {
+  public function processConfig(): Config {
     $this->config->replace($this->processor->export());
-    return $this;
+    return $this->config;
   }
 
 }

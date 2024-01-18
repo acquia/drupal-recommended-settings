@@ -12,12 +12,12 @@ class ArrayManipulator {
   /**
    * Merges arrays recursively while preserving.
    *
-   * @param array $array1
+   * @param string[] $array1
    *   The first array.
-   * @param array $array2
+   * @param string[] $array2
    *   The second array.
    *
-   * @return array
+   * @return string[]
    *   The merged array.
    *
    * @see http://php.net/manual/en/function.array-merge-recursive.php#92195
@@ -25,7 +25,7 @@ class ArrayManipulator {
   public static function arrayMergeRecursiveDistinct(
         array &$array1,
         array &$array2
-    ) {
+    ): array {
     $merged = $array1;
     foreach ($array2 as $key => &$value) {
       if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
@@ -45,13 +45,13 @@ class ArrayManipulator {
    * E.g., [drush.alias => 'self'] would be expanded to
    * ['drush' => ['alias' => 'self']]
    *
-   * @param array $array
+   * @param string[] $array
    *   The array containing unexpanded dot-notated keys.
    *
-   * @return array
+   * @return string[]
    *   The expanded array.
    */
-  public static function expandFromDotNotatedKeys(array $array) {
+  public static function expandFromDotNotatedKeys(array $array): array {
     $data = new Data();
 
     // @todo Make this work at all levels of array.
@@ -69,13 +69,13 @@ class ArrayManipulator {
    * ['drush' => ['alias' => 'self']] would be flattened to
    * [drush.alias => 'self'].
    *
-   * @param array $array
+   * @param string[] $array
    *   The multidimensional array.
    *
-   * @return array
+   * @return string[]
    *   The flattened array.
    */
-  public static function flattenToDotNotatedKeys(array $array) {
+  public static function flattenToDotNotatedKeys(array $array): array {
     return self::flattenMultidimensionalArray($array, '.');
   }
 
@@ -86,15 +86,15 @@ class ArrayManipulator {
    * ['drush' => ['alias' => 'self']] would be flattened to
    * [drush.alias => 'self'].
    *
-   * @param array $array
+   * @param string[] $array
    *   The multidimensional array.
    * @param string $glue
    *   The character(s) to use for imploding keys.
    *
-   * @return array
+   * @return string[]
    *   The flattened array.
    */
-  public static function flattenMultidimensionalArray(array $array, $glue) {
+  public static function flattenMultidimensionalArray(array $array, string $glue): array {
     $iterator = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($array));
     $result = [];
     foreach ($iterator as $leafValue) {
@@ -113,13 +113,13 @@ class ArrayManipulator {
    *
    * Used primarily for rendering tables via Symfony Console commands.
    *
-   * @param array $array
+   * @param string[] $array
    *   The multi-dimensional array.
    *
-   * @return array
-   *   The human-readble, flat array.
+   * @return string[]
+   *   The human-readable, flat array.
    */
-  public static function convertArrayToFlatTextArray(array $array) {
+  public static function convertArrayToFlatTextArray(array $array): array {
     $rows = [];
     $max_line_length = 60;
     foreach ($array as $key => $value) {

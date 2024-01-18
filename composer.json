@@ -1,40 +1,50 @@
 {
     "name": "acquia/drupal-recommended-settings",
-    "type": "composer-plugin",
     "description": "The composer plugin for adding drupal-recommended-settings for Acquia Cloud.",
+    "license": "GPL-2.0-only",
+    "type": "composer-plugin",
     "keywords": [
         "drupal",
         "acquia",
         "drupal-recommended-settings"
     ],
-    "license": "GPL-2.0-only",
     "authors": [
         {
             "name": "Vishal Khode",
             "email": "vishal.khode@acquia.com"
         }
     ],
+    "support": {
+        "issues": "https://github.com/acquia/drupal-recommended-settings/issues",
+        "docs": "https://docs.acquia.com/drupal-recommended-settings/"
+    },
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.1",
         "composer-plugin-api": "^2",
         "acquia/drupal-environment-detector": "^1.5.3",
-        "composer/composer": "^2.5",
-        "consolidation/config": "^1.0.0 || ^2.0.0",
-        "dflydev/dot-access-data": "^1.1.0 || ^2 || ^3",
-        "drupal/config_sync_without_site_uuid": "^1.0",
-        "grasmash/yaml-expander": "^3",
-        "loophp/phposinfo": "^1.7.1",
-        "symfony/filesystem": "^6.2",
-        "symfony/yaml": "^4.4 || ^5 || ^6"
-    },
-    "conflict": {
-        "acquia/blt": "*"
+        "consolidation/config": "^2.0.0",
+        "grasmash/yaml-expander": "^3.0",
+        "loophp/phposinfo": "^1.7.1"
     },
     "require-dev": {
-        "acquia/coding-standards": "^1.0",
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
-        "ergebnis/composer-normalize": "~2.15.0",
-        "phpro/grumphp-shim": "^1.5"
+        "acquia/coding-standards": "^2.0",
+        "composer/composer": "^2.2",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
+        "ergebnis/composer-normalize": "^2.30.2",
+        "phpro/grumphp-shim": "^2.2",
+        "phpunit/phpunit": "^9 || ^10"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Acquia\\Drupal\\RecommendedSettings\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Acquia\\Drupal\\RecommendedSettings\\Tests\\": "tests/src"
+        }
     },
     "config": {
         "allow-plugins": {
@@ -45,16 +55,5 @@
     },
     "extra": {
         "class": "Acquia\\Drupal\\RecommendedSettings\\Plugin"
-    },
-    "autoload": {
-        "psr-4": {
-            "Acquia\\Drupal\\RecommendedSettings\\": "src/"
-        }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "support": {
-        "issues": "https://github.com/acquia/drupal-recommended-settings/issues",
-        "docs": "https://docs.acquia.com/drupal-recommended-settings/"
     }
 }
