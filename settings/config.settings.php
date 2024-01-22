@@ -15,15 +15,16 @@ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
  * directory should be shared between all multi-sites, and each multisite will
  * override this selectively using configuration splits. However, some
  * applications may prefer to manage the configuration for each multisite
- * completely separately. If this is the case, they can set
- * $drs_override_config_directories to FALSE and
- * $settings['config_sync_directory'] = $dir . "/config/$site_dir" in
+ * completely separately. If this is the case,
+ * set FALSE to $drs_override_config_directories
+ * and $drs_override_site_studio_sync_directories
+ * $settings['config_sync_directory'] = $dir . "/config/$site_dir"
+ * $settings['site_studio_sync'] =  $dir . "/sitestudio/$site_dir" in
  * settings.php, and we will not overwrite it.
  */
 // phpcs:ignore
-if (!isset($drs_override_config_directories)) {
-  $drs_override_config_directories = TRUE;
-}
+$drs_override_config_directories = !isset($drs_override_config_directories) ? TRUE : FALSE;
+$drs_override_site_studio_sync_directories = !isset($drs_override_site_studio_sync_directories) ? TRUE : FALSE;
 
 /**
  * Site path.
@@ -35,12 +36,12 @@ if (!isset($drs_override_config_directories)) {
 $site_name = EnvironmentDetector::getSiteName($site_path);
 
 // phpcs:ignore
-if ($drs_override_config_directories) {
-  // Config sync settings.
-  $settings['config_sync_directory'] = "../config/" . $site_name;
-  // Site Studio sync settings.
-  $settings['site_studio_sync'] = "../sitestudio/" . $site_name;
-}
+// Config sync settings.
+$settings['config_sync_directory'] = $drs_override_config_directories ?
+"../config/$site_name" : "../config/default";
+// Site Studio sync settings.
+$settings['site_studio_sync'] = $drs_override_site_studio_sync_directories ?
+"../sitestudio/$site_name" : "../sitestudio/default";
 
 $split_filename_prefix = 'config_split.config_split';
 
