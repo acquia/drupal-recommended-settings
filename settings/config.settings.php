@@ -37,10 +37,10 @@ $site_name = EnvironmentDetector::getSiteName($site_path);
 
 // phpcs:ignore
 // Config sync settings.
-$settings['config_sync_directory'] = $drs_override_config_directories ?
+$settings['config_sync_directory'] = !$drs_override_config_directories ?
 "../config/$site_name" : "../config/default";
 // Site Studio sync settings.
-$settings['site_studio_sync'] = $drs_override_site_studio_sync_directories ?
+$settings['site_studio_sync'] = !$drs_override_site_studio_sync_directories ?
 "../sitestudio/$site_name" : "../sitestudio/default";
 
 $split_filename_prefix = 'config_split.config_split';
