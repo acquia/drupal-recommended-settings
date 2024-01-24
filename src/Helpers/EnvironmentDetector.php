@@ -2,6 +2,7 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Helpers;
 
+use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
 use Acquia\DrupalEnvironmentDetector\AcquiaDrupalEnvironmentDetector;
 use loophp\phposinfo\Enum\FamilyName;
 use loophp\phposinfo\OsInfo;
