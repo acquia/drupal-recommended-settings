@@ -3,7 +3,7 @@
 namespace Acquia\Drupal\RecommendedSettings\Config;
 
 use Consolidation\Config\Config;
-use Drush\Config\DrushConfig;
+use Consolidation\Config\ConfigInterface;
 
 /**
  * The configuration for settings.
@@ -16,7 +16,7 @@ class DefaultDrushConfig extends Config {
    * @param string[] $data
    *   Data array, if available.
    */
-  public function __construct(DrushConfig $config) {
+  public function __construct(ConfigInterface $config) {
     $uri = $config->get("options.uri") ?? "default";
     $config->set('repo.root', $config->get("runtime.project"));
     $config->set('docroot', $config->get("options.root"));

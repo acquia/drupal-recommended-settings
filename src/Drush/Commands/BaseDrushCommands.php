@@ -41,10 +41,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    */
   #[CLI\Hook(type: HookManager::INITIALIZE)]
   public function init(InputInterface $input, AnnotationData $annotationData): void {
-    $config = new DefaultDrushConfig($this->getConfig());
-    $configInitializer = new ConfigInitializer($config);
-    $config = $configInitializer->loadAllConfig()->processConfig();
-    $this->setConfig($config);
+    $this->switchSiteContext("default");
   }
 
   /**
@@ -99,6 +96,23 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
         $output->write($buffer, FALSE, OutputInterface::OUTPUT_NORMAL);
       }
     });
+  }
+
+  /**
+   * Sets multisite context by settings site-specific config values.
+   *
+   * @param string $site_name
+   *   The name of a multisite, e.g., if docroot/sites/example.com is the site,
+   *   $site_name would be example.com.
+   */
+  public function switchSiteContext(string $site_name) {
+    $this->logger->debug("Switching site context to <comment>$site_name</comment>.");
+    $config = new DefaultDrushConfig($this->getConfig());
+    $configInitializer = new ConfigInitializer($config);
+    $config = $configInitializer->loadAllConfig()->processConfig();
+    $config->set('drush.uri', $site_name);
+    $config->set('site', $site_name);
+    $this->setConfig($config);
   }
 
 }
