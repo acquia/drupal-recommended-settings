@@ -3,9 +3,11 @@
 namespace Acquia\Drupal\RecommendedSettings;
 
 use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
+use Acquia\Drupal\RecommendedSettings\Config\DefaultConfig;
 use Acquia\Drupal\RecommendedSettings\Config\SettingsConfig;
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem;
+use Consolidation\Config\Config;
 
 /**
  * Core class of the plugin.
@@ -53,10 +55,10 @@ WARNING;
   /**
    * Constructs the plugin object.
    */
-  public function __construct(string $drupalRoot, string $site = "default") {
+  public function __construct(string $drupal_root, string $site = "default") {
+    $this->config = new DefaultConfig($drupal_root);
     $this->fileSystem = new Filesystem();
-    $this->drupalRoot = $drupalRoot;
-    $this->site = $site;
+    $this->config->set("site", $site);
   }
 
   /**
@@ -72,7 +74,7 @@ WARNING;
   protected function copyGlobalSettings(): bool {
     return $this->fileSystem->copyFiles(
       self::getPluginPath() . "/settings/global",
-      $this->drupalRoot . "/sites/settings"
+      $this->config->get("docroot") . "/sites/settings"
     );
   }
 
@@ -82,7 +84,7 @@ WARNING;
   protected function copySiteSettings(): bool {
     return $this->fileSystem->copyFiles(
       self::getPluginPath() . "/settings/site",
-      $this->drupalRoot . "/sites/" . $this->site . "/settings"
+      $this->config->get("docroot") . "/sites/" . $this->config->get("site") . "/settings"
     );
   }
 
@@ -96,45 +98,48 @@ WARNING;
    */
   public function generate(array $overrideData = []): void {
     try {
-      $site = $this->site;
+      // Replace variables in local.settings.php file.
+      $config = new ConfigInitializer($this->config);
+      $config = $config->loadAllConfig();
+      if ($overrideData) {
+        $config->addConfig($overrideData);
+      }
+      $config = $config->processConfig();
+
+      $site = $config->get("site");
+      $docroot = $config->get("docroot");
       $this->copyGlobalSettings();
       $this->copySiteSettings();
 
       // Create settings.php file from default.settings.php.
       $this->fileSystem->copyFile(
-      $this->drupalRoot . "/sites/default/default.settings.php",
-      $this->drupalRoot . "/sites/$site/settings.php"
+        $docroot . "/sites/default/default.settings.php",
+        $docroot . "/sites/$site/settings.php"
       );
 
       // Append `require acquia-recommended.settings.php` code block in
       // site specific settings.php file (if it does not exist).
       $this->appendIfMatchesCollect(
-       $this->drupalRoot . "/sites/$site/settings.php",
+        $docroot . "/sites/$site/settings.php",
        '#vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php#', PHP_EOL . 'require DRUPAL_ROOT . "/../vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php";' . PHP_EOL
       );
       $this->appendIfMatchesCollect(
-       $this->drupalRoot . "/sites/$site/settings.php",
+        $docroot . "/sites/$site/settings.php",
        '#Do not include additional settings here#', $this->settingsWarning . PHP_EOL
       );
 
       // Create local.settings.php file from default.local.settings.php.
       $this->fileSystem->copyFile(
-       $this->drupalRoot . "/sites/$site/settings/default.local.settings.php",
-       $this->drupalRoot . "/sites/$site/settings/local.settings.php"
+        $docroot . "/sites/$site/settings/default.local.settings.php",
+        $docroot . "/sites/$site/settings/local.settings.php"
       );
 
-      // Replace variables in local.settings.php file.
-      $config = new ConfigInitializer();
-      $config = $config->loadAllConfig();
-      if ($overrideData) {
-        $config->addConfig($overrideData);
-      }
-      $settings = new SettingsConfig($config->processConfig()->export());
-      $settings->replaceFileVariables($this->drupalRoot . "/sites/$site/settings/local.settings.php");
+      $settings = new SettingsConfig($config->export());
+      $settings->replaceFileVariables($docroot . "/sites/$site/settings/local.settings.php");
 
       // The config directory for given site must exists, otherwise Drupal will
       // add database credentials to settings.php.
-      $this->fileSystem->ensureDirectoryExists($this->drupalRoot . "/../config/$site");
+      $this->fileSystem->ensureDirectoryExists($docroot . "/../config/$site");
     }
     catch (\Exception $e) {
       throw new SettingsException($e);

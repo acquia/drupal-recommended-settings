@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Acquia\Drupal\RecommendedSettings\Drush\Commands;
 
+use Acquia\Drupal\RecommendedSettings\Common\IO;
+use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
+use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
+use Acquia\Drupal\RecommendedSettings\Robo\Tasks\DrushTask;
 use Acquia\Drupal\RecommendedSettings\Robo\Tasks\LoadTasks;
 use Consolidation\AnnotatedCommand\AnnotationData;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
@@ -20,6 +24,7 @@ use Robo\Contract\ConfigAwareInterface;
 use Robo\Contract\IOAwareInterface;
 use Robo\LoadAllTasks;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
 /**
@@ -31,19 +36,17 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
   use LoadAllTasks;
   use ConfigAwareTrait;
   use LoadTasks;
+  use IO;
 
   /**
    * {@inheritdoc}
    */
   #[CLI\Hook(type: HookManager::INITIALIZE)]
   public function init(InputInterface $input, AnnotationData $annotationData): void {
-    if ($this->getConfig()->get("options.uri")) {
-      $this->getConfig()->setDefault('drush.uri', $this->getConfig()->get("options.uri"));
-    }
-    if ($this->getConfig()->get("options.ansi")) {
-      $this->getConfig()->setDefault('drush.ansi', $this->getConfig()->get("options.ansi"));
-    }
-    $this->getConfig()->setDefault('drush.bin', $this->getConfig()->get("runtime.drush-script"));
+    $config = new DefaultDrushConfig($this->getConfig());
+    $configInitializer = new ConfigInitializer($config);
+    $config = $configInitializer->loadAllConfig()->processConfig();
+    $this->setConfig($config);
   }
 
   /**
@@ -72,7 +75,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    * Invokes a single Drush command.
    *
    * @param string $command_name
-   *   The name of the command, e.g., 'tests:behat:run'.
+   *   The name of the command, e.g., 'status'.
    * @param array $args
    *   An array of arguments to pass to the command.
    *
@@ -80,25 +83,24 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    */
   protected function invokeCommand(string $command_name, array $args = []): void {
     $options = $this->input()->getOptions();
+    $drushOptions = [];
     foreach ($options as $key => $value) {
-      if ($value === NULL || $key === "define") {
+      if ($value === NULL || $key === "define" || $value == FALSE) {
         unset($options[$key]);
       }
     }
     $process = Drush::drush(Drush::aliasManager()->getSelf(), $command_name, $args, $options);
-    $this->output->writeln("<comment> > " . $process->getCommandLine() . "</comment>");
-    $process->run($process->showRealtime()->hideStderr());
-    $errorOutput = $process->getErrorOutput();
-    if ($errorOutput) {
-      if (!$process->isSuccessful()) {
-        $errorOutput = preg_replace("/^\s+|\s+$/", "", $errorOutput);
-        throw new SettingsException($errorOutput);
+    $this->output->writeln("<comment> > " . $command_name. "</comment>");
+    $output = $this->output();
+    $process->setTty(Process::isTtySupported());
+    $process->run(static function ($type, $buffer) use ($output, $process) {
+      if (Process::ERR === $type) {
+        $output->getErrorOutput()->write($buffer, false, OutputInterface::OUTPUT_NORMAL);
       }
       else {
-        $errorOutput = str_replace("[success]", "<bg=green;options=bold;fg=white>[success]</>", $errorOutput);
-        $this->io()->write($errorOutput);
+        $output->write($buffer, false, OutputInterface::OUTPUT_NORMAL);
       }
-    }
+    });
   }
 
 }

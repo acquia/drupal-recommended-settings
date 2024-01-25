@@ -4,6 +4,7 @@ namespace Acquia\Drupal\RecommendedSettings\Config;
 
 use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
 use Consolidation\Config\Config;
+use Consolidation\Config\ConfigInterface;
 use Consolidation\Config\Loader\YamlConfigLoader;
 
 /**
@@ -11,7 +12,7 @@ use Consolidation\Config\Loader\YamlConfigLoader;
  */
 class ConfigInitializer {
 
-  const DEFAULT_CONFIG_FILE_PATH = "/config/build.yml";
+  const CONFIG_FILE_PATH = "/config/build.yml";
 
   /**
    * Config.
@@ -39,23 +40,11 @@ class ConfigInitializer {
    * @param string $site
    *   Drupal site uri. Ex: site1, site2 etc.
    */
-  public function __construct(string $site = "default") {
-    $this->config = new Config();
+  public function __construct(ConfigInterface $config) {
+    $this->config = $config;
     $this->loader = new YamlConfigLoader();
     $this->processor = new YamlConfigProcessor();
-    $this->setSite($site);
     $this->initialize();
-  }
-
-  /**
-   * Set site.
-   *
-   * @param string $site
-   *   Given Site.
-   */
-  public function setSite(string $site): void {
-    $this->site = $site;
-    $this->config->set('site', $site);
   }
 
   /**
@@ -72,6 +61,7 @@ class ConfigInitializer {
    */
   public function loadAllConfig(): ConfigInitializer {
     $this->loadDefaultConfig();
+    $this->loadProjectConfig();
     return $this;
   }
 
@@ -81,7 +71,18 @@ class ConfigInitializer {
   protected function loadDefaultConfig(): ConfigInitializer {
     $this->addConfig($this->config->export());
     $drsDirectory = dirname(__FILE__, 3);
-    $this->processor->extend($this->loader->load($drsDirectory . self::DEFAULT_CONFIG_FILE_PATH));
+    $this->processor->extend($this->loader->load($drsDirectory . self::CONFIG_FILE_PATH));
+    return $this;
+  }
+
+  /**
+   * Load config.
+   *
+   * @return $this
+   *   Config.
+   */
+  public function loadProjectConfig(): ConfigInitializer {
+    $this->processor->extend($this->loader->load($this->config->get('repo.root') . self::CONFIG_FILE_PATH));
     return $this;
   }
 
@@ -102,6 +103,9 @@ class ConfigInitializer {
    * @throws \ReflectionException
    */
   public function determineEnvironment(): string {
+    if ($this->config->get('environment')) {
+      return $this->config->get('environment');
+    }
     if (EnvironmentDetector::isCiEnv()) {
       return 'ci';
     }
