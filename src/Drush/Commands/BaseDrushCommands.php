@@ -7,9 +7,7 @@ namespace Acquia\Drupal\RecommendedSettings\Drush\Commands;
 use Acquia\Drupal\RecommendedSettings\Common\IO;
 use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
 use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
-use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
-use Acquia\Drupal\RecommendedSettings\Robo\Tasks\DrushTask;
 use Acquia\Drupal\RecommendedSettings\Robo\Tasks\LoadTasks;
 use Consolidation\AnnotatedCommand\AnnotationData;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
@@ -52,12 +50,12 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
   /**
    * Invokes an array of Drush commands.
    *
-   * @param array $commands
+   * @param string[] $commands
    *   An array of Symfony commands to invoke, e.g., 'tests:behat:run'.
    *
    * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
-  protected function invokeCommands(array $commands) {
+  protected function invokeCommands(array $commands): void {
     foreach ($commands as $key => $value) {
       if (is_numeric($key)) {
         $command = $value;
@@ -76,7 +74,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    *
    * @param string $command_name
    *   The name of the command, e.g., 'status'.
-   * @param array $args
+   * @param string[] $args
    *   An array of arguments to pass to the command.
    *
    * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
@@ -90,15 +88,15 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
       }
     }
     $process = Drush::drush(Drush::aliasManager()->getSelf(), $command_name, $args, $options);
-    $this->output->writeln("<comment> > " . $command_name. "</comment>");
+    $this->output->writeln("<comment> > " . $command_name . "</comment>");
     $output = $this->output();
     $process->setTty(Process::isTtySupported());
-    $process->run(static function ($type, $buffer) use ($output, $process) {
+    $process->run(static function ($type, $buffer) use ($output, $process): void {
       if (Process::ERR === $type) {
-        $output->getErrorOutput()->write($buffer, false, OutputInterface::OUTPUT_NORMAL);
+        $output->getErrorOutput()->write($buffer, FALSE, OutputInterface::OUTPUT_NORMAL);
       }
       else {
-        $output->write($buffer, false, OutputInterface::OUTPUT_NORMAL);
+        $output->write($buffer, FALSE, OutputInterface::OUTPUT_NORMAL);
       }
     });
   }

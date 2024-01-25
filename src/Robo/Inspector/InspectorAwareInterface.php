@@ -10,7 +10,7 @@ interface InspectorAwareInterface {
   /**
    * Sets $this->inspector.
    *
-   * @param \Acquia\Blt\Robo\Inspector\Inspector $inspector
+   * @param \Acquia\Drupal\RecommendedSettings\Robo\Inspector\Inspector $inspector
    *   The inspector.
    *
    * @return $this

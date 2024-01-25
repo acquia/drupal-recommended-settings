@@ -3,8 +3,6 @@
 namespace Acquia\Drupal\RecommendedSettings\Config;
 
 use Consolidation\Config\Config;
-use Grasmash\YamlExpander\YamlExpander;
-use Psr\Log\NullLogger;
 
 /**
  * The configuration for settings.

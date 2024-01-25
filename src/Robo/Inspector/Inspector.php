@@ -12,7 +12,6 @@ use Acquia\Drupal\RecommendedSettings\Common\Executor;
 use Acquia\Drupal\RecommendedSettings\Common\IO;
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
-use Consolidation\Config\Loader\YamlConfigLoader;
 use League\Container\ContainerAwareInterface;
 use League\Container\ContainerAwareTrait;
 use Psr\Log\LoggerAwareInterface;
@@ -25,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Inspects various details about the current project.
  *
- * @package Acquia\Blt\Robo\Common
+ * @package Acquia\Drupal\RecommendedSettings\Common
  */
 class Inspector implements BuilderAwareInterface, ConfigAwareInterface, ContainerAwareInterface, LoggerAwareInterface {
 
@@ -38,56 +37,44 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
   /**
    * Process executor.
    *
-   * @var \Acquia\Blt\Robo\Common\Executor
    */
-  protected $executor;
+  protected \Acquia\Drupal\RecommendedSettings\Common\Executor $executor;
 
   /**
    * Is MYSQL available.
    *
-   * @var null
    */
-  protected $isMySqlAvailable = NULL;
+  protected bool $isMySqlAvailable;
 
   /**
    * Is PostgreSQL available.
    *
-   * @var null
    */
-  protected $isPostgreSqlAvailable = NULL;
+  protected bool $isPostgreSqlAvailable;
 
   /**
    * Is Sqlite available.
    *
-   * @var null
    */
-  protected $isSqliteAvailable = NULL;
+  protected bool $isSqliteAvailable;
 
-  /**
-   * DrupalVM status.
-   *
-   * @var array
-   */
-  protected $drupalVmStatus = NULL;
 
   /**
    * Filesystem.
    *
-   * @var \Symfony\Component\Filesystem\Filesystem
    */
-  protected $fs;
+  protected \Symfony\Component\Filesystem\Filesystem $fs;
 
   /**
    * Warnings were issued.
    *
-   * @var bool
    */
-  protected $warningsIssued = FALSE;
+  protected bool $warningsIssued = FALSE;
 
   /**
    * The constructor.
    *
-   * @param \Acquia\Blt\Robo\Common\Executor $executor
+   * @param \Acquia\Drupal\RecommendedSettings\Common\Executor $executor
    *   Process executor.
    */
   public function __construct(Executor $executor) {
@@ -101,14 +88,14 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return \Symfony\Component\Filesystem\Filesystem
    *   Filesystem.
    */
-  public function getFs() {
+  public function getFs(): \Symfony\Component\Filesystem\Filesystem {
     return $this->fs;
   }
 
   /**
    * Clear state.
    */
-  public function clearState() {
+  public function clearState(): void {
     $this->isMySqlAvailable = NULL;
     $this->isPostgreSqlAvailable = NULL;
     $this->isSqliteAvailable = NULL;
@@ -120,7 +107,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if file exists.
    */
-  public function isRepoRootPresent() {
+  public function isRepoRootPresent(): bool {
     return file_exists($this->getConfigValue('repo.root'));
   }
 
@@ -130,7 +117,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if file exists.
    */
-  public function isDocrootPresent() {
+  public function isDocrootPresent(): bool {
     return file_exists($this->getConfigValue('docroot'));
   }
 
@@ -140,7 +127,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if file exists.
    */
-  public function isDrupalSettingsFilePresent() {
+  public function isDrupalSettingsFilePresent(): bool {
     return file_exists($this->getConfigValue('drupal.settings_file'));
   }
 
@@ -150,7 +137,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if file exists.
    */
-  public function isHashSaltPresent() {
+  public function isHashSaltPresent(): bool {
     return file_exists($this->getConfigValue('repo.root') . '/salt.txt');
   }
 
@@ -160,17 +147,17 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if file exists.
    */
-  public function isDrupalLocalSettingsFilePresent() {
+  public function isDrupalLocalSettingsFilePresent(): bool {
     return file_exists($this->getConfigValue('drupal.local_settings_file'));
   }
 
   /**
-   * Determines if Drupal settings.php contains required BLT includes.
+   * Determines if Drupal settings.php contains required DRS includes.
    *
    * @return bool
-   *   TRUE if settings.php is valid for BLT usage.
+   *   TRUE if settings.php is valid for DRS usage.
    */
-  public function isDrupalSettingsFileValid() {
+  public function isDrupalSettingsFileValid(): bool {
     $settings_file_contents = file_get_contents($this->getConfigValue('drupal.settings_file'));
     if (!strstr($settings_file_contents,
       '/../vendor/acquia/blt/settings/blt.settings.php')
@@ -189,7 +176,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if Drupal is installed.
    */
-  public function isDrupalInstalled() {
+  public function isDrupalInstalled(): bool {
     $this->logger->debug("Verifying that Drupal is installed...");
     $output = $this->getDrushStatus()['bootstrap'] ?? '';
     $installed = $output === 'Successful';
@@ -201,10 +188,10 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
   /**
    * Gets the result of `drush status`.
    *
-   * @return array
+   * @return string[]
    *   The result of `drush status`.
    */
-  public function getDrushStatus() {
+  public function getDrushStatus(): array {
     $docroot = $this->getConfigValue('docroot');
     $status_info = (array) json_decode($this->executor->drush([
       'status',
@@ -222,7 +209,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return mixed
    *   Status.
    */
-  public function getStatus() {
+  public function getStatus(): mixed {
     $status = $this->getDrushStatus();
     if (array_key_exists('php-conf', $status)) {
       foreach ($status['php-conf'] as $key => $conf) {
@@ -258,7 +245,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if alias is valid.
    */
-  public function isDrushAliasValid($alias) {
+  public function isDrushAliasValid(string $alias): bool {
     return $this->executor->drush([
       "site:alias",
       "@$alias",
@@ -274,7 +261,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if MySQL is available.
    */
-  public function isDatabaseAvailable() {
+  public function isDatabaseAvailable(): bool {
     $db = $this->getDrushStatus()['db-driver'];
     switch ($db) {
       case 'mysql':
@@ -286,7 +273,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
       case 'sqlite':
         return $this->isSqliteAvailable();
     }
-
+    return FALSE;
   }
 
   /**
@@ -297,7 +284,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if MySQL is available.
    */
-  public function isMySqlAvailable() {
+  public function isMySqlAvailable(): bool {
     if (is_null($this->isMySqlAvailable)) {
       $this->isMySqlAvailable = $this->getMySqlAvailable();
     }
@@ -313,7 +300,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if MySQL is available.
    */
-  public function getMySqlAvailable() {
+  public function getMySqlAvailable(): bool {
     $this->logger->debug("Verifying that MySQL is available...");
     /** @var \Robo\Result $result */
     $result = $this->executor->drush(["sqlq", "SHOW DATABASES"])
@@ -330,7 +317,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if MySQL is available.
    */
-  public function isPostgreSqlAvailable() {
+  public function isPostgreSqlAvailable(): bool {
     if (is_null($this->isPostgreSqlAvailable)) {
       $this->isPostgreSqlAvailable = $this->getPostgreSqlAvailable();
     }
@@ -346,7 +333,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if PostgreSQL is available.
    */
-  public function getPostgreSqlAvailable() {
+  public function getPostgreSqlAvailable(): bool {
     $this->logger->debug("Verifying that PostgreSQL is available...");
     /** @var \Robo\Result $result */
     $result = $this->executor->drush(["sqlq \"SHOW DATABASES\""])
@@ -363,7 +350,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if Sqlite is available.
    */
-  public function isSqliteAvailable() {
+  public function isSqliteAvailable(): bool {
     if (is_null($this->isSqliteAvailable)) {
       $this->isSqliteAvailable = $this->getSqliteAvailable();
     }
@@ -379,7 +366,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if Sqlite is available.
    */
-  public function getSqliteAvailable() {
+  public function getSqliteAvailable(): bool {
     $this->logger->debug("Verifying that Sqlite is available...");
     /** @var \Robo\Result $result */
     $result = $this->executor->drush(["sqlq", ".tables"])
@@ -394,7 +381,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if Lando configuration exists.
    */
-  public function isLandoConfigPresent() {
+  public function isLandoConfigPresent(): bool {
     return file_exists($this->getConfigValue('repo.root') . '/.lando.yml');
   }
 
@@ -404,7 +391,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return string
    *   The version of Composer.
    */
-  public function getComposerVersion() {
+  public function getComposerVersion(): string {
     $version = $this->executor->execute(["composer", "--version"])
       ->interactive(FALSE)
       ->silent(TRUE)
@@ -423,7 +410,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if minimum version is satisfied.
    */
-  public function isComposerMinimumVersionSatisfied($minimum_version) {
+  public function isComposerMinimumVersionSatisfied(string $minimum_version): bool {
     // phpcs:ignore
     exec("composer --version | cut -d' ' -f3", $output, $exit_code);
     if (version_compare($output[0], $minimum_version, '>=')) {
@@ -441,7 +428,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if the command exists, otherwise FALSE.
    */
-  public function commandExists($command) {
+  public function commandExists(string $command): bool {
     // phpcs:ignore
     exec("command -v $command >/dev/null 2>&1", $output, $exit_code);
     return $exit_code == 0;
@@ -456,7 +443,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if minimum version is satisfied.
    */
-  public function isGitMinimumVersionSatisfied($minimum_version) {
+  public function isGitMinimumVersionSatisfied(string $minimum_version): bool {
     // phpcs:ignore
     exec("git --version | cut -d' ' -f3", $output, $exit_code);
     if (version_compare($output[0], $minimum_version, '>=')) {
@@ -471,7 +458,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if configured, FALSE otherwise.
    */
-  public function isGitUserSet() {
+  public function isGitUserSet(): bool {
     // phpcs:ignore
     exec("git config user.name", $output, $name_not_set);
     // phpcs:ignore
@@ -485,18 +472,18 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return \Acquia\Blt\Robo\Config\BltConfig
    *   The local Behat configuration.
    */
-//  public function getLocalBehatConfig() {
-//    $behat_local_config_file = $this->getConfigValue('repo.root') . '/tests/behat/local.yml';
-//
-//    $behat_local_config = new BltConfig();
-//    $loader = new YamlConfigLoader();
-//    $processor = new YamlConfigProcessor();
-//    $processor->extend($loader->load($behat_local_config_file));
-//    $processor->extend($loader->load($this->getConfigValue('repo.root') . '/tests/behat/behat.yml'));
-//    $behat_local_config->replace($processor->export());
-//
-//    return $behat_local_config;
-//  }
+  //  public function getLocalBehatConfig() {
+  //    $behat_local_config_file = $this->getConfigValue('repo.root') . '/tests/behat/local.yml';
+  //
+  //    $behat_local_config = new BltConfig();
+  //    $loader = new YamlConfigLoader();
+  //    $processor = new YamlConfigProcessor();
+  //    $processor->extend($loader->load($behat_local_config_file));
+  //    $processor->extend($loader->load($this->getConfigValue('repo.root') . '/tests/behat/behat.yml'));
+  //    $behat_local_config->replace($processor->export());
+  //
+  //    return $behat_local_config;
+  //  }
 
   /**
    * Returns an array of required Behat files, as defined by Behat config.
@@ -505,10 +492,10 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * and bootstrap dir on the local file system. All of these files are
    * required for behat to function properly.
    *
-   * @return array
+   * @return string[]
    *   An array of required Behat configuration files.
    */
-  public function getBehatConfigFiles() {
+  public function getBehatConfigFiles(): array {
     $behat_local_config = $this->getLocalBehatConfig();
 
     return [
@@ -523,17 +510,20 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if all required Behat files exist.
    */
-  public function areBehatConfigFilesPresent() {
+  public function areBehatConfigFilesPresent(): bool {
     return $this->filesExist($this->getBehatConfigFiles());
   }
 
   /**
    * Determines if all file in a given array exist.
    *
+   * @param string[] $files
+   *   An array of files.
+   *
    * @return bool
    *   TRUE if all files exist.
    */
-  public function filesExist($files) {
+  public function filesExist(array $files): bool {
     foreach ($files as $file) {
       if (!file_exists($file)) {
         $this->logger->warning("Required file $file does not exist.");
@@ -550,7 +540,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return string
    *   The current schema version.
    */
-  public function getCurrentSchemaVersion() {
+  public function getCurrentSchemaVersion(): string {
     if (file_exists($this->getConfigValue('blt.config-files.schema-version'))) {
       $version = trim(file_get_contents($this->getConfigValue('blt.config-files.schema-version')));
     }
@@ -564,7 +554,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
   /**
    * Is schema version up to date?
    */
-  public function isSchemaVersionUpToDate() {
+  public function isSchemaVersionUpToDate(): bool {
     return $this->getCurrentSchemaVersion() >= $this->getContainer()->get('updater')->getLatestUpdateMethodVersion();
   }
 
@@ -572,9 +562,9 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * Issues warnings to user if their local environment is mis-configured.
    *
    * @param string $command_name
-   *   The name of the BLT Command being executed.
+   *   The name of the DRS Command being executed.
    */
-  public function issueEnvironmentWarnings($command_name) {
+  public function issueEnvironmentWarnings(string $command_name): void {
     if (!$this->warningsIssued) {
       $this->warnIfPhpOutdated();
 
@@ -585,13 +575,13 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
   /**
    * Throws an exception if the minimum PHP version is not met.
    *
-   * @throws \Acquia\Blt\Robo\Exceptions\BltException
+   * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
-  public function warnIfPhpOutdated() {
+  public function warnIfPhpOutdated(): void {
     $minimum_php_version = 7;
     $current_php_version = phpversion();
     if ($current_php_version < $minimum_php_version) {
-      throw new SettingsException("BLT requires PHP $minimum_php_version or greater. You are using $current_php_version.");
+      throw new SettingsException("DRS requires PHP $minimum_php_version or greater. You are using $current_php_version.");
     }
   }
 
@@ -601,7 +591,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return bool
    *   TRUE if config is identical.
    */
-  public function isActiveConfigIdentical() {
+  public function isActiveConfigIdentical(): bool {
     $result = $this->executor->drush(["config:status"])->run();
     $message = trim($result->getMessage());
     $this->logger->debug("Config status check results:");

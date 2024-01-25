@@ -7,7 +7,6 @@ use Acquia\Drupal\RecommendedSettings\Config\DefaultConfig;
 use Acquia\Drupal\RecommendedSettings\Config\SettingsConfig;
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem;
-use Consolidation\Config\Config;
 
 /**
  * Core class of the plugin.

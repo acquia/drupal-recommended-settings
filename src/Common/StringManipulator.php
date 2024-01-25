@@ -18,7 +18,7 @@ class StringManipulator {
    * @return string
    *   The trimmed text.
    */
-  public static function trimEndingLines($text, $num_lines) {
+  public static function trimEndingLines(string $text, int $num_lines): string {
     return implode("\n",
       array_slice(explode("\n", $text), 0, count($text) - $num_lines));
   }
@@ -34,7 +34,7 @@ class StringManipulator {
    * @return string
    *   The trimmed text.
    */
-  public static function trimStartingLines($text, $num_lines) {
+  public static function trimStartingLines(string $text, int $num_lines): string {
     return implode("\n", array_slice(explode("\n", $text), $num_lines));
   }
 
@@ -43,19 +43,19 @@ class StringManipulator {
    *
    * @param string $identifier
    *   Identifier.
-   * @param array $filter
+   * @param string[] $filter
    *   Filter.
    *
    * @return mixed
    *   Safe string.
    */
-  public static function convertStringToMachineSafe($identifier, array $filter = [
+  public static function convertStringToMachineSafe(string $identifier, array $filter = [
     ' ' => '_',
     '-' => '_',
     '/' => '_',
     '[' => '_',
     ']' => '',
-  ]) {
+  ]): mixed {
     $identifier = str_replace(array_keys($filter), array_values($filter), $identifier);
     // Valid characters are:
     // - a-z (U+0030 - U+0039)
@@ -86,7 +86,7 @@ class StringManipulator {
    * @return mixed
    *   Prefix.
    */
-  public static function convertStringToPrefix($string) {
+  public static function convertStringToPrefix(string $string): mixed {
     $words = explode(' ', $string);
     $prefix = '';
     foreach ($words as $word) {
@@ -101,10 +101,10 @@ class StringManipulator {
    * @param string $command
    *   The command string to conver to array.
    *
-   * @return array
+   * @return string[]
    *   Command array.
    */
-  public static function commandConvert($command) {
+  public static function commandConvert(string $command): array {
     return explode(" ", $command);
   }
 
@@ -114,7 +114,7 @@ class StringManipulator {
    * @return string
    *   The deprecation warning.
    */
-  public static function stringToArrayMsg() {
+  public static function stringToArrayMsg(): string {
     return "Deprecation Warning: this command is passing a command string and should pass a command array.";
   }
 

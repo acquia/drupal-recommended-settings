@@ -16,9 +16,7 @@ use Drush\Attributes as CLI;
 use Drush\Boot\BootstrapManager;
 use Drush\Boot\DrupalBootLevels;
 use Drush\Commands\DrushCommands;
-use Drush\Drush;
 use Psr\Container\ContainerInterface as DrushContainer;
-use Symfony\Component\Filesystem\Path;
 
 /**
  * A Drush command to generate settings.php for Multisite.
@@ -127,13 +125,14 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
    *
    * @param string $site_name
    *   The site name.
-   *
-   * @return array
+   * @param string[] $default_credentials
+   *   The default db credentials.
+   * @return string[]
    *   The database specs.
    */
-  private function askDbCredentials(string $site_name, array $defaultCredentials): array {
+  private function askDbCredentials(string $site_name, array $default_credentials): array {
     $shouldAsk = $this->io()->confirm(dt("Would you like to configure the local database credentials?"));
-    $credentials = $defaultCredentials;
+    $credentials = $default_credentials;
     if ($shouldAsk) {
       $credentials['database'] = $this->io()->ask("Local database name", $site_name);
       $credentials['username'] = $this->io()->ask("Local database user", $credentials['username']);

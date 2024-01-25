@@ -10,14 +10,13 @@ trait InspectorAwareTrait {
   /**
    * The inspector.
    *
-   * @var \Acquia\Blt\Robo\Inspector\Inspector
    */
-  private $inspector;
+  private Inspector $inspector;
 
   /**
    * Sets $this->inspector.
    */
-  public function setInspector(Inspector $inspector) {
+  public function setInspector(Inspector $inspector): self {
     $this->inspector = $inspector;
 
     return $this;
@@ -26,10 +25,10 @@ trait InspectorAwareTrait {
   /**
    * Gets $this->inspector.
    *
-   * @return \Acquia\Blt\Robo\Inspector\Inspector
+   * @return \Acquia\Drupal\RecommendedSettings\Robo\Inspector\Inspector
    *   The inspector.
    */
-  public function getInspector() {
+  public function getInspector(): Inspector {
     return $this->inspector;
   }
 

@@ -28,82 +28,66 @@ class DrushTask extends CommandStack {
 
   /**
    * Site alias to prepend to each command.
-   *
-   * @var string
    */
-  protected $alias;
+  protected string|NULL $alias;
 
   /**
    * Directory to execute the command from.
    *
-   * @var string
-   *
    * @see ExecTrait::$workingDirectory
    */
-  protected $dir;
+  protected string|NULL $dir;
 
   /**
    * Site uri to append uri option to each command.
    *
-   * @var string
    */
-  protected $uri;
+  protected string|NULL $uri;
 
   /**
    * Indicates if the command output should be verbose.
    *
-   * @var bool
    */
-  protected $verbose;
+  protected bool $verbose = FALSE;
 
   /**
    * Indicates if the command output should be very verbose.
-   *
-   * @var bool
    */
-  protected $veryVerbose;
+  protected  bool $veryVerbose = FALSE;
 
   /**
    * Indicates if the command output should be debug verbosity.
-   *
-   * @var bool
    */
-  protected $debug;
+  protected bool $debug = FALSE;
 
   /**
    * Defaults init.
-   *
-   * @var bool
    */
-  protected $defaultsInitialized;
+  protected bool $defaultsInitialized = FALSE;
 
   /**
    * Additional directory paths to search for drush commands.
-   *
-   * @var string
    */
-  protected $include;
+  protected string|NULL $include = NULL;
 
   /**
    * Add or not the --ansi option.
-   *
-   * @var bool
    */
-  protected $ansi;
+  protected bool $ansi = FALSE;
 
   /**
    * Drush commands to execute when task is run.
    *
-   * @var array
+   * @var string[]
    */
-  protected $commands;
+  protected array $commands;
 
   /**
    * Options for each drush command.
    *
-   * @var array
+   * @var string[]
    */
-  protected $options;
+  protected array $options;
 
   /**
    * Adds the given drush command to a stack.
@@ -113,7 +97,7 @@ class DrushTask extends CommandStack {
    *
    * @return $this
    */
-  public function drush($command) {
+  public function drush(string $command) {
     // Clear out options associated with previous drush command.
     $this->setOptionsForLastCommand();
 
@@ -137,7 +121,7 @@ class DrushTask extends CommandStack {
    *
    * @return $this
    */
-  public function alias($alias) {
+  public function alias(string $alias) {
     $this->alias = $alias;
     return $this;
   }
@@ -150,21 +134,14 @@ class DrushTask extends CommandStack {
    *
    * @return $this
    */
-  public function uri($uri) {
+  public function uri(string $uri) {
     $this->uri = $uri;
 
     return $this;
   }
 
   /**
-   * Sets the working directory for each command.
-   *
-   * @param string $dir
-   *   Dir.
-   *
-   * @return $this
-   *
-   * @see ExecTrait::$workingDirectory
+   * {@inheritdoc}
    */
   public function dir($dir) {
     $this->dir = $dir;
@@ -181,7 +158,7 @@ class DrushTask extends CommandStack {
    *
    * @return $this
    */
-  public function verbose($verbose) {
+  public function verbose(bool $verbose) {
     $this->verbose = $this->mixedToBool($verbose);
     return $this;
   }
@@ -194,7 +171,7 @@ class DrushTask extends CommandStack {
    *
    * @return $this
    */
-  public function veryVerbose($verbose) {
+  public function veryVerbose(bool $verbose) {
     $this->veryVerbose = $this->mixedToBool($verbose);
     return $this;
   }
@@ -207,7 +184,7 @@ class DrushTask extends CommandStack {
    *
    * @return $this
    */
-  public function debug($verbose) {
+  public function debug(bool $verbose) {
     $this->debug = $this->mixedToBool($verbose);
     return $this;
   }
@@ -220,7 +197,7 @@ class DrushTask extends CommandStack {
    *
    * @return $this
    */
-  public function includePath($path) {
+  public function includePath(string $path) {
     $this->include = $path;
     return $this;
   }
@@ -233,7 +210,7 @@ class DrushTask extends CommandStack {
    *
    * @return $this
    */
-  public function ansi($ansi) {
+  public function ansi(bool $ansi) {
     $this->ansi = $ansi;
     return $this;
   }
@@ -241,7 +218,7 @@ class DrushTask extends CommandStack {
   /**
    * Sets up drush defaults using config.
    */
-  protected function init() {
+  protected function init(): void {
     if ($this->getConfig()->get('drush.bin')) {
       $this->executable = str_replace(' ', '\\ ', $this->getConfig()->get('drush.bin'));
     }
@@ -278,7 +255,7 @@ class DrushTask extends CommandStack {
    *   TRUE/FALSE as per PHP's cast to boolean ruleset, with the exception that
    *   a string value not equal to 'yes' or 'true' will evaluate to FALSE.
    */
-  protected function mixedToBool($mixedVar) {
+  protected function mixedToBool(mixed $mixedVar): bool {
     if (is_string($mixedVar)) {
       $boolVar = ($mixedVar === 'yes' || $mixedVar === 'true');
     }
@@ -291,7 +268,7 @@ class DrushTask extends CommandStack {
   /**
    * Associates arguments with their corresponding drush command.
    */
-  protected function setOptionsForLastCommand() {
+  protected function setOptionsForLastCommand(): void {
     if (isset($this->commands)) {
       $numberOfCommands = count($this->commands);
       $correspondingCommand = $numberOfCommands - 1;
@@ -306,7 +283,7 @@ class DrushTask extends CommandStack {
   /**
    * Set the options to be used for each drush command in the stack.
    */
-  protected function setGlobalOptions() {
+  protected function setGlobalOptions(): void {
     if (isset($this->uri) && !empty($this->uri)) {
       $this->option('uri', $this->uri);
     }
@@ -360,8 +337,17 @@ class DrushTask extends CommandStack {
 
   /**
    * Overriding CommandArguments::option to default option separator to '='.
+   *
+   * @param string $option
+   *   An option key.
+   * @param string $value
+   *   Value for option.
+   * @param string $separator
+   *   The separator for options.
+   *
+   * @return $this
    */
-  public function option($option, $value = NULL, $separator = '=') {
+  public function option(string $option, string $value = NULL, string $separator = '=') {
     return $this->traitOption($option, $value, $separator);
   }
 
@@ -370,6 +356,8 @@ class DrushTask extends CommandStack {
    *
    * Make note that if stopOnFail() is TRUE, then result data isn't returned!
    * Maybe this should be changed.
+   *
+   * {@inheritdoc}
    */
   public function run() {
     $this->setupExecution();
@@ -406,7 +394,7 @@ class DrushTask extends CommandStack {
   /**
    * Adds drush commands with their corresponding options to stack.
    */
-  protected function setupExecution() {
+  protected function setupExecution(): void {
     $this->setOptionsForLastCommand();
     $this->setGlobalOptions();
 

@@ -4,8 +4,6 @@ namespace Acquia\Drupal\RecommendedSettings\Config;
 
 use Consolidation\Config\Config;
 use Drush\Config\DrushConfig;
-use Grasmash\YamlExpander\YamlExpander;
-use Psr\Log\NullLogger;
 
 /**
  * The configuration for settings.
@@ -24,7 +22,7 @@ class DefaultDrushConfig extends Config {
     $config->set('docroot', $config->get("options.root"));
     $config->set('composer.bin', $config->get("drush.vendor-dir") . '/bin');
     $config->set('drush.uri', $config->get("options.uri"));
-    $config->set('site',  $config->get("options.uri"));
+    $config->set('site', $config->get("options.uri"));
     if ($config->get("options.ansi")) {
       $config->set('drush.ansi', $config->get("options.ansi"));
     }

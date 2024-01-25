@@ -2,14 +2,16 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Common;
 
+use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
 use GuzzleHttp\Client;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Robo\Collection\CollectionBuilder;
+use Robo\Common\ProcessExecutor;
 use Robo\Contract\ConfigAwareInterface;
-use Robo\Contract\IOAwareInterface;
 use Robo\Robo;
+use Robo\Task\Base\Exec;
 use Symfony\Component\Process\Process;
 
 /**
@@ -26,8 +28,8 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
   /**
    * A copy of the Robo builder.
    *
-   * @var \Acquia\Blt\Robo\BltTasks*/
-  protected $builder;
+   */
+  protected \Robo\Collection\CollectionBuilder $builder;
 
   /**
    * Executor constructor.
@@ -43,10 +45,10 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
   /**
    * Returns $this->builder.
    *
-   * @return \Acquia\Blt\Robo\BltTasks
+   * @return \Robo\Collection\CollectionBuilder
    *   The builder.
    */
-  public function getBuilder() {
+  public function getBuilder(): CollectionBuilder {
     return $this->builder;
   }
 
@@ -60,7 +62,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    * @return \Robo\Task\Base\Exec
    *   The task. You must call run() on this to execute it!
    */
-  public function taskExec($command) {
+  public function taskExec(string $command): Exec {
     return $this->builder->taskExec($command);
   }
 
@@ -73,7 +75,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    * @return \Robo\Common\ProcessExecutor
    *   The unexecuted process.
    */
-  public function drush($command) {
+  public function drush(mixed $command): ProcessExecutor {
     $drush_array = [];
     // @todo Set to silent if verbosity is less than very verbose.
     $drush_array[] = $this->getConfigValue('composer.bin') . DIRECTORY_SEPARATOR . "drush";
@@ -108,7 +110,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    * @return \Robo\Common\ProcessExecutor
    *   The unexecuted command.
    */
-  public function execute($command) {
+  public function execute(mixed $command): ProcessExecutor {
     // Backwards compatibility check for legacy commands.
     if (!is_array($command)) {
       $this->say($command);
@@ -132,7 +134,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    * @return \Robo\Common\ProcessExecutor
    *   The unexecuted command.
    */
-  public function executeShell($command) {
+  public function executeShell(string $command): ProcessExecutor {
     $process_executor = Robo::process(Process::fromShellCommandline($command));
     return $process_executor->dir($this->getConfigValue('repo.root'))
       ->printOutput(FALSE)
@@ -146,7 +148,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    * @param string $port
    *   The port number.
    */
-  public function killProcessByPort($port) {
+  public function killProcessByPort(string $port): void {
     $this->logger->info("Killing all processes on port '$port'...");
     // This is allowed to fail.
     // @todo Replace with standardized call to Symfony Process.
@@ -162,7 +164,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    * @param string $name
    *   The name of the process.
    */
-  public function killProcessByName($name) {
+  public function killProcessByName(string $name): void {
     $this->logger->info("Killing all processing containing string '$name'...");
     // This is allowed to fail.
     // @todo Replace with standardized call to Symfony Process.
@@ -179,7 +181,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    * @param string $url
    *   The URL to wait for.
    */
-  public function waitForUrlAvailable($url) {
+  public function waitForUrlAvailable(string $url): void {
     $this->wait([$this, 'checkUrl'], [$url], "Waiting for non-50x response from $url...");
   }
 
@@ -190,7 +192,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    *
    * @param callable $callable
    *   The method/function to wait for a TRUE response from.
-   * @param array $args
+   * @param string[] $args
    *   Arguments to pass to $callable.
    * @param string $message
    *   The message to display when this function is called.
@@ -200,7 +202,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    *
    * @throws \Exception
    */
-  public function wait(callable $callable, array $args, $message = '') {
+  public function wait(callable $callable, array $args, string $message = ''): bool {
     $maxWait = 60 * 1000;
     $checkEvery = 1 * 1000;
     $start = microtime(TRUE) * 1000;
@@ -225,7 +227,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
       usleep($checkEvery * 1000);
     }
 
-    throw new BltException("Timed out.");
+    throw new SettingsException("Timed out.");
   }
 
   /**
@@ -237,7 +239,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    * @return bool
    *   TRUE if URL responded with a non-50x response.
    */
-  public function checkUrl($url) {
+  public function checkUrl(string $url): bool {
     try {
       $client = new Client();
       $res = $client->request('GET', $url, [

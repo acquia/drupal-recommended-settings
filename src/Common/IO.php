@@ -9,6 +9,8 @@ use Symfony\Component\Console\Question\Question;
 
 /**
  * An extension of \Robo\Common\IO.
+ *
+ * @phpcs:disable SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
  */
 trait IO {
 
@@ -18,7 +20,7 @@ trait IO {
    * @param string $text
    *   The text to write.
    */
-  protected function say($text) {
+  protected function say($text): void {
     $this->writeln($text);
   }
 
@@ -32,7 +34,7 @@ trait IO {
    * @param string $color
    *   The color of the text.
    */
-  protected function yell($text, $length = 40, $color = 'green') {
+  protected function yell($text, $length = 40, $color = 'green'): void {
     $format = "<fg=white;bg=$color;options=bold>%s</fg=white;bg=$color;options=bold>";
     $this->formattedOutput($text, $length, $format);
   }
@@ -46,7 +48,7 @@ trait IO {
    * @return string
    *   The formatted question text.
    */
-  protected function formatQuestion($message) {
+  protected function formatQuestion($message): string {
     return "<question> $message</question> ";
   }
 
@@ -55,7 +57,7 @@ trait IO {
    *
    * @param string $question
    *   The question text.
-   * @param array $options
+   * @param string[] $options
    *   An array of available options.
    * @param mixed $default
    *   Default.
@@ -63,7 +65,7 @@ trait IO {
    * @return string
    *   The chosen option.
    */
-  protected function askChoice($question, array $options, $default = NULL) {
+  protected function askChoice(string $question, array $options, mixed $default = NULL): string {
     return $this->doAsk(new ChoiceQuestion($this->formatQuestion($question),
       $options, $default));
   }
@@ -77,7 +79,7 @@ trait IO {
    * @return string
    *   The response.
    */
-  protected function askRequired($message) {
+  protected function askRequired(string $message): string {
     $question = new Question($this->formatQuestion($message));
     $question->setValidator(function ($answer) {
       if (empty($answer)) {
@@ -94,15 +96,15 @@ trait IO {
   /**
    * Writes an array to the screen as a formatted table.
    *
-   * @param array $array
+   * @param string[] $array
    *   The unformatted array.
-   * @param array $headers
+   * @param string[] $headers
    *   The headers for the array. Defaults to ['Property','Value'].
    */
   protected function printArrayAsTable(
     array $array,
     array $headers = ['Property', 'Value']
-  ) {
+  ): void {
     $table = new Table($this->output);
     $table->setHeaders($headers)
       ->setRows(ArrayManipulator::convertArrayToFlatTextArray($array))
@@ -112,14 +114,14 @@ trait IO {
   /**
    * Writes a particular configuration key's value to the log.
    *
-   * @param array $array
+   * @param string[] $array
    *   The configuration.
    * @param string $prefix
    *   A prefix to add to each row in the configuration.
    * @param int $verbosity
    *   The verbosity level at which to display the logged message.
    */
-  protected function logConfig(array $array, $prefix = '', $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE) {
+  protected function logConfig(array $array, string $prefix = '', int $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE): void {
     if ($this->output()->getVerbosity() >= $verbosity) {
       if ($prefix) {
         $this->output()->writeln("<comment>Configuration for $prefix:</comment>");

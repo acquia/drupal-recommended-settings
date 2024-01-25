@@ -12,17 +12,9 @@ trait ConfigAwareTrait {
   use RoboConfigAwareTrait;
 
   /**
-   * Gets a config value for a given key.
-   *
-   * @param string $key
-   *   The config key.
-   * @param mixed|null $default
-   *   The default value if the key does not exist in config.
-   *
-   * @return mixed|null
-   *   The config value, or else the default value if they key does not exist.
+   * {@inheritdoc}
    */
-  protected function getConfigValue($key, $default = NULL) {
+  protected function getConfigValue($key, $default = NULL): mixed {
     if (!$this->getConfig()) {
       return $default;
     }
