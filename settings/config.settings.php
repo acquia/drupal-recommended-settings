@@ -23,8 +23,8 @@ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
  * settings.php, and we will not overwrite it.
  */
 // phpcs:ignore
-$drs_override_config_directories = !isset($drs_override_config_directories) ? TRUE : FALSE;
-$drs_override_site_studio_sync_directories = !isset($drs_override_site_studio_sync_directories) ? TRUE : FALSE;
+$drs_override_config_directories = $drs_override_config_directories ?? FALSE;
+$drs_override_site_studio_sync_directories = $drs_override_site_studio_sync_directories ?? FALSE;
 
 /**
  * Site path.
