@@ -9,6 +9,7 @@ use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
 use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
 use Acquia\Drupal\RecommendedSettings\Robo\Tasks\LoadTasks;
+use Acquia\Drupal\RecommendedSettings\Settings;
 use Consolidation\AnnotatedCommand\AnnotationData;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drush\Attributes as Cli;
@@ -41,7 +42,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    */
   #[CLI\Hook(type: HookManager::INITIALIZE)]
   public function init(InputInterface $input, AnnotationData $annotationData): void {
-    $this->switchSiteContext("default");
+    $this->initializeConfig();
   }
 
   /**
@@ -107,11 +108,22 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    */
   public function switchSiteContext(string $site_name) {
     $this->logger->debug("Switching site context to <comment>$site_name</comment>.");
+    $this->initializeConfig($site_name);
+  }
+
+  /**
+   * Initialize the configuration.
+   *
+   * @param string $site_name
+   *   Given site name
+   */
+  protected function initializeConfig(string $site_name = ""): void {
     $config = new DefaultDrushConfig($this->getConfig());
-    $configInitializer = new ConfigInitializer($config);
-    $config = $configInitializer->loadAllConfig()->processConfig();
-    $config->set('drush.uri', $site_name);
-    $config->set('site', $site_name);
+    $configInitializer = new ConfigInitializer($config, $this->input());
+    if ($site_name) {
+      $configInitializer->setSite($site_name);
+    }
+    $config = $configInitializer->initialize()->loadAllConfig()->processConfig();
     $this->setConfig($config);
   }
 

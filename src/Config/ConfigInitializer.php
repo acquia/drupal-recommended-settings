@@ -6,6 +6,7 @@ use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
 use Consolidation\Config\Config;
 use Consolidation\Config\ConfigInterface;
 use Consolidation\Config\Loader\YamlConfigLoader;
+use Symfony\Component\Console\Input\InputInterface;
 
 /**
  * Config init.
@@ -30,9 +31,15 @@ class ConfigInitializer {
   protected YamlConfigProcessor $processor;
 
   /**
+   * Input.
+   *
+   */
+  protected ?InputInterface $input;
+
+  /**
    * Site.
    */
-  protected string $site;
+  protected string $site = "";
 
   /**
    * ConfigInitializer constructor.
@@ -40,17 +47,45 @@ class ConfigInitializer {
    * @param string $site
    *   Drupal site uri. Ex: site1, site2 etc.
    */
-  public function __construct(ConfigInterface $config) {
+  public function __construct(ConfigInterface $config, ?InputInterface $input = NULL) {
     $this->config = $config;
     $this->loader = new YamlConfigLoader();
     $this->processor = new YamlConfigProcessor();
-    $this->initialize();
+    $this->input = $input;
+  }
+
+  /**
+   * Set site.
+   *
+   * @param string $site
+   *   Site.
+   */
+  public function setSite(string $site): void {
+    $this->site = $site;
+    $this->config->set("site", $site);
+    $this->config->set("drush.uri", $site);
+  }
+
+  /**
+   * Determine site.
+   */
+  protected function determineSite(): string {
+    // If input parameter has site option, then use that.
+    if ($this->input instanceof InputInterface && $this->input->hasOption("uri") && $this->input->getOption("uri")) {
+      return $this->input->getOption("uri");
+    }
+
+    return 'default';
   }
 
   /**
    * Initialize.
    */
   public function initialize(): ConfigInitializer {
+    if (!$this->site) {
+      $this->site = $this->determineSite();
+      $this->setSite($this->site);
+    }
     $environment = $this->determineEnvironment();
     $this->config->set('environment', $environment);
     return $this;
@@ -62,6 +97,7 @@ class ConfigInitializer {
   public function loadAllConfig(): ConfigInitializer {
     $this->loadDefaultConfig();
     $this->loadProjectConfig();
+    $this->loadSiteConfig();
     return $this;
   }
 
@@ -82,7 +118,23 @@ class ConfigInitializer {
    *   Config.
    */
   public function loadProjectConfig(): ConfigInitializer {
-    $this->processor->extend($this->loader->load($this->config->get('repo.root') . self::CONFIG_FILE_PATH));
+    $this->processor->extend($this->loader->load($this->config->get('repo.root') . "/drs/config.yml"));
+    return $this;
+  }
+
+  /**
+   * Load config.
+   *
+   * @return $this
+   *   Config.
+   */
+  public function loadSiteConfig(): ConfigInitializer {
+    if ($this->site) {
+      // Since docroot can change in the project, we need to respect that here.
+      $this->config->replace($this->processor->export());
+      $this->processor->extend($this->loader->load($this->config->get('docroot') . "/sites/{$this->site}/drs/config.yml"));
+    }
+
     return $this;
   }
 

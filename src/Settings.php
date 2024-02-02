@@ -7,6 +7,7 @@ use Acquia\Drupal\RecommendedSettings\Config\DefaultConfig;
 use Acquia\Drupal\RecommendedSettings\Config\SettingsConfig;
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem;
+use Consolidation\Config\ConfigInterface;
 
 /**
  * Core class of the plugin.
@@ -16,6 +17,11 @@ use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem;
  * @internal
  */
 class Settings {
+
+  /**
+   * Config.
+   */
+  protected ConfigInterface $config;
 
   /**
    * Settings warning.
@@ -97,15 +103,16 @@ WARNING;
    */
   public function generate(array $overrideData = []): void {
     try {
+      $site = $this->config->get("site");
       // Replace variables in local.settings.php file.
       $config = new ConfigInitializer($this->config);
-      $config = $config->loadAllConfig();
+      $config->setSite($site);
+      $config = $config->initialize()->loadAllConfig();
       if ($overrideData) {
         $config->addConfig($overrideData);
       }
       $config = $config->processConfig();
 
-      $site = $config->get("site");
       $docroot = $config->get("docroot");
       $this->copyGlobalSettings();
       $this->copySiteSettings();
