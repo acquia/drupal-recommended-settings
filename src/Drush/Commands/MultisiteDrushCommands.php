@@ -72,7 +72,7 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
           'port' => '3306',
         ];
         $dbSpec = [
-          "drupal" => ["db" => $db]
+          "drupal" => ["db" => $db],
         ];
         if (!($options['db-url'])) {
           if (EnvironmentDetector::isLocalEnv()) {
@@ -89,7 +89,7 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
           $this->postGenerateSettings($commandData);
         }
         catch (SettingsException $e) {
-          $this->io()->warning($e->getMessage());
+          $this->io()->error($e->getMessage());
         }
       }
     }
@@ -103,6 +103,7 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
     $status = TRUE;
     foreach ($handlers as $handler) {
       $status = $handler($commandData);
+      $this->debugCommand($handler);
       if (!$status) {
         return FALSE;
       }
@@ -117,6 +118,7 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
     $handlers = $this->getCustomEventHandlers(self::POST_GENERATE_SETTINGS);
     foreach ($handlers as $handler) {
       $handler($commandData);
+      $this->debugCommand($handler);
     }
   }
 
@@ -127,6 +129,7 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
    *   The site name.
    * @param string[] $default_credentials
    *   The default db credentials.
+   *
    * @return string[]
    *   The database specs.
    */
@@ -141,6 +144,24 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
       $credentials['port'] = $this->io()->ask("Local database port", $credentials['port']);
     }
     return $credentials;
+  }
+
+  /**
+   * Method to print command in terminal.
+   *
+   * @param object[] $handler
+   *   An array of command handler.
+   */
+  private function debugCommand(array $handler): void {
+    $object = $handler[0] ?? NULL;
+    $method = $handler[1] ?? NULL;
+    $className = is_object($object) ? $object::class : "";
+    $commandInvoked = ($className && $method) ? "$className::$method" : "";
+    if ($commandInvoked) {
+      $this->logger()->debug(
+        "Invoked command: <info>$commandInvoked</info>."
+      );
+    }
   }
 
 }
