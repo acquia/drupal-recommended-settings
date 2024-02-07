@@ -27,9 +27,8 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
 
   /**
    * A copy of the Robo builder.
-   *
    */
-  protected \Robo\Collection\CollectionBuilder $builder;
+  protected CollectionBuilder $builder;
 
   /**
    * Executor constructor.

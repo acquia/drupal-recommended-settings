@@ -9,7 +9,6 @@ use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
 use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
 use Acquia\Drupal\RecommendedSettings\Robo\Tasks\LoadTasks;
-use Acquia\Drupal\RecommendedSettings\Settings;
 use Consolidation\AnnotatedCommand\AnnotationData;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drush\Attributes as Cli;
@@ -79,7 +78,6 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    */
   protected function invokeCommand(string $command_name, array $args = []): void {
     $options = $this->input()->getOptions();
-    $drushOptions = [];
     foreach ($options as $key => $value) {
       if ($value === NULL || $key === "define" || $value == FALSE) {
         unset($options[$key]);
@@ -89,7 +87,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
     $this->output->writeln("<comment> > " . $command_name . "</comment>");
     $output = $this->output();
     $process->setTty(Process::isTtySupported());
-    $process->run(static function ($type, $buffer) use ($output, $process): void {
+    $process->run(static function ($type, $buffer) use ($output): void {
       if (Process::ERR === $type) {
         $output->getErrorOutput()->write($buffer, FALSE, OutputInterface::OUTPUT_NORMAL);
       }
@@ -106,7 +104,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    *   The name of a multisite, e.g., if docroot/sites/example.com is the site,
    *   $site_name would be example.com.
    */
-  public function switchSiteContext(string $site_name) {
+  public function switchSiteContext(string $site_name): void {
     $this->logger->debug("Switching site context to <comment>$site_name</comment>.");
     $this->initializeConfig($site_name);
   }
@@ -115,7 +113,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    * Initialize the configuration.
    *
    * @param string $site_name
-   *   Given site name
+   *   Given site name.
    */
   protected function initializeConfig(string $site_name = ""): void {
     $config = new DefaultDrushConfig($this->getConfig());

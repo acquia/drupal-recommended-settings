@@ -10,7 +10,7 @@ use Drush\Attributes as CLI;
 use Drush\Commands\DrushCommands;
 
 /**
- * This
+ * Base hook commands.
  */
 class HooksDrushCommands extends DrushCommands {
 

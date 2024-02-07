@@ -32,7 +32,6 @@ class ConfigInitializer {
 
   /**
    * Input.
-   *
    */
   protected ?InputInterface $input;
 
@@ -44,8 +43,10 @@ class ConfigInitializer {
   /**
    * ConfigInitializer constructor.
    *
-   * @param string $site
-   *   Drupal site uri. Ex: site1, site2 etc.
+   * @param \Consolidation\Config\ConfigInterface $config
+   *   The config object.
+   * @param \Symfony\Component\Console\Input\InputInterface|null $input
+   *   An input object or null.
    */
   public function __construct(ConfigInterface $config, ?InputInterface $input = NULL) {
     $this->config = $config;

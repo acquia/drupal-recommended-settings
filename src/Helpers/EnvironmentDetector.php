@@ -3,6 +3,7 @@
 namespace Acquia\Drupal\RecommendedSettings\Helpers;
 
 use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
+use Acquia\Drupal\RecommendedSettings\Config\DefaultConfig;
 use Acquia\DrupalEnvironmentDetector\AcquiaDrupalEnvironmentDetector;
 use loophp\phposinfo\Enum\FamilyName;
 use loophp\phposinfo\OsInfo;
@@ -227,7 +228,8 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
       // factory site is active. The hostname must have a corresponding entry
       // under the multisites key.
       $input = new ArgvInput($argv);
-      $config_initializer = new ConfigInitializer(self::getRepoRoot(), $input);
+      $config = new DefaultConfig(self::getRepoRoot());
+      $config_initializer = new ConfigInitializer($config, $input);
       $drs_config = $config_initializer->initialize();
 
       // The hostname must match the pattern local.[site-name].com, where

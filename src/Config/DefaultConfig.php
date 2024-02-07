@@ -12,8 +12,8 @@ class DefaultConfig extends Config {
   /**
    * Config Constructor.
    *
-   * @param string[] $data
-   *   Data array, if available.
+   * @param string $drupal_root
+   *   The path to Drupal webroot.
    */
   public function __construct(string $drupal_root) {
     parent::__construct();

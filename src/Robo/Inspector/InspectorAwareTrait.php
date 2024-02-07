@@ -9,7 +9,6 @@ trait InspectorAwareTrait {
 
   /**
    * The inspector.
-   *
    */
   private Inspector $inspector;
 

@@ -40,20 +40,18 @@ class DrushTask extends CommandStack {
 
   /**
    * Site uri to append uri option to each command.
-   *
    */
   protected string|NULL $uri;
 
   /**
    * Indicates if the command output should be verbose.
-   *
    */
   protected bool $verbose = FALSE;
 
   /**
    * Indicates if the command output should be very verbose.
    */
-  protected  bool $veryVerbose = FALSE;
+  protected bool $veryVerbose = FALSE;
 
   /**
    * Indicates if the command output should be debug verbosity.

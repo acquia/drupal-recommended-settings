@@ -13,11 +13,10 @@ class DefaultDrushConfig extends Config {
   /**
    * Config Constructor.
    *
-   * @param string[] $data
-   *   Data array, if available.
+   * @param \Consolidation\Config\ConfigInterface $config
+   *   The config object.
    */
   public function __construct(ConfigInterface $config) {
-    $uri = $config->get("options.uri") ?? "default";
     $config->set('repo.root', $config->get("runtime.project"));
     $config->set('docroot', $config->get("options.root"));
     $config->set('composer.bin', $config->get("drush.vendor-dir") . '/bin');
