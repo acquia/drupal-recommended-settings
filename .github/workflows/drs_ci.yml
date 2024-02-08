@@ -47,16 +47,22 @@ jobs:
          ../orca/bin/ci/after_failure.sh
          ../orca/bin/ci/after_script.sh
  PHPUNIT_TESTS:
-    name: "Execute PHPUnit tests"
+    name: "Run PHPUnit tests on PHP: ${{ matrix.php-version }}"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version:
+          - 8.1
+          - 8.2
+          - 8.3
     env:
-      ORCA_FIXTURE_DIR: "/home/runner/work/drupal-recommended-settings/orca-build"
+      ORCA_JOB: ISOLATED_TEST_ON_CURRENT
       CI: TRUE
     steps:
       - uses: actions/checkout@v3
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: ${{ matrix.php-version }}
           coverage: xdebug
       - name: Download ORCA
         run: composer create-project --no-dev --ignore-platform-req=php acquia/orca ../orca "$ORCA_VERSION" -n
