@@ -64,13 +64,14 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           coverage: xdebug
+          ini-file: development
       - name: Download ORCA
         run: composer create-project --no-dev --ignore-platform-req=php acquia/orca ../orca "$ORCA_VERSION" -n
       - name: Before Install
         run: ../orca/bin/ci/before_install.sh
       - name: Install
         run: ../orca/bin/ci/install.sh
-      - name: Before script
+      - name: Before Script
         run: ../orca/bin/ci/before_script.sh
       - name: Script
         run: ../orca/bin/ci/script.sh

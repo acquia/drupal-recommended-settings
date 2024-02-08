@@ -3,10 +3,10 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\functional\Config;
 
 use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
 use Drush\Config\DrushConfig;
 
-class DefaultDrushConfigTest extends FunctionalTestBase {
+class DefaultDrushConfigTest extends FunctionalBaseTest {
 
   public function testDefaultDrushConfigData(): void {
     $drupal_root = $this->getFixtureDirectory() . "/project/docroot";

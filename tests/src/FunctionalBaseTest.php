@@ -4,7 +4,7 @@ namespace Acquia\Drupal\RecommendedSettings\Tests;
 
 use PHPUnit\Framework\TestCase;
 
-class FunctionalTestBase extends TestCase {
+abstract class FunctionalBaseTest extends TestCase {
 
   protected function getFixtureDirectory(): string {
     return realpath(__DIR__ . "/../fixtures");

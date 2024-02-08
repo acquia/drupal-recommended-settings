@@ -3,9 +3,9 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\functional\Config;
 
 use Acquia\Drupal\RecommendedSettings\Config\SettingsConfig;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
 
-class SettingsConfigTest extends FunctionalTestBase {
+class SettingsConfigTest extends FunctionalBaseTest {
 
   protected string $file;
 

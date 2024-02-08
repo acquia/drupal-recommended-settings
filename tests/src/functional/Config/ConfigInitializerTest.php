@@ -3,13 +3,13 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\functional\Config;
 
 use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
 use Consolidation\Config\Config;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 
-class ConfigInitializerTest extends FunctionalTestBase {
+class ConfigInitializerTest extends FunctionalBaseTest {
 
   public function testSetSite(): void {
     $config = new Config();
