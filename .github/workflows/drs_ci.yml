@@ -66,10 +66,8 @@ jobs:
         run: ../orca/bin/ci/install.sh
       - name: Before script
         run: ../orca/bin/ci/before_script.sh
-      - name: Run PHPUnit tests
-        run: |
-          composer install
-          ./vendor/bin/phpunit tests
+      - name: Script
+        run: ../orca/bin/ci/script.sh
       - name: After script
         run: |
           ../orca/bin/ci/after_success.sh
