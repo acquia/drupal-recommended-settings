@@ -89,6 +89,8 @@ class ConfigInitializer {
     }
     $environment = $this->determineEnvironment();
     $this->config->set('environment', $environment);
+
+    $this->processor->add($this->config->export());
     return $this;
   }
 
@@ -118,7 +120,7 @@ class ConfigInitializer {
    * @return $this
    *   Config.
    */
-  public function loadProjectConfig(): ConfigInitializer {
+  protected function loadProjectConfig(): ConfigInitializer {
     $this->processor->extend($this->loader->load($this->config->get('repo.root') . "/drs/config.yml"));
     return $this;
   }
@@ -129,7 +131,7 @@ class ConfigInitializer {
    * @return $this
    *   Config.
    */
-  public function loadSiteConfig(): ConfigInitializer {
+  protected function loadSiteConfig(): ConfigInitializer {
     if ($this->site) {
       // Since docroot can change in the project, we need to respect that here.
       $this->config->replace($this->processor->export());
@@ -155,7 +157,7 @@ class ConfigInitializer {
    *
    * @throws \ReflectionException
    */
-  public function determineEnvironment(): string {
+  protected function determineEnvironment(): string {
     if ($this->config->get('environment')) {
       return $this->config->get('environment');
     }
