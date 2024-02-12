@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 class PluginUnitTest extends TestCase {
 
   /**
-   * The recommended settings object.
+   * The recommended setting's plugin object.
    */
   protected Plugin $plugin;
 
@@ -19,6 +19,7 @@ class PluginUnitTest extends TestCase {
    * The Composer service.
    */
   protected Composer $composer;
+
   /**
    * Composer's I/O service.
    */
