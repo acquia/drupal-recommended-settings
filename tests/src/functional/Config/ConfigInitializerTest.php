@@ -9,18 +9,27 @@ use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 
+/**
+ * Functional test for the ConfigInitializer class.
+ *
+ * @covers \Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer
+ */
 class ConfigInitializerTest extends FunctionalBaseTest {
 
+  /**
+   * Tests setSite() method.
+   *
+   * @throws \ReflectionException
+   */
   public function testSetSite(): void {
     $config = new Config();
     $config_initializer = new ConfigInitializer($config);
 
-    $reflectionClass = $this->getReflectionClass($config_initializer::class);
-    $method = $this->getReflectionMethod($reflectionClass, "setSite");
+    $method = $this->getReflectionMethod($config_initializer::class, "setSite");
     $result = $method->invokeArgs($config_initializer, ['site1']);
     $this->assertNull($result);
 
-    $property = $this->getReflectionProperty($reflectionClass, 'config');
+    $property = $this->getReflectionProperty($config_initializer::class, 'config');
     $value = $property->getValue($config_initializer);
 
     $this->assertEquals($value->export(), [
@@ -31,36 +40,43 @@ class ConfigInitializerTest extends FunctionalBaseTest {
     ]);
   }
 
+  /**
+   * Tests determineSite() method.
+   *
+   * @throws \ReflectionException
+   */
   public function testDetermineSite(): void {
     $config = new Config();
     $config_initializer = new ConfigInitializer($config);
-    $reflectionClass = $this->getReflectionClass($config_initializer::class);
-    $method = $this->getReflectionMethod($reflectionClass, "determineSite");
+    $method = $this->getReflectionMethod($config_initializer::class, "determineSite");
     $result = $method->invoke($config_initializer);
 
     $this->assertSame("default", $result);
 
     $input = new StringInput("");
-    $inputOption = new InputOption("uri", "l", InputOption::VALUE_OPTIONAL);
-    $inputDefinition = new InputDefinition([$inputOption]);
-    $input->bind($inputDefinition);
+    $input_option = new InputOption("uri", "l", InputOption::VALUE_OPTIONAL);
+    $input_definition = new InputDefinition([$input_option]);
+    $input->bind($input_definition);
 
     $input->setOption("uri", "site1");
 
     $config_initializer = new ConfigInitializer($config, $input);
-    $reflectionClass = $this->getReflectionClass($config_initializer::class);
-    $method = $this->getReflectionMethod($reflectionClass, "determineSite");
+    $method = $this->getReflectionMethod($config_initializer::class, "determineSite");
     $result = $method->invoke($config_initializer);
 
     $this->assertSame("site1", $result);
   }
 
+  /**
+   * Tests determineEnvironment() method.
+   *
+   * @throws \ReflectionException
+   */
   public function testDetermineEnvironment(): void {
     putenv("CI=");
     $config = new Config();
     $config_initializer = new ConfigInitializer($config);
-    $reflectionClass = $this->getReflectionClass($config_initializer::class);
-    $method = $this->getReflectionMethod($reflectionClass, "determineEnvironment");
+    $method = $this->getReflectionMethod($config_initializer::class, "determineEnvironment");
     $result = $method->invoke($config_initializer);
     $this->assertSame("local", $result);
 
@@ -72,18 +88,20 @@ class ConfigInitializerTest extends FunctionalBaseTest {
     $config = new Config();
     $config->set("environment", "dev");
     $config_initializer = new ConfigInitializer($config);
-    $reflectionClass = $this->getReflectionClass($config_initializer::class);
-    $method = $this->getReflectionMethod($reflectionClass, "determineEnvironment");
+    $method = $this->getReflectionMethod($config_initializer::class, "determineEnvironment");
     $result = $method->invoke($config_initializer);
     $this->assertSame("dev", $result);
   }
 
+  /**
+   * Tests the initialize() method.
+   */
   public function testInitialize(): void {
     putenv("CI=");
     $config = new Config();
-    $configInitializer = new ConfigInitializer($config);
-    $configInitializer->initialize();
-    $this->assertEquals($configInitializer->processConfig()->export(), [
+    $config_initializer = new ConfigInitializer($config);
+    $config_initializer->initialize();
+    $this->assertEquals($config_initializer->processConfig()->export(), [
       "site" => "default",
       "drush" => [
         "uri" => "default",
@@ -91,11 +109,11 @@ class ConfigInitializerTest extends FunctionalBaseTest {
       "environment" => "local",
     ]);
 
-    $configInitializer = new ConfigInitializer($config);
-    $configInitializer->setSite("site1");
-    $configInitializer->initialize();
+    $config_initializer = new ConfigInitializer($config);
+    $config_initializer->setSite("site1");
+    $config_initializer->initialize();
 
-    $this->assertEquals($configInitializer->processConfig()->export(), [
+    $this->assertEquals($config_initializer->processConfig()->export(), [
       "site" => "site1",
       "drush" => [
         "uri" => "site1",
@@ -105,10 +123,10 @@ class ConfigInitializerTest extends FunctionalBaseTest {
 
     putenv("CI=true");
     $config = new Config();
-    $configInitializer = new ConfigInitializer($config);
-    $configInitializer->initialize();
+    $config_initializer = new ConfigInitializer($config);
+    $config_initializer->initialize();
 
-    $this->assertEquals($configInitializer->processConfig()->export(), [
+    $this->assertEquals($config_initializer->processConfig()->export(), [
       "site" => "default",
       "drush" => [
         "uri" => "default",
@@ -118,11 +136,14 @@ class ConfigInitializerTest extends FunctionalBaseTest {
     putenv("CI=");
   }
 
+  /**
+   * Tests the loadAllConfig() method.
+   */
   public function testLoadAllConfig(): void {
     putenv("CI=");
     $config = new Config();
-    $configInitializer = new ConfigInitializer($config);
-    $config = $configInitializer->initialize()->loadAllConfig()->processConfig();
+    $config_initializer = new ConfigInitializer($config);
+    $config = $config_initializer->initialize()->loadAllConfig()->processConfig();
     $this->assertEquals($config->export(), [
       "site" => "default",
       "drush" => [
@@ -141,10 +162,11 @@ class ConfigInitializerTest extends FunctionalBaseTest {
     ]);
 
     $config = new Config();
-    $projectDir = $this->getFixtureDirectory() . "/project";
-    $config->set("repo.root", $projectDir);
-    $configInitializer = new ConfigInitializer($config);
-    $config = $configInitializer->initialize()->loadAllConfig()->processConfig();
+    $project_root = $this->getProjectRoot();
+    $drupal_root = $this->getDrupalRoot();
+    $config->set("repo.root", $project_root);
+    $config_initializer = new ConfigInitializer($config);
+    $config = $config_initializer->initialize()->loadAllConfig()->processConfig();
 
     $this->assertEquals($config->export(), [
       "site" => "default",
@@ -153,7 +175,7 @@ class ConfigInitializerTest extends FunctionalBaseTest {
       ],
       "environment" => "local",
       "repo" => [
-        "root" => $projectDir,
+        "root" => $project_root,
       ],
       "drupal" => [
         "db" => [
@@ -167,22 +189,21 @@ class ConfigInitializerTest extends FunctionalBaseTest {
     ]);
 
     $config = new Config();
-    $projectDir = $this->getFixtureDirectory() . "/project";
-    $config->set("repo.root", $projectDir);
-    $config->set("docroot", "$projectDir/docroot");
-    $configInitializer = new ConfigInitializer($config);
-    $configInitializer = $configInitializer->initialize()->loadAllConfig();
+    $config->set("repo.root", $project_root);
+    $config->set("docroot", $this->getDrupalRoot());
+    $config_initializer = new ConfigInitializer($config);
+    $config_initializer = $config_initializer->initialize()->loadAllConfig();
 
-    $this->assertEquals($configInitializer->processConfig()->export(), [
+    $this->assertEquals($config_initializer->processConfig()->export(), [
       "site" => "default",
       "drush" => [
         "uri" => "default",
       ],
       "environment" => "local",
       "repo" => [
-        "root" => $projectDir,
+        "root" => $project_root,
       ],
-      "docroot" => "$projectDir/docroot",
+      "docroot" => $this->getDrupalRoot(),
       "drupal" => [
         "db" => [
           "database" => "default",
@@ -194,7 +215,7 @@ class ConfigInitializerTest extends FunctionalBaseTest {
       ],
     ]);
 
-    $configInitializer->addConfig([
+    $config_initializer->addConfig([
       "drupal" => [
         "db" => [
           "database" => "override",
@@ -202,16 +223,16 @@ class ConfigInitializerTest extends FunctionalBaseTest {
       ],
     ]);
 
-    $this->assertEquals($configInitializer->processConfig()->export(), [
+    $this->assertEquals($config_initializer->processConfig()->export(), [
       "site" => "default",
       "drush" => [
         "uri" => "default",
       ],
       "environment" => "local",
       "repo" => [
-        "root" => $projectDir,
+        "root" => $project_root,
       ],
-      "docroot" => "$projectDir/docroot",
+      "docroot" => $drupal_root,
       "drupal" => [
         "db" => [
           "database" => "override",

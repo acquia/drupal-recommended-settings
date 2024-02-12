@@ -17,6 +17,7 @@
   <php>
     <ini name="error_reporting" value="-1"/>
     <env name="COLUMNS" value="80" force="true" />
+<!--    <env name="ORCA_FIXTURE_DIR" value="/Applications/MAMP/htdocs/acquia_cms" force="true" />-->
   </php>
 
   <testsuites>
@@ -30,9 +31,11 @@
     <include>
       <directory suffix=".php">src</directory>
     </include>
-    <report>
-      <clover outputFile="var/phpunit/clover.xml"/>
-    </report>
+<!--    <report>-->
+<!--      <html outputDirectory="coverage" lowUpperBound="50" highLowerBound="90"/>-->
+<!--    </report>-->
   </coverage>
-
+<!--  <logging>-->
+<!--    <testdoxHtml outputFile="testdox.html"/>-->
+<!--  </logging>-->
 </phpunit>

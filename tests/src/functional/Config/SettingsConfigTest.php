@@ -4,16 +4,35 @@ namespace Acquia\Drupal\RecommendedSettings\Tests\functional\Config;
 
 use Acquia\Drupal\RecommendedSettings\Config\SettingsConfig;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
+use Acquia\Drupal\RecommendedSettings\Tests\Traits\FileCreationTraitTest;
+use Acquia\Drupal\RecommendedSettings\Tests\Traits\StringTraitTest;
 
+/**
+ * Functional test for the SettingsConfig class.
+ *
+ * @covers \Acquia\Drupal\RecommendedSettings\Config\SettingsConfig
+ */
 class SettingsConfigTest extends FunctionalBaseTest {
 
+  use StringTraitTest;
+  use FileCreationTraitTest;
+
+  /**
+   * Holds the path to file.
+   */
   protected string $file;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
-    $this->file = $this->getFixtureDirectory() . "/" . $this->randomFileName() . ".txt";
+    $this->file = $this->getProjectRoot() . "/" . $this->randomString(5) . ".txt";
   }
 
+  /**
+   * Tests the set() method.
+   */
   public function testSetMethod(): void {
     $settings_config = new SettingsConfig();
     $settings_config->set("a.b.c", "true");
@@ -36,6 +55,9 @@ class SettingsConfigTest extends FunctionalBaseTest {
     ], "The dollar notation for string 'true', 'false' also should resolve to boolean.");
   }
 
+  /**
+   * Tests the get() method.
+   */
   public function testGetMethod(): void {
     $settings_config = new SettingsConfig();
     $settings_config->set("a.b.c", "true");
@@ -43,12 +65,15 @@ class SettingsConfigTest extends FunctionalBaseTest {
     $this->assertEquals($settings_config->get("d"), 'This should be boolean 1 value.');
   }
 
+  /**
+   * Tests the replaceFileVariables() method.
+   */
   public function testReplaceFileVariables(): void {
     $content = <<<Content
 My name is '\${name.firstname} \${name.lastname}'.
 I live in city: '\${country.state.city.name}' of state: '\${country.state.name}' in country: '\${country.name}'.
 Content;
-    $this->createConfigFile($content);
+    $this->createFile($this->file, $content);
     $settings_config = new SettingsConfig([
       "name" => [
         "firstname" => "Drupal",
@@ -72,24 +97,12 @@ Content;
     $this->assertSame($expectedContent, file_get_contents($this->file));
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function tearDown(): void {
     parent::tearDown();
     @unlink($this->file);
-  }
-
-  protected function randomFileName(): string {
-    return substr(
-      str_shuffle(
-        str_repeat(
-          $x = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(5 / strlen($x)),
-        )
-      ), 1, 5);
-  }
-
-  protected function createConfigFile(string $content): void {
-    $config = fopen($this->file, "w") or die("Unable to open file!");
-    fwrite($config, $content);
-    fclose($config);
   }
 
 }

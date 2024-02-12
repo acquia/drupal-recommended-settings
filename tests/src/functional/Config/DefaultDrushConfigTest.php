@@ -6,11 +6,19 @@ use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
 use Drush\Config\DrushConfig;
 
+/**
+ * Functional test for the DefaultDrushConfig class.
+ *
+ * @covers \Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig
+ */
 class DefaultDrushConfigTest extends FunctionalBaseTest {
 
+  /**
+   * Tests the default config data.
+   */
   public function testDefaultDrushConfigData(): void {
-    $drupal_root = $this->getFixtureDirectory() . "/project/docroot";
-    $project_root = dirname($drupal_root);
+    $drupal_root = $this->getDrupalRoot();
+    $project_root = $this->getProjectRoot();
 
     $drushConfig = new DrushConfig();
     $drushConfig->set("runtime.project", $project_root);
