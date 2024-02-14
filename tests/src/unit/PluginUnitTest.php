@@ -55,20 +55,20 @@ class PluginUnitTest extends FunctionalBaseTest {
    * Test to get project root.
    */
   public function testGetProjectRoot(): void {
-    $getProjectRootMethod = $this->getReflectionMethod(Plugin::class, "getProjectRoot");
-    $projectRootPath = $getProjectRootMethod->invoke($this->plugin);
+    $method = $this->getReflectionMethod(Plugin::class, "getProjectRoot");
+    $project_root_dir = $method->invoke($this->plugin);
     // Assertion to check project root path.
-    $this->assertEquals($this->getProjectRoot(), $projectRootPath);
+    $this->assertEquals($this->getProjectRoot(), $project_root_dir);
   }
 
   /**
    * Test to get drupal root.
    */
   public function testGetDrupalRoot(): void {
-    $getDrupalRootMethod = $this->getReflectionMethod(Plugin::class, "getDrupalRoot");
-    $drupalRootPath = $getDrupalRootMethod->invoke($this->plugin);
+    $method = $this->getReflectionMethod(Plugin::class, "getDrupalRoot");
+    $drupal_root_dir = $method->invoke($this->plugin);
     // Assertion to check project docroot path.
-    $this->assertEquals(realpath($this->getProjectRoot() . "/docroot"), $drupalRootPath);
+    $this->assertEquals($this->getProjectRoot() . "/docroot", $drupal_root_dir);
   }
 
   /**
@@ -77,12 +77,12 @@ class PluginUnitTest extends FunctionalBaseTest {
   public function testGetSettingsPackage(): void {
     $repository = $this->createMock(RepositoryInterface::class);
     $operation = new InstallOperation($this->composer->getPackage());
-    $packageEvent = new PackageEvent("install", $this->composer, $this->io, FALSE, $repository, [], $operation);
-    $this->plugin->onPostPackageEvent($packageEvent);
-    $getSettingsPackageMethod = $this->getReflectionMethod(Plugin::class, "getSettingsPackage");
-    $getSettingsPackage = $getSettingsPackageMethod->invokeArgs($this->plugin, [$operation]);
+    $package_event = new PackageEvent("install", $this->composer, $this->io, FALSE, $repository, [], $operation);
+    $this->plugin->onPostPackageEvent($package_event);
+    $method = $this->getReflectionMethod(Plugin::class, "getSettingsPackage");
+    $package_name = $method->invokeArgs($this->plugin, [$operation]);
     // Assertion to check package name.
-    $this->assertEquals($getSettingsPackage, "acquia/drupal-recommended-settings-1.0");
+    $this->assertEquals($package_name, "acquia/drupal-recommended-settings-1.0");
   }
 
 }
