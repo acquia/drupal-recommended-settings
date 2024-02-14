@@ -3,8 +3,9 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\unit;
 
 use Acquia\Drupal\RecommendedSettings\Settings;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
 
-class SettingsUnitTest extends DrsPhpUnitBase {
+class SettingsUnitTest extends FunctionalBaseTest {
 
   /**
    * The path to settings for testing.
@@ -22,14 +23,13 @@ class SettingsUnitTest extends DrsPhpUnitBase {
   public function setUp(): void {
     $this->drupalRoot = dirname(__FILE__, 3) . "/fixtures/project/docroot";
     $this->settings = new Settings($this->drupalRoot, "default");
-    $this->setClass($this->settings);
   }
 
   /**
    * Test copies the default site specific setting files.
    */
   public function testCopySiteSettings(): void {
-    $getSettingsMethod = $this->getClassMethod("copySiteSettings");
+    $getSettingsMethod = $this->getReflectionMethod(Settings::class, "copySiteSettings");
     $actualSettingsData = $getSettingsMethod->invoke($this->settings);
     $this->assertTrue($actualSettingsData);
     // Assert that default.includes.settings.php file exist.
@@ -42,7 +42,7 @@ class SettingsUnitTest extends DrsPhpUnitBase {
    * Test copies the default global specific setting files.
    */
   public function testGlobalSiteSettings(): void {
-    $getSettingsMethod = $this->getClassMethod("copyGlobalSettings");
+    $getSettingsMethod = $this->getReflectionMethod(Settings::class, "copyGlobalSettings");
     $actualGlobalSettingsData = $getSettingsMethod->invoke($this->settings);
     $this->assertTrue($actualGlobalSettingsData);
     // Assert that default.global.settings.php file exist.
@@ -53,7 +53,8 @@ class SettingsUnitTest extends DrsPhpUnitBase {
    * Test AppendIfMatchesCollect Method.
    */
   public function testAppendIfMatchesCollect(): void {
-    $getAppendIfMatchesCollectMethod = $this->getClassMethod("appendIfMatchesCollect");
+    touch($this->drupalRoot . '/sites/default/settings.php');
+    $getAppendIfMatchesCollectMethod = $this->getReflectionMethod(Settings::class, "appendIfMatchesCollect");
     $file = $this->drupalRoot . '/sites/default/settings.php';
     $pattern = '#vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php#';
     $content = 'require DRUPAL_ROOT . "/../vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php"';
@@ -65,6 +66,7 @@ class SettingsUnitTest extends DrsPhpUnitBase {
     $this->assertFileExists($this->drupalRoot . '/sites/default/settings.php');
     // Assert that settings.php file content matches exist.
     $this->assertEquals($content, file_get_contents($this->drupalRoot . '/sites/default/settings.php'));
+
   }
 
   /**
@@ -73,10 +75,10 @@ class SettingsUnitTest extends DrsPhpUnitBase {
   protected function tearDown(): void {
     parent::tearDown();
     // Remove all testing files.
-    unlink($this->drupalRoot . "/sites/default/settings.php");
-    unlink($this->drupalRoot . "/sites/settings/default.global.settings.php");
-    unlink($this->drupalRoot . "/sites/default/settings/default.local.settings.php");
-    unlink($this->drupalRoot . "/sites/default/settings/default.includes.settings.php");
+    @unlink($this->drupalRoot . "/sites/default/settings.php");
+    @unlink($this->drupalRoot . "/sites/settings/default.global.settings.php");
+    @unlink($this->drupalRoot . "/sites/default/settings/default.local.settings.php");
+    @unlink($this->drupalRoot . "/sites/default/settings/default.includes.settings.php");
   }
 
 }
