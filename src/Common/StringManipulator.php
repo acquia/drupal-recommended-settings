@@ -19,8 +19,10 @@ class StringManipulator {
    *   The trimmed text.
    */
   public static function trimEndingLines(string $text, int $num_lines): string {
-    return implode("\n",
-      array_slice(explode("\n", $text), 0, count($text) - $num_lines));
+    $array_of_lines = explode(PHP_EOL, $text);
+    return implode(PHP_EOL,
+      array_slice($array_of_lines, 0, count($array_of_lines) - $num_lines)
+    );
   }
 
   /**
@@ -82,11 +84,9 @@ class StringManipulator {
    *
    * @param string $string
    *   String.
-   *
-   * @return mixed
-   *   Prefix.
    */
-  public static function convertStringToPrefix(string $string): mixed {
+  public static function convertStringToPrefix(string $string): string
+  {
     $words = explode(' ', $string);
     $prefix = '';
     foreach ($words as $word) {
@@ -106,16 +106,6 @@ class StringManipulator {
    */
   public static function commandConvert(string $command): array {
     return explode(" ", $command);
-  }
-
-  /**
-   * Provides a common warning for command string / array use.
-   *
-   * @return string
-   *   The deprecation warning.
-   */
-  public static function stringToArrayMsg(): string {
-    return "Deprecation Warning: this command is passing a command string and should pass a command array.";
   }
 
 }
