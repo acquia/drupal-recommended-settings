@@ -6,7 +6,6 @@
  */
 
 use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
-use Drupal\Component\Assertion\Handle;
 
 $db_name = '${drupal.db.database}';
 

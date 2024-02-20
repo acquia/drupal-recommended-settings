@@ -16,10 +16,15 @@ trait SiteUriTrait {
    *
    * This code copied from SiteInstallCommands.php file.
    *
+   * @param string $root
+   *   The path to drupal docroot.
+   * @param string $uri
+   *   The site uri.
+   *
    * @return array|false|mixed|string|string[]
    *   Returns the site uri.
    */
-  private function getSitesSubdirFromUri($root, $uri): mixed {
+  private function getSitesSubdirFromUri(string $root, string $uri): mixed {
     $dir = strtolower($uri);
     // Always accept simple uris (e.g. 'dev', 'stage', etc.)
     if (preg_match('#^[a-z0-9_-]*$#', $dir)) {

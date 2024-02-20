@@ -16,9 +16,7 @@ use Drush\Attributes as CLI;
 use Drush\Boot\BootstrapManager;
 use Drush\Boot\DrupalBootLevels;
 use Drush\Commands\DrushCommands;
-use Drush\Drush;
 use Psr\Container\ContainerInterface as DrushContainer;
-use Symfony\Component\Filesystem\Path;
 
 /**
  * A Drush command to generate settings.php for Multisite.
@@ -74,7 +72,7 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
           'port' => '3306',
         ];
         $dbSpec = [
-          "drupal" => ["db" => $db]
+          "drupal" => ["db" => $db],
         ];
         if (!($options['db-url'])) {
           if (EnvironmentDetector::isLocalEnv()) {
@@ -91,7 +89,7 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
           $this->postGenerateSettings($commandData);
         }
         catch (SettingsException $e) {
-          $this->io()->warning($e->getMessage());
+          $this->io()->error($e->getMessage());
         }
       }
     }
@@ -105,6 +103,7 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
     $status = TRUE;
     foreach ($handlers as $handler) {
       $status = $handler($commandData);
+      $this->debugCommand($handler);
       if (!$status) {
         return FALSE;
       }
@@ -119,6 +118,7 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
     $handlers = $this->getCustomEventHandlers(self::POST_GENERATE_SETTINGS);
     foreach ($handlers as $handler) {
       $handler($commandData);
+      $this->debugCommand($handler);
     }
   }
 
@@ -127,13 +127,15 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
    *
    * @param string $site_name
    *   The site name.
+   * @param string[] $default_credentials
+   *   The default db credentials.
    *
-   * @return array
+   * @return string[]
    *   The database specs.
    */
-  private function askDbCredentials(string $site_name, array $defaultCredentials): array {
+  private function askDbCredentials(string $site_name, array $default_credentials): array {
     $shouldAsk = $this->io()->confirm(dt("Would you like to configure the local database credentials?"));
-    $credentials = $defaultCredentials;
+    $credentials = $default_credentials;
     if ($shouldAsk) {
       $credentials['database'] = $this->io()->ask("Local database name", $site_name);
       $credentials['username'] = $this->io()->ask("Local database user", $credentials['username']);
@@ -142,6 +144,24 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
       $credentials['port'] = $this->io()->ask("Local database port", $credentials['port']);
     }
     return $credentials;
+  }
+
+  /**
+   * Method to print command in terminal.
+   *
+   * @param object[] $handler
+   *   An array of command handler.
+   */
+  private function debugCommand(array $handler): void {
+    $object = $handler[0] ?? NULL;
+    $method = $handler[1] ?? NULL;
+    $className = is_object($object) ? $object::class : "";
+    $commandInvoked = ($className && $method) ? "$className::$method" : "";
+    if ($commandInvoked) {
+      $this->logger()->debug(
+        "Invoked command: <info>$commandInvoked</info>."
+      );
+    }
   }
 
 }
