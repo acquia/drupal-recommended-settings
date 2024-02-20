@@ -40,6 +40,21 @@ trait IO {
   }
 
   /**
+   * Prints the message to terminal.
+   *
+   * @param string $message
+   *   Givem message to print.
+   * @param string $type
+   *   Type of message. Ex: error, success, info etc.
+   * @param string $color
+   *   Given backgound color.
+   */
+  protected function print(string $message, string $type = "success", string $color = "green"): void {
+    $message = " <fg=white;bg=$color;options=bold>[$type]</fg=white;bg=$color;options=bold> " . $message;
+    $this->writeln($message);
+  }
+
+  /**
    * Format text as a question.
    *
    * @param string $message

@@ -84,8 +84,8 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
       }
     }
     $process = Drush::drush(Drush::aliasManager()->getSelf(), $command_name, $args, $options);
-    $this->output->writeln("<comment> > " . $command_name . "</comment>");
     $output = $this->output();
+    $output->writeln("<comment> > " . $command_name . "</comment>");
     $process->setTty(Process::isTtySupported());
     $process->run(static function ($type, $buffer) use ($output): void {
       if (Process::ERR === $type) {
