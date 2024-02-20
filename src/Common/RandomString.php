@@ -42,7 +42,7 @@ class RandomString {
    */
   public static function string(int $length = 8, bool $unique = FALSE, callable $validator = NULL, string $characters = ''): string {
     $counter = 0;
-    $strings = [];
+    static $strings = [];
     $characters_array = $characters ? str_split($characters) : [];
 
     // Continue to loop if $unique is TRUE and the generated string is not
