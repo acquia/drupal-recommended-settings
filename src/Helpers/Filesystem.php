@@ -52,19 +52,19 @@ class Filesystem {
     if (!is_dir($directory)) {
       if (file_exists($directory)) {
         throw new \RuntimeException(
-          $directory . ' exists and is not a directory.'
+          sprintf("The directory '%s' exists and is not a directory.", $directory)
         );
       }
       if (!@mkdir($directory, 0777, TRUE)) {
         throw new \RuntimeException(
-          $directory . ' does not exist and could not be created.'
+          sprintf("The directory '%s' does not exist and could not be created.", $directory)
         );
       }
     }
     else {
       if (!is_writable($directory)) {
         throw new \RuntimeException(
-          $directory . ' exist and is not writable.'
+          sprintf("The directory '%s' exist and is not writable.", $directory)
         );
       }
     }
@@ -173,6 +173,43 @@ class Filesystem {
     if (fwrite($fileHandle, $content) === FALSE) {
       fclose($fileHandle);
       throw new \RuntimeException("Failed to write content to the file: " . $filePath);
+    }
+    return TRUE;
+  }
+
+  /**
+   * Checks & convert to iterable.
+   *
+   * @param string|iterable<string> $files
+   *   A file path or an array of files.
+   *
+   * @return iterable<string>
+   *   Returns an array of files or directories.
+   */
+  private function toIterable(string|iterable $files): iterable {
+    return is_iterable($files) ? $files : [$files];
+  }
+
+  /**
+   * Change permissions for directory, file or an array of files, directories.
+   *
+   * @param string|iterable<string> $files
+   *   A file path or an array of files.
+   * @param int $mode
+   *   Given file mode.
+   * @param int $umask
+   *   Given umask for file.
+   * @param bool $recursive
+   *   Determines if recursive needed.
+   */
+  public function chmod(string|iterable $files, int $mode, int $umask = 0000, bool $recursive = FALSE): bool {
+    foreach ($this->toIterable($files) as $file) {
+      if (file_exists($file) && !chmod($file, $mode & ~$umask)) {
+        $file_or_directory = is_dir($file) ? "directory" : "file";
+        throw new \RuntimeException(
+          sprintf("Failed to change permissions for %s: '%s'.", $file_or_directory, $file)
+        );
+      }
     }
     return TRUE;
   }
