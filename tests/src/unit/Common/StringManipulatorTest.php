@@ -96,32 +96,38 @@ Expected;
       "site:install",
       "minimal",
       "--uri=site1",
-      "--yes"
+      "--yes",
     ], $actual);
   }
 
   /**
    * The dataProvider for method: convertStringToMachineSafe().
+   *
+   * @return \string[][]
+   *   Returns data provider
    */
   public function convertStringToMachineSafeDataProvider(): array {
     return [
-      [ "Acquia CMS Common" , "acquia_cms_common" ],
-      [ 'Acquia-CMS/Common[1]' , "acquia_cms_common_1" ],
-      [ '111Acquia CMS Common' , "_11acquia_cms_common" ],
-      [ '-11Acquia CMS Common' , "_11acquia_cms_common" ],
-      [ '--Acquia CMS Common' , "__acquia_cms_common" ],
-      [ '`~!@#$Acquia%^&*()+<>?;:"{}' , "acquia" ],
+      ["Acquia CMS Common" , "acquia_cms_common"],
+      ['Acquia-CMS/Common[1]' , "acquia_cms_common_1"],
+      ['111Acquia CMS Common' , "_11acquia_cms_common"],
+      ['-11Acquia CMS Common' , "_11acquia_cms_common"],
+      ['--Acquia CMS Common' , "__acquia_cms_common"],
+      ['`~!@#$Acquia%^&*()+<>?;:"{}' , "acquia"],
     ];
   }
 
   /**
    * The dataProvider for method: convertStringToPrefix().
+   *
+   * @return \string[][]
+   *   Returns data provider.
    */
   public function convertStringToPrefixDataProvider(): array {
     return [
       ["Acquia", "A"],
       ["acquia", "A"],
-      ["   acquia", "A"]
+      ["   acquia", "A"],
     ];
   }
 

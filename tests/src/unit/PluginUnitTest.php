@@ -39,7 +39,7 @@ class PluginUnitTest extends FunctionalBaseTest {
     $package->setExtra([
       "drupal-scaffold" => [
         "locations" => [
-          "web-root" => "docroot"
+          "web-root" => "docroot",
         ],
       ],
     ]);

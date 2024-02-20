@@ -11,6 +11,8 @@ abstract class FunctionalBaseTest extends TestCase {
 
   /**
    * An array of fixture files to create.
+   *
+   * @var array<string>
    */
   private array $fixtureFiles = [];
 
@@ -24,11 +26,10 @@ abstract class FunctionalBaseTest extends TestCase {
    */
   private function copyFixtureFiles(string $base_fixture_dir, string $root_fixture_dir): void {
     $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($base_fixture_dir));
-    $files = [];
 
     /** @var \SplFileInfo $file */
     foreach ($rii as $file) {
-      if ($file->isDir()){
+      if ($file->isDir()) {
         continue;
       }
 
@@ -114,7 +115,7 @@ abstract class FunctionalBaseTest extends TestCase {
     if (is_dir($project_dir . "/docroot")) {
       $root_dir = $project_dir . "/docroot";
     }
-    else if (is_dir($project_dir . "/web")) {
+    elseif (is_dir($project_dir . "/web")) {
       $root_dir = $project_dir . "/web";
     }
     else {

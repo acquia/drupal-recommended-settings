@@ -13,7 +13,7 @@ trait StringTraitTest {
    * @param int $length
    *   Given length of string.
    */
-  protected function randomString($length = 5): string {
+  protected function randomString(int $length = 5): string {
     return substr(
       str_shuffle(
         str_repeat(

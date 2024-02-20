@@ -15,9 +15,9 @@ class ArrayManipulatorTest extends TestCase {
   /**
    * Tests arrayMergeRecursiveDistinct() method.
    *
-   * @param array $actual
+   * @param array<string> $actual
    *   An array to create input actual data.
-   * @param array $expected
+   * @param array<string> $expected
    *   An array of expected data.
    *
    * @dataProvider arrayMergeDataProvider
@@ -30,9 +30,9 @@ class ArrayManipulatorTest extends TestCase {
   /**
    * Tests expandFromDotNotatedKeys() method.
    *
-   * @param array $actual
+   * @param array<string> $actual
    *   An array to create input actual data.
-   * @param array $expected
+   * @param array<string> $expected
    *   An array of expected data.
    *
    * @dataProvider expandFromDotNotatedKeysDataProvider
@@ -45,9 +45,9 @@ class ArrayManipulatorTest extends TestCase {
   /**
    * Tests flattenToDotNotatedKeys() method.
    *
-   * @param array $expected
+   * @param array<string> $expected
    *   An array of expected data.
-   * @param array $actual
+   * @param array<string> $actual
    *   An array to create input actual data.
    *
    * @dataProvider expandFromDotNotatedKeysDataProvider
@@ -60,12 +60,12 @@ class ArrayManipulatorTest extends TestCase {
   /**
    * Tests flattenMultidimensionalArray() method.
    *
-   * @param array $expected
+   * @param array<string> $expected
    *   An array of expected data.
    * @param string $glue
    *   A string to join array data.
-   * @param array $actual
-   *   An array to create input actual data
+   * @param array<string> $actual
+   *   An array to create input actual data.
    *
    * @dataProvider flattenMultidimensionalArrayDataProvider
    */
@@ -91,7 +91,8 @@ class ArrayManipulatorTest extends TestCase {
     ];
     $expected = [
       0 => [
-        0 => 'first.second.third', 1 => 'fourth',
+        0 => 'first.second.third',
+        1 => 'fourth',
       ],
       1 => [
         0 => 'first.fifth.0',
@@ -112,6 +113,9 @@ class ArrayManipulatorTest extends TestCase {
 
   /**
    * The dataProvider for method: arrayMergeRecursiveDistinct().
+   *
+   * @return array<string>
+   *   Returns data provider.
    */
   public function arrayMergeDataProvider(): array {
     return [
@@ -122,7 +126,7 @@ class ArrayManipulatorTest extends TestCase {
       [
         [
           ["key1" => "val1", "key2" => "val2", "key3" => "val3"],
-          ["key1" => ["value1", "value2"], "key3" => "value3", "key4" => ["value3", "value4"]]
+          ["key1" => ["value1", "value2"], "key3" => "value3", "key4" => ["value3", "value4"]],
         ],
         ["key1" => ["value1", "value2"], "key2" => "val2", "key3" => "value3", "key4" => ["value3", "value4"]],
       ],
@@ -131,6 +135,9 @@ class ArrayManipulatorTest extends TestCase {
 
   /**
    * The dataProvider for method: expandFromDotNotatedKeys().
+   *
+   * @return array<string>
+   *   Returns data provider.
    */
   public function expandFromDotNotatedKeysDataProvider(): array {
     return [
@@ -147,6 +154,9 @@ class ArrayManipulatorTest extends TestCase {
 
   /**
    * The dataProvider for method: flattenMultidimensionalArray().
+   *
+   * @return array<string>
+   *   Returns data provider.
    */
   public function flattenMultidimensionalArrayDataProvider(): array {
     return [

@@ -42,7 +42,7 @@ class RandomString {
    */
   public static function string(int $length = 8, bool $unique = FALSE, callable $validator = NULL, string $characters = ''): string {
     $counter = 0;
-    $strings = [];
+    static $strings = [];
     $characters_array = $characters ? str_split($characters) : [];
 
     // Continue to loop if $unique is TRUE and the generated string is not
@@ -66,7 +66,7 @@ class RandomString {
 
       $continue = FALSE;
       if ($unique) {
-        $continue = (count(array_unique(str_split($str))) != $length);
+        $continue = isset($strings[$str]);
       }
       if (!$continue && is_callable($validator)) {
         // If the validator callback returns FALSE generate another random
@@ -74,6 +74,10 @@ class RandomString {
         $continue = !call_user_func($validator, $str);
       }
     } while ($continue);
+
+    if ($unique) {
+      $strings[$str] = TRUE;
+    }
 
     return $str;
   }

@@ -2,7 +2,6 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Tests\unit\Common;
 
-use Acquia\Drupal\RecommendedSettings\Common\ArrayManipulator;
 use Acquia\Drupal\RecommendedSettings\Common\RandomString;
 use PHPUnit\Framework\TestCase;
 
@@ -18,19 +17,13 @@ class RandomStringTest extends TestCase {
    */
   protected bool $called = FALSE;
 
- /**
-  * Tests string() method.
-  */
+  /**
+   * Tests string() method.
+   */
   public function testString(): void {
     $string = RandomString::string();
     $this->assertIsString($string);
     $this->assertSame(8, strlen($string));
-
-    $string = RandomString::string(10, TRUE);
-    $this->assertIsString($string);
-    $this->assertSame(10, strlen($string));
-    // Tests that all characters are unique.
-    $this->assertCount(10, array_unique(str_split($string)));
 
     $alphabets = 'abcdefghijklmnopqrstuvwxyz';
     $capital_alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -42,7 +35,7 @@ class RandomStringTest extends TestCase {
     $string = RandomString::string(10, TRUE, NULL, $capital_alphabets);
     $this->assertMatchesAllRegularExpression('/[A-Z]/', $string);
 
-    $string = RandomString::string(15, TRUE, NULL, $alphabets.$capital_alphabets);
+    $string = RandomString::string(15, TRUE, NULL, $alphabets . $capital_alphabets);
     $this->assertSame(15, strlen($string));
     $this->assertMatchesAllRegularExpression('/[a-zA-Z]/', $string);
 
@@ -50,15 +43,8 @@ class RandomStringTest extends TestCase {
     $this->assertSame(5, strlen($string));
     $this->assertMatchesAllRegularExpression('/[0-9]/', $string);
 
-
     $string = RandomString::string(5, TRUE, \Closure::fromCallable([$this, 'validateDigits']), $digits);
     $this->assertTrue($this->called);
-
-    $this->expectException(\RuntimeException::class);
-    $this->expectExceptionMessage("Unable to generate a unique random name");
-    // We are trying to generate 11 digits unique number from given 10 digits
-    // which is impossible, so it should thrown exception.
-    $string = RandomString::string(11, TRUE, NULL, $digits);
   }
 
   /**

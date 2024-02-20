@@ -85,8 +85,7 @@ class StringManipulator {
    * @param string $string
    *   String.
    */
-  public static function convertStringToPrefix(string $string): string
-  {
+  public static function convertStringToPrefix(string $string): string {
     $words = explode(' ', $string);
     $prefix = '';
     foreach ($words as $word) {

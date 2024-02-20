@@ -24,7 +24,9 @@ class IOTest extends TestCase {
   }
 
   /**
-   * Stores the strings to print.
+   * Stores the messages to print.
+   *
+   * @var array<string>
    */
   private array $print;
 
@@ -193,21 +195,20 @@ class IOTest extends TestCase {
   protected function getDialog() {
     $question_helper = $this->createMock(QuestionHelper::class);
     $question_helper->expects($this->any())
-    ->method("ask")->willReturn("answer");
+      ->method("ask")->willReturn("answer");
     return $question_helper;
   }
 
   /**
    * Helper method to store input string to property.
-   *
-   * @param string|iterable $messages
    */
   protected function mockPrint(string|iterable $messages): void {
     if (is_iterable($messages)) {
       foreach ($messages as $message) {
         $this->print[] = $message;
       }
-    } else {
+    }
+    else {
       $this->print[] = $messages;
     }
   }
