@@ -51,6 +51,40 @@ class SiteUriTraitTest extends FunctionalBaseTest {
     $uri = $this->getSitesSubdirFromUri($drupal_root, "http://www.acquia.com");
     // If URI does't exist on sites.php file, fallback to site default.
     $this->assertEquals($uri, "default");
+
+    // If uri makes pattern port.domain.path and it exists in the sites.php
+    // then it return the value.
+    $uri = $this->getSitesSubdirFromUri($drupal_root, "http://acquia.com/stage/acquia_cms");
+    $this->assertEquals($uri, "stage.acquia_cms");
+
+    $uri = $this->getSitesSubdirFromUri($drupal_root, "http://acquia.org:8080/developer/acquia_cms");
+    $this->assertEquals($uri, "developer.acquia_cms");
+  }
+
+  /**
+   * Test prepareSiteUri() method.
+   */
+  public function testPrepareSiteUri(): void {
+    $site_uri = $this->prepareSiteUri("http://acquia.com/stage/acquia_cms");
+    $this->assertEquals($site_uri, "acquia.com.stage.acquia_cms");
+
+    $site_uri = $this->prepareSiteUri("http://acquia.org:8080/developer/acquia_cms");
+    $this->assertEquals($site_uri, "8080.acquia.org.developer.acquia_cms");
+
+    $site_uri = $this->prepareSiteUri("acquia_cms_low_code");
+    $this->assertEquals($site_uri, "acquia_cms_low_code");
+
+    $site_uri = $this->prepareSiteUri("https://www.acquia.com/docs");
+    $this->assertEquals($site_uri, "www.acquia.com.docs");
+
+    $site_uri = $this->prepareSiteUri("http://acquia.org");
+    $this->assertEquals($site_uri, "acquia.org");
+
+    $site_uri = $this->prepareSiteUri("acquia_cms_headless");
+    $this->assertEquals($site_uri, "acquia_cms_headless");
+
+    $site_uri = $this->prepareSiteUri("https://dev.acquiacms.com");
+    $this->assertEquals($site_uri, "dev.acquiacms.com");
   }
 
   /**
@@ -70,6 +104,8 @@ class SiteUriTraitTest extends FunctionalBaseTest {
     $this->fileSystem->appendToFile($sites_file, PHP_EOL . '$sites["http://dev.acquia_cms.com"] = "dev.acquia_cms";');
     $this->fileSystem->appendToFile($sites_file, PHP_EOL . '$sites["https://www.acquia_cms.com"] = "acquia_cms";');
     $this->fileSystem->appendToFile($sites_file, PHP_EOL . '$sites["www.acquia.com/qa/acquia_cms"] = "qa.acquia_cms";');
+    $this->fileSystem->appendToFile($sites_file, PHP_EOL . '$sites["acquia.com.stage.acquia_cms"] = "stage.acquia_cms";');
+    $this->fileSystem->appendToFile($sites_file, PHP_EOL . '$sites["8080.acquia.org.developer.acquia_cms"] = "developer.acquia_cms";');
   }
 
   /**
@@ -77,7 +113,7 @@ class SiteUriTraitTest extends FunctionalBaseTest {
    */
   protected function tearDown(): void {
     parent::tearDown();
-    unlink($this->getDrupalRoot() . "/sites/sites.php");
+    @unlink($this->getDrupalRoot() . "/sites/sites.php");
   }
 
 }
