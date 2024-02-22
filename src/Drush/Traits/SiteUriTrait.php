@@ -65,8 +65,11 @@ trait SiteUriTrait {
    *   Site uri with format port.domain.path or normal uri.
    */
   protected function prepareSiteUri(string $uri): string {
+    // Checking whether the passed --uri from the command is valid url.
     if (filter_var($uri, FILTER_VALIDATE_URL) !== FALSE) {
+      // Parsing url to retrieve url object.
       $parseUrl = parse_url($uri);
+      // Initialize site uri.
       $siteUri = "";
       if (isset($parseUrl['port'])) {
         $siteUri = $parseUrl['port'] . ".";
@@ -75,8 +78,10 @@ trait SiteUriTrait {
         $siteUri = $siteUri . $parseUrl['host'];
       }
       if (isset($parseUrl['path'])) {
+        // Url consists of path then replace slash with dot.
         $siteUri = $siteUri . str_replace("/", ".", rtrim($parseUrl['path'], "/"));
       }
+      // Return site uri as port.domain.path pattern.
       return trim($siteUri);
     }
 

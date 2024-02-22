@@ -63,28 +63,35 @@ class SiteUriTraitTest extends FunctionalBaseTest {
 
   /**
    * Test prepareSiteUri() method.
+   *
+   * @param string $uri
+   *   Testing uri.
+   * @param string $dir_key
+   *   Site sub directory key.
+   *
+   * @dataProvider siteUriProvider
    */
-  public function testPrepareSiteUri(): void {
-    $site_uri = $this->prepareSiteUri("http://acquia.com/stage/acquia_cms");
-    $this->assertEquals($site_uri, "acquia.com.stage.acquia_cms");
+  public function testPrepareSiteUri(string $uri, string $dir_key): void {
+    $site_uri = $this->prepareSiteUri($uri);
+    $this->assertEquals($site_uri, $dir_key);
+  }
 
-    $site_uri = $this->prepareSiteUri("http://acquia.org:8080/developer/acquia_cms");
-    $this->assertEquals($site_uri, "8080.acquia.org.developer.acquia_cms");
-
-    $site_uri = $this->prepareSiteUri("acquia_cms_low_code");
-    $this->assertEquals($site_uri, "acquia_cms_low_code");
-
-    $site_uri = $this->prepareSiteUri("https://www.acquia.com/docs");
-    $this->assertEquals($site_uri, "www.acquia.com.docs");
-
-    $site_uri = $this->prepareSiteUri("http://acquia.org");
-    $this->assertEquals($site_uri, "acquia.org");
-
-    $site_uri = $this->prepareSiteUri("acquia_cms_headless");
-    $this->assertEquals($site_uri, "acquia_cms_headless");
-
-    $site_uri = $this->prepareSiteUri("https://dev.acquiacms.com");
-    $this->assertEquals($site_uri, "dev.acquiacms.com");
+  /**
+   * Data for the testPrepareSiteUri.
+   *
+   * @return array<string>
+   *   List of site uri and site sub directory key.
+   */
+  public function siteUriProvider(): array {
+    return [
+      ['http://acquia.com/stage/acquia_cms', 'acquia.com.stage.acquia_cms'],
+      ['http://acquia.org:8080/developer/acquia_cms', '8080.acquia.org.developer.acquia_cms'],
+      ['acquia_cms_low_code', 'acquia_cms_low_code'],
+      ['https://www.acquia.com/docs', 'www.acquia.com.docs'],
+      ['http://acquia.org', 'acquia.org'],
+      ['acquia_cms_headless', 'acquia_cms_headless'],
+      ['https://dev.acquiacms.com', 'dev.acquiacms.com'],
+    ];
   }
 
   /**
