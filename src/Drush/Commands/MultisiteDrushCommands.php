@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Acquia\Drupal\RecommendedSettings\Drush\Commands;
 
-use Acquia\Drupal\RecommendedSettings\Drush\Traits\SiteUriTrait;
+use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
 use Acquia\Drupal\RecommendedSettings\Settings;
 use Consolidation\AnnotatedCommand\CommandData;
@@ -24,7 +24,6 @@ use Psr\Container\ContainerInterface as DrushContainer;
 class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareInterface {
 
   use CustomEventAwareTrait;
-  use SiteUriTrait;
 
   const VALIDATE_GENERATE_SETTINGS = 'validate-generate-settings';
   const POST_GENERATE_SETTINGS = 'post-generate-settings';
@@ -51,15 +50,10 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
   #[CLI\Hook(type: HookManager::PRE_ARGUMENT_VALIDATOR, target: 'site-install')]
   public function preValidateSiteInstall(CommandData $commandData): void {
     if ($this->validateGenerateSettings($commandData)) {
-      $uri = $commandData->input()->getOption('uri') ?? 'default';
-      $sitesSubdir = $this->getSitesSubdirFromUri(DRUPAL_ROOT, $uri);
-      $commandData->input()->setOption('sites-subdir', $sitesSubdir);
-      $options = $commandData->options();
-      $this->bootstrapManager->setUri('http://' . $sitesSubdir);
-
+      // Get sites subdir which we set in the hook doGenerateSettings.
+      $sitesSubdir = $commandData->input()->getOption('sites-subdir');
       // Try to get any already configured database information.
       $this->bootstrapManager->bootstrapMax(DrupalBootLevels::CONFIGURATION, $commandData->annotationData());
-
       // By default, bootstrap manager boot site from default/setting.php
       // hence remove the database connection if site is other than default.
       if (($sitesSubdir && "sites/$sitesSubdir" !== $this->bootstrapManager->bootstrap()->confpath())) {
@@ -74,6 +68,9 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
         $dbSpec = [
           "drupal" => ["db" => $db],
         ];
+
+        $options = $commandData->options();
+        // Db url is not present then ask for db credentials.
         if (!($options['db-url'])) {
           if (EnvironmentDetector::isLocalEnv()) {
             $db = $this->askDbCredentials($sitesSubdir, $db);
@@ -85,6 +82,7 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
         }
         $settings = new Settings(DRUPAL_ROOT, $sitesSubdir);
         try {
+          // Generate settings files with db specs.
           $settings->generate($dbSpec);
           $this->postGenerateSettings($commandData);
         }
@@ -108,6 +106,7 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
         return FALSE;
       }
     }
+
     return $status;
   }
 

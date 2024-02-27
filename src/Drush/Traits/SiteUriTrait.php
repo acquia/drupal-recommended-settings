@@ -36,11 +36,13 @@ trait SiteUriTrait {
     if ($dir && file_exists(Path::join($root, $dir))) {
       return $dir;
     }
+
     // Find the dir from sites.php file.
     $sites_file = $root . '/sites/sites.php';
     if (file_exists($sites_file)) {
       $sites = [];
       include $sites_file;
+      $uri = $this->prepareSiteUri($uri);
       if (!empty($sites) && array_key_exists($uri, $sites)) {
         return $sites[$uri];
       }
@@ -51,6 +53,39 @@ trait SiteUriTrait {
     }
 
     return FALSE;
+  }
+
+  /**
+   * Preparing site uri if --uri="https://www.example.com"
+   *
+   * @param string $uri
+   *   Site uri in a url format.
+   *
+   * @return string
+   *   Site uri with format port.domain.path or normal uri.
+   */
+  protected function prepareSiteUri(string $uri): string {
+    // Checking whether the passed --uri from the command is valid url.
+    if (filter_var($uri, FILTER_VALIDATE_URL) !== FALSE) {
+      // Parsing url to retrieve url object.
+      $parseUrl = parse_url($uri);
+      // Initialize site uri.
+      $siteUri = "";
+      if (isset($parseUrl['port'])) {
+        $siteUri = $parseUrl['port'] . ".";
+      }
+      if (isset($parseUrl['host'])) {
+        $siteUri = $siteUri . $parseUrl['host'];
+      }
+      if (isset($parseUrl['path'])) {
+        // Url consists of path then replace slash with dot.
+        $siteUri = $siteUri . str_replace("/", ".", rtrim($parseUrl['path'], "/"));
+      }
+      // Return site uri as port.domain.path pattern.
+      return trim($siteUri);
+    }
+
+    return $uri;
   }
 
 }
