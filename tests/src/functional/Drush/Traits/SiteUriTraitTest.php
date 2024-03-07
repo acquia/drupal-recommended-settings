@@ -82,7 +82,7 @@ class SiteUriTraitTest extends FunctionalBaseTest {
    * @return array<string>
    *   List of site uri and site sub directory key.
    */
-  public function siteUriProvider(): array {
+  public static function siteUriProvider(): array {
     return [
       ['http://acquia.com/stage/acquia_cms', 'acquia.com.stage.acquia_cms'],
       ['http://acquia.org:8080/developer/acquia_cms', '8080.acquia.org.developer.acquia_cms'],

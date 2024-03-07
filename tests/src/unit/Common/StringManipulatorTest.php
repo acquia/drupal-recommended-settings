@@ -106,7 +106,7 @@ Expected;
    * @return \string[][]
    *   Returns data provider
    */
-  public function convertStringToMachineSafeDataProvider(): array {
+  public static function convertStringToMachineSafeDataProvider(): array {
     return [
       ["Acquia CMS Common" , "acquia_cms_common"],
       ['Acquia-CMS/Common[1]' , "acquia_cms_common_1"],
@@ -123,7 +123,7 @@ Expected;
    * @return \string[][]
    *   Returns data provider.
    */
-  public function convertStringToPrefixDataProvider(): array {
+  public static function convertStringToPrefixDataProvider(): array {
     return [
       ["Acquia", "A"],
       ["acquia", "A"],

@@ -117,7 +117,7 @@ class ArrayManipulatorTest extends TestCase {
    * @return array<string>
    *   Returns data provider.
    */
-  public function arrayMergeDataProvider(): array {
+  public static function arrayMergeDataProvider(): array {
     return [
       [
         [['key' => 'one'], ['key' => ['one', 'two']]],
@@ -139,7 +139,7 @@ class ArrayManipulatorTest extends TestCase {
    * @return array<string>
    *   Returns data provider.
    */
-  public function expandFromDotNotatedKeysDataProvider(): array {
+  public static function expandFromDotNotatedKeysDataProvider(): array {
     return [
       [
         ['drush.alias' => "self"],
@@ -158,7 +158,7 @@ class ArrayManipulatorTest extends TestCase {
    * @return array<string>
    *   Returns data provider.
    */
-  public function flattenMultidimensionalArrayDataProvider(): array {
+  public static function flattenMultidimensionalArrayDataProvider(): array {
     return [
       [
         ['drush.alias' => "self"],
