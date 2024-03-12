@@ -95,6 +95,7 @@ abstract class FunctionalBaseTest extends TestCase {
       $files_copied = TRUE;
       return $orca_fixture_dir;
     }
+
     return $base_fixture_dir . "/project";
   }
 
@@ -121,6 +122,7 @@ abstract class FunctionalBaseTest extends TestCase {
     else {
       $root_dir = $project_dir;
     }
+
     return $root_dir;
   }
 
@@ -150,6 +152,7 @@ abstract class FunctionalBaseTest extends TestCase {
     $class = $this->getReflectionClass($class);
     $method = $class->getMethod($method);
     $method->setAccessible(TRUE);
+
     return $method;
   }
 
@@ -167,6 +170,7 @@ abstract class FunctionalBaseTest extends TestCase {
     $class = $this->getReflectionClass($class);
     $property = $class->getProperty($property);
     $property->setAccessible(TRUE);
+
     return $property;
   }
 
