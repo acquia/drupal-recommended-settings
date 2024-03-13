@@ -26,7 +26,7 @@ jobs:
    env:
      ORCA_JOB: STATIC_CODE_ANALYSIS
    steps:
-     - uses: actions/checkout@v3
+     - uses: actions/checkout@v4
      - uses: shivammathur/setup-php@v2
        with:
          php-version: 8.2
@@ -59,12 +59,12 @@ jobs:
       ORCA_JOB: ISOLATED_TEST_ON_CURRENT
       CI: TRUE
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
           coverage: xdebug
-          ini-file: development
+          ini-values: assert.active=1, assert.exception=1, zend.assertions=1
       - name: Download ORCA
         run: composer create-project --no-dev --ignore-platform-req=php acquia/orca ../orca "$ORCA_VERSION" -n
       - name: Before Install
