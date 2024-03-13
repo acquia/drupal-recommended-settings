@@ -33,8 +33,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
 
   /**
    * Is CI.
-   *
-   * @throws \ReflectionException
    */
   public static function isCiEnv(): bool {
     return self::getCiEnv() || getenv('CI');
@@ -50,8 +48,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
    *
    * @return string
    *   Settings file full path and filename.
-   *
-   * @throws \ReflectionException
    */
   public static function getCiSettingsFile(): string {
     return sprintf("%s/vendor/acquia/drupal-recommended-settings/settings/%s.settings.php", dirname(DRUPAL_ROOT), self::getCiEnv());
@@ -94,8 +90,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
 
   /**
    * Is local.
-   *
-   * @throws \ReflectionException
    */
   public static function isLocalEnv(): bool {
     return parent::isLocalEnv() && !self::isPantheonEnv() && !self::isCiEnv();
@@ -103,8 +97,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
 
   /**
    * Is dev.
-   *
-   * @throws \ReflectionException
    */
   public static function isDevEnv(): bool {
     return self::isAhDevEnv() || self::isPantheonDevEnv();
@@ -112,8 +104,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
 
   /**
    * Is stage.
-   *
-   * @throws \ReflectionException
    */
   public static function isStageEnv(): bool {
     return self::isAhStageEnv() || self::isPantheonStageEnv();
@@ -121,8 +111,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
 
   /**
    * Is prod.
-   *
-   * @throws \ReflectionException
    */
   public static function isProdEnv(): bool {
     return self::isAhProdEnv() || self::isPantheonProdEnv();
@@ -175,8 +163,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
    *
    * @return string|null
    *   Site name.
-   *
-   * @throws \ReflectionException
    */
   public static function getSiteName(string $site_path): ?string {
     if (self::isAcsfEnv()) {
@@ -236,8 +222,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
    *
    * @return string[]
    *   Returns an array of environments.
-   *
-   * @throws \ReflectionException
    */
   public static function getEnvironments(): array {
     return [

@@ -9,7 +9,6 @@ use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
 use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
 use Acquia\Drupal\RecommendedSettings\Robo\Tasks\LoadTasks;
-use Consolidation\AnnotatedCommand\AnnotationData;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drush\Attributes as Cli;
 use Drush\Commands\DrushCommands;
@@ -21,7 +20,6 @@ use Robo\Contract\BuilderAwareInterface;
 use Robo\Contract\ConfigAwareInterface;
 use Robo\Contract\IOAwareInterface;
 use Robo\LoadAllTasks;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
@@ -40,7 +38,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    * {@inheritdoc}
    */
   #[CLI\Hook(type: HookManager::INITIALIZE)]
-  public function init(InputInterface $input, AnnotationData $annotationData): void {
+  public function init(): void {
     $this->initializeConfig();
   }
 
@@ -79,7 +77,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
   protected function invokeCommand(string $command_name, array $args = []): void {
     $options = $this->input()->getOptions();
     foreach ($options as $key => $value) {
-      if ($value === NULL || $key === "define" || $value == FALSE) {
+      if ($key === "define" || $value == FALSE) {
         unset($options[$key]);
       }
     }
