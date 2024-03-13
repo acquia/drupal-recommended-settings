@@ -175,21 +175,19 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
       // factory site is active. The hostname must have a corresponding entry
       // under the multisites key.
       $input = new ArgvInput($argv);
-      $config = new DefaultConfig(self::getRepoRoot());
+      $config = new DefaultConfig(self::getDrupalRoot());
       $config_initializer = new ConfigInitializer($config, $input);
-      $drs_config = $config_initializer->initialize();
-
+      $drs_config = $config_initializer->initialize()->loadAllConfig()->processConfig();
       // The hostname must match the pattern local.[site-name].com, where
       // [site-name] is a value in the multisites array.
       $domain_fragments = explode('.', getenv('HTTP_HOST'));
-      if (isset($domain_fragments[1])) {
+      if (isset($domain_fragments[1]) && $drs_config->has('multisites')) {
         $name = $domain_fragments[1];
         $acsf_sites = $drs_config->get('multisites');
         if (in_array($name, $acsf_sites, TRUE)) {
           return $name;
         }
       }
-
     }
 
     return str_replace('sites/', '', $site_path);
@@ -207,14 +205,21 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
    *   The repo root as an absolute path.
    */
   public static function getRepoRoot(): string {
-    if (defined('DRUPAL_ROOT')) {
+    if (self::getDrupalRoot()) {
       // This is a web or Drush request.
-      return dirname(DRUPAL_ROOT);
+      return dirname(self::getDrupalRoot());
     }
     // phpcs:ignore
     global $repo_root;
     // phpcs:enable
     return $repo_root;
+  }
+
+  /**
+   * Returns the Drupal root path.
+   */
+  public static function getDrupalRoot(): string {
+    return defined('DRUPAL_ROOT') ? DRUPAL_ROOT : "";
   }
 
   /**

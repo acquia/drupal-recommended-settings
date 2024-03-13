@@ -110,12 +110,6 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    *   The unexecuted command.
    */
   public function execute(mixed $command): ProcessExecutor {
-    // Backwards compatibility check for legacy commands.
-    if (!is_array($command)) {
-      $this->say($command);
-      $this->say(StringManipulator::stringToArrayMsg());
-      $command = StringManipulator::commandConvert($command);
-    }
     /** @var \Robo\Common\ProcessExecutor $process_executor */
     $process_executor = Robo::process(new Process($command));
     return $process_executor->dir($this->getConfigValue('repo.root'))

@@ -2,14 +2,14 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Robo\Config;
 
-use Robo\Common\ConfigAwareTrait as RoboConfigAwareTrait;
+use Drush\Config\ConfigAwareTrait as DrushConfigAwareTrait;
 
 /**
- * Adds custom methods to RoboConfigAwareTrait.
+ * Adds custom methods to DrushConfigAwareTrait.
  */
 trait ConfigAwareTrait {
 
-  use RoboConfigAwareTrait;
+  use DrushConfigAwareTrait;
 
   /**
    * {@inheritdoc}
