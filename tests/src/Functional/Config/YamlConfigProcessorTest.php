@@ -1,16 +1,16 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\functional\Config;
+namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Config;
 
 use Acquia\Drupal\RecommendedSettings\Config\YamlConfigProcessor;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 
 /**
  * Functional test for the YamlConfigProcessor class.
  *
  * @covers \Acquia\Drupal\RecommendedSettings\Config\YamlConfigProcessor
  */
-class YamlConfigProcessorTest extends FunctionalBaseTest {
+class YamlConfigProcessorTest extends FunctionalTestBase {
 
   /**
    * Tests the preprocess() method.

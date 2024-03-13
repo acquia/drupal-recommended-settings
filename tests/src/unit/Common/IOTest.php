@@ -1,6 +1,6 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\unit\Common;
+namespace Acquia\Drupal\RecommendedSettings\Tests\Unit\Common;
 
 use Acquia\Drupal\RecommendedSettings\Common\IO;
 use PHPUnit\Framework\TestCase;

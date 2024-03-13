@@ -1,6 +1,6 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\unit;
+namespace Acquia\Drupal\RecommendedSettings\Tests\Unit;
 
 use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem as DrsFilesystem;
 use Acquia\Drupal\RecommendedSettings\Settings;

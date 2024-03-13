@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Base functional PHPUnit class.
  */
-abstract class FunctionalBaseTest extends TestCase {
+abstract class FunctionalTestBase extends TestCase {
 
   /**
    * An array of fixture files to create.

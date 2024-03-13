@@ -1,9 +1,9 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\functional\Config;
+namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Config;
 
 use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 use Drush\Config\DrushConfig;
 
 /**
@@ -11,7 +11,7 @@ use Drush\Config\DrushConfig;
  *
  * @covers \Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig
  */
-class DefaultDrushConfigTest extends FunctionalBaseTest {
+class DefaultDrushConfigTest extends FunctionalTestBase {
 
   /**
    * Tests the default config data.

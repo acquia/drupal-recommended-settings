@@ -1,9 +1,9 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\functional\Helpers;
+namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Helpers;
 
 use Acquia\Drupal\RecommendedSettings\Helpers\HashGenerator;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 use Composer\IO\IOInterface;
 
 /**
@@ -11,7 +11,7 @@ use Composer\IO\IOInterface;
  *
  * @covers \Acquia\Drupal\RecommendedSettings\Helpers\HashGenerator
  */
-class HashGeneratorTest extends FunctionalBaseTest {
+class HashGeneratorTest extends FunctionalTestBase {
 
   /**
    * Composer's I/O service.
@@ -28,7 +28,8 @@ class HashGeneratorTest extends FunctionalBaseTest {
 
   /**
    * Test  HashGenerator::generate().
-   * @throws SettingsException
+   *
+   * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
   public function testGenerate(): void {
     HashGenerator::generate($this->getProjectRoot(), $this->io);
