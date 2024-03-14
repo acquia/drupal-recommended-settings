@@ -1,17 +1,17 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\functional\Drush\Traits;
+namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Drush\Traits;
 
 use Acquia\Drupal\RecommendedSettings\Drush\Traits\SiteUriTrait;
 use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 
 /**
  * Functional test for the SiteUriTrait trait.
  *
  * @covers \Acquia\Drupal\RecommendedSettings\Drush\Traits\SiteUriTrait
  */
-class SiteUriTraitTest extends FunctionalBaseTest {
+class SiteUriTraitTest extends FunctionalTestBase {
   use SiteUriTrait;
 
   /**

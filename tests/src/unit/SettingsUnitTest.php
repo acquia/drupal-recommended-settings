@@ -1,11 +1,11 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\unit;
+namespace Acquia\Drupal\RecommendedSettings\Tests\Unit;
 
 use Acquia\Drupal\RecommendedSettings\Settings;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 
-class SettingsUnitTest extends FunctionalBaseTest {
+class SettingsUnitTest extends FunctionalTestBase {
 
   /**
    * The path to settings for testing.

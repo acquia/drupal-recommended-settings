@@ -1,11 +1,11 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\functional\Helpers;
+namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Helpers;
 
 use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
 use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem as DrsFilesystem;
 use Acquia\Drupal\RecommendedSettings\Plugin;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 use Composer\Composer;
 use Composer\Config;
 use Composer\IO\IOInterface;
@@ -16,7 +16,7 @@ use Composer\Package\RootPackage;
  *
  * @covers \Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector
  */
-class EnvironmentDetectorTest extends FunctionalBaseTest {
+class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * The recommended setting's plugin object.

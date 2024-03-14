@@ -1,16 +1,16 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\functional\Helpers;
+namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Helpers;
 
 use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem as DrsFilesystem;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 
 /**
  * Functional test for the Filesystem class.
  *
  * @covers \Acquia\Drupal\RecommendedSettings\Helpers\Filesystem
  */
-class FilesystemTest extends FunctionalBaseTest {
+class FilesystemTest extends FunctionalTestBase {
 
   /**
    * The path to drupal webroot directory.

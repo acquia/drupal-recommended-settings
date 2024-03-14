@@ -1,9 +1,9 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\functional\Config;
+namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Config;
 
 use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 use Consolidation\Config\Config;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\StringInput;
  *
  * @covers \Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer
  */
-class ConfigInitializerTest extends FunctionalBaseTest {
+class ConfigInitializerTest extends FunctionalTestBase {
 
   /**
    * Tests setSite() method.

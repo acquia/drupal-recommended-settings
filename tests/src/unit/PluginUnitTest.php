@@ -1,9 +1,9 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\unit;
+namespace Acquia\Drupal\RecommendedSettings\Tests\Unit;
 
 use Acquia\Drupal\RecommendedSettings\Plugin;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 use Composer\Composer;
 use Composer\Config;
 use Composer\DependencyResolver\Operation\InstallOperation;
@@ -12,7 +12,7 @@ use Composer\IO\IOInterface;
 use Composer\Package\RootPackage;
 use Composer\Repository\RepositoryInterface;
 
-class PluginUnitTest extends FunctionalBaseTest {
+class PluginUnitTest extends FunctionalTestBase {
 
   /**
    * The recommended setting's plugin object.

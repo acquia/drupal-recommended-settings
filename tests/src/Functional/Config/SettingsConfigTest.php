@@ -1,21 +1,20 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\functional\Config;
+namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Config;
 
+use Acquia\Drupal\RecommendedSettings\Common\RandomString;
 use Acquia\Drupal\RecommendedSettings\Config\SettingsConfig;
-use Acquia\Drupal\RecommendedSettings\Tests\FunctionalBaseTest;
-use Acquia\Drupal\RecommendedSettings\Tests\Traits\FileCreationTraitTest;
-use Acquia\Drupal\RecommendedSettings\Tests\Traits\StringTraitTest;
+use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
+use Acquia\Drupal\RecommendedSettings\Tests\Traits\FileCreationTrait;
 
 /**
  * Functional test for the SettingsConfig class.
  *
  * @covers \Acquia\Drupal\RecommendedSettings\Config\SettingsConfig
  */
-class SettingsConfigTest extends FunctionalBaseTest {
+class SettingsConfigTest extends FunctionalTestBase {
 
-  use StringTraitTest;
-  use FileCreationTraitTest;
+  use FileCreationTrait;
 
   /**
    * Holds the path to file.
@@ -27,7 +26,7 @@ class SettingsConfigTest extends FunctionalBaseTest {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->file = $this->getProjectRoot() . "/" . $this->randomString(5) . ".txt";
+    $this->file = $this->getProjectRoot() . "/" . RandomString::string(5) . ".txt";
   }
 
   /**

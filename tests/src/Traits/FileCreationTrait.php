@@ -5,7 +5,7 @@ namespace Acquia\Drupal\RecommendedSettings\Tests\Traits;
 /**
  * Test traits to perform file operations.
  */
-trait FileCreationTraitTest {
+trait FileCreationTrait {
 
   /**
    * Creates a file and write/append contents to the file.
