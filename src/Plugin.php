@@ -100,8 +100,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    */
   public function onPostCmdEvent(): void {
     // Only install the template files, if the drupal-recommended-settings
-    // plugin is installed.
-    if ($this->settingsPackage) {
+    // plugin is installed, with drupal project.
+    if ($this->settingsPackage && $this->getDrupalRoot()) {
       try {
         $vendor_dir = $this->composer->getConfig()->get('vendor-dir');
         HashGenerator::generate($this->getProjectRoot(), $this->io);
@@ -148,7 +148,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   protected function getDrupalRoot(): string {
     $extra = $this->composer->getPackage()->getExtra();
     $docroot = $extra['drupal-scaffold']['locations']['web-root'] ?? "";
-    return realpath($this->getProjectRoot() . "/" . $docroot);
+    if ($docroot) {
+      return realpath($this->getProjectRoot() . "/" . $docroot);
+    }
+    return "";
   }
 
   /**
