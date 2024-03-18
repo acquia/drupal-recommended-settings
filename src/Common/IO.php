@@ -43,15 +43,23 @@ trait IO {
    * Prints the message to terminal.
    *
    * @param string $message
-   *   Givem message to print.
+   *   Given message to print.
    * @param string $type
    *   Type of message. Ex: error, success, info etc.
    * @param string $color
-   *   Given backgound color.
+   *   Given background color.
    */
-  protected function print(string $message, string $type = "success", string $color = "green"): void {
+  protected function print(string $message, string $type = "success", string $color = ""): void {
+    if (!$color) {
+      $color = match ($type) {
+        "warning" => "yellow",
+        "notice" => "cyan",
+        "error" => "red",
+        default => "green",
+      };
+    }
     $message = " <fg=white;bg=$color;options=bold>[$type]</fg=white;bg=$color;options=bold> " . $message;
-    $this->writeln($message);
+    $this->say($message);
   }
 
   /**

@@ -3,7 +3,6 @@
 namespace Acquia\Drupal\RecommendedSettings;
 
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
-use Acquia\Drupal\RecommendedSettings\Helpers\HashGenerator;
 use Composer\Composer;
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\OperationInterface;
@@ -104,7 +103,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     if ($this->settingsPackage && $this->getDrupalRoot()) {
       try {
         $vendor_dir = $this->composer->getConfig()->get('vendor-dir');
-        HashGenerator::generate($this->getProjectRoot(), $this->io);
         $this->executeCommand($vendor_dir . "/bin/drush drs:init:settings", [], TRUE);
       }
       catch (SettingsException $e) {
@@ -145,13 +143,14 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   /**
    * Returns the drupal root directory path.
    */
-  protected function getDrupalRoot(): string {
+  protected function getDrupalRoot(): ?string {
     $extra = $this->composer->getPackage()->getExtra();
-    $docroot = $extra['drupal-scaffold']['locations']['web-root'] ?? "";
+    $docroot = $extra['drupal-scaffold']['locations']['web-root'] ?? NULL;
     if ($docroot) {
-      return realpath($this->getProjectRoot() . "/" . $docroot);
+      $docroot = realpath($this->getProjectRoot() . DIRECTORY_SEPARATOR . $docroot);
+      return $docroot ?: NULL;
     }
-    return "";
+    return NULL;
   }
 
   /**
