@@ -94,8 +94,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 
   /**
    * Includes Acquia recommended settings post composer update/install command.
-   *
-   * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
   public function onPostCmdEvent(): void {
     // Only install the template files, if the drupal-recommended-settings
@@ -103,7 +101,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     if ($this->settingsPackage && $this->getDrupalRoot()) {
       try {
         $vendor_dir = $this->composer->getConfig()->get('vendor-dir');
-        $this->executeCommand($vendor_dir . "/bin/drush drs:init:settings", [], TRUE);
+        $this->executeCommand(
+          $vendor_dir . "/bin/drush drs:init:settings", [],
+          TRUE
+        );
       }
       catch (SettingsException $e) {
         $this->io->write("<fg=white;bg=red;options=bold>[error]</> " . $e->getMessage());
@@ -178,11 +179,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     array_unshift($args, $cmd);
     // And replace the arguments.
     $command = call_user_func_array('sprintf', $args);
-    $output = '';
     if ($this->io->isVerbose() || $display_output) {
       $this->io->write('<comment> > ' . $command . '</comment>');
       $io = $this->io;
-      $output = function ($type, $buffer) use ($io): void {
+      function ($type, $buffer) use ($io): void {
         $io->write($buffer, FALSE);
       };
     }
