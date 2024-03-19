@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acquia\Drupal\RecommendedSettings\Drush\Commands;
 
 use Acquia\Drupal\RecommendedSettings\Common\RandomString;
+use Acquia\Drupal\RecommendedSettings\Drush\Traits\SiteUriTrait;
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Settings;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
@@ -15,6 +16,8 @@ use Robo\ResultData;
  * The DRS Drush commands.
  */
 class SettingsDrushCommands extends BaseDrushCommands {
+
+  use SiteUriTrait;
 
   /**
    * Command name for settings.php generation.
@@ -58,7 +61,8 @@ class SettingsDrushCommands extends BaseDrushCommands {
       'port' => $options['port'],
     ];
     try {
-      $settings = new Settings($this->getConfigValue("docroot"), $this->getConfigValue("drush.uri"));
+      $site_directory = $this->getSitesSubdirFromUri($this->getConfigValue("docroot"), $this->getConfigValue("drush.uri"));
+      $settings = new Settings($this->getConfigValue("docroot"), $site_directory);
       $settings->generate($db);
       if (!$this->output()->isQuiet()) {
         $this->print(
