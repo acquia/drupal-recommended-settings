@@ -28,12 +28,38 @@ class SettingsDrushCommands extends BaseDrushCommands {
 
   /**
    * Generates the settings.php for given site.
+   *
+   * @param array<string> $options
+   *   An array of input options.
    */
   #[CLI\Command(name: self::SETTINGS_COMMAND, aliases: ["drs:init:settings", "dis", "init:settings"])]
-  public function initSettings(): int {
+  #[CLI\Help(description: 'Generates the acquia recommended settings template files for given site.')]
+  #[CLI\Option(name: 'database', description: 'Local database name')]
+  #[CLI\Option(name: 'username', description: 'Local database username')]
+  #[CLI\Option(name: 'password', description: 'Local database password')]
+  #[CLI\Option(name: 'host', description: 'Local database host')]
+  #[CLI\Option(name: 'port', description: 'Local database port')]
+  #[CLI\Usage(
+    name: 'drush ' . self::SETTINGS_COMMAND . ' --database=mydb --username=myuser --password=mypass --host=127.0.0.1 --port=1234 --uri=site1',
+    description: 'Generates the settings.php for site2 passing db credentials.',
+  )]
+  public function initSettings(array $options = [
+    'database' => 'drupal',
+    'username' => 'drupal',
+    'password' => 'drupal',
+    'host' => 'localhost',
+    'port' => "3306",
+  ]): int {
+    $db["drupal"]["db"] = [
+      'database' => $options['database'],
+      'username' => $options['username'],
+      'password' => $options['password'],
+      'host' => $options['host'],
+      'port' => $options['port'],
+    ];
     try {
       $settings = new Settings($this->getConfigValue("docroot"), $this->getConfigValue("drush.uri"));
-      $settings->generate();
+      $settings->generate($db);
       if (!$this->output()->isQuiet()) {
         $this->print(
           sprintf("Settings generated successfully for site '%s'.", $this->getConfigValue("drush.uri"))

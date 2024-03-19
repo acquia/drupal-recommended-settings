@@ -71,19 +71,17 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    *   The name of the command, e.g., 'status'.
    * @param string[] $args
    *   An array of arguments to pass to the command.
-   *
-   * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
+   * @param string[] $options
+   *   An array of options to pass to the command.
+   * @param bool $display_command
+   *   Decides if command should be displayed on terminal or not. Default is TRUE.
    */
-  protected function invokeCommand(string $command_name, array $args = []): void {
-    $options = $this->input()->getOptions();
-    foreach ($options as $key => $value) {
-      if ($key === "define" || $value == FALSE) {
-        unset($options[$key]);
-      }
-    }
+  protected function invokeCommand(string $command_name, array $args = [], array $options = [], bool $display_command = TRUE): void {
     $process = Drush::drush(Drush::aliasManager()->getSelf(), $command_name, $args, $options);
     $output = $this->output();
-    $output->writeln("<comment> > " . $command_name . "</comment>");
+    if ($display_command) {
+      $output->writeln("<comment> > " . $command_name . "</comment>");
+    }
     $process->setTty(Process::isTtySupported());
     $process->run(static function ($type, $buffer) use ($output): void {
       if (Process::ERR === $type) {
