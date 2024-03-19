@@ -43,7 +43,7 @@ class ConfigInitializer {
   /**
    * ConfigInitializer constructor.
    *
-   * @param \Consolidation\Config\ConfigInterface $config
+   * @param \Consolidation\Config\ConfigInterface|\Consolidation\Config\Config $config
    *   The config object.
    * @param \Symfony\Component\Console\Input\InputInterface|null $input
    *   An input object or null.

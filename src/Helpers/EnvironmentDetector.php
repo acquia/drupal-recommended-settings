@@ -33,8 +33,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
 
   /**
    * Is CI.
-   *
-   * @throws \ReflectionException
    */
   public static function isCiEnv(): bool {
     return self::getCiEnv() || getenv('CI');
@@ -50,8 +48,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
    *
    * @return string
    *   Settings file full path and filename.
-   *
-   * @throws \ReflectionException
    */
   public static function getCiSettingsFile(): string {
     return sprintf("%s/vendor/acquia/drupal-recommended-settings/settings/%s.settings.php", dirname(DRUPAL_ROOT), self::getCiEnv());
@@ -94,8 +90,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
 
   /**
    * Is local.
-   *
-   * @throws \ReflectionException
    */
   public static function isLocalEnv(): bool {
     return parent::isLocalEnv() && !self::isPantheonEnv() && !self::isCiEnv();
@@ -103,8 +97,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
 
   /**
    * Is dev.
-   *
-   * @throws \ReflectionException
    */
   public static function isDevEnv(): bool {
     return self::isAhDevEnv() || self::isPantheonDevEnv();
@@ -112,8 +104,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
 
   /**
    * Is stage.
-   *
-   * @throws \ReflectionException
    */
   public static function isStageEnv(): bool {
     return self::isAhStageEnv() || self::isPantheonStageEnv();
@@ -121,8 +111,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
 
   /**
    * Is prod.
-   *
-   * @throws \ReflectionException
    */
   public static function isProdEnv(): bool {
     return self::isAhProdEnv() || self::isPantheonProdEnv();
@@ -175,8 +163,6 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
    *
    * @return string|null
    *   Site name.
-   *
-   * @throws \ReflectionException
    */
   public static function getSiteName(string $site_path): ?string {
     if (self::isAcsfEnv()) {
@@ -189,21 +175,19 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
       // factory site is active. The hostname must have a corresponding entry
       // under the multisites key.
       $input = new ArgvInput($argv);
-      $config = new DefaultConfig(self::getRepoRoot());
+      $config = new DefaultConfig(self::getDrupalRoot());
       $config_initializer = new ConfigInitializer($config, $input);
-      $drs_config = $config_initializer->initialize();
-
+      $drs_config = $config_initializer->initialize()->loadAllConfig()->processConfig();
       // The hostname must match the pattern local.[site-name].com, where
       // [site-name] is a value in the multisites array.
       $domain_fragments = explode('.', getenv('HTTP_HOST'));
-      if (isset($domain_fragments[1])) {
+      if (isset($domain_fragments[1]) && $drs_config->has('multisites')) {
         $name = $domain_fragments[1];
         $acsf_sites = $drs_config->get('multisites');
         if (in_array($name, $acsf_sites, TRUE)) {
           return $name;
         }
       }
-
     }
 
     return str_replace('sites/', '', $site_path);
@@ -221,9 +205,9 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
    *   The repo root as an absolute path.
    */
   public static function getRepoRoot(): string {
-    if (defined('DRUPAL_ROOT')) {
+    if (self::getDrupalRoot()) {
       // This is a web or Drush request.
-      return dirname(DRUPAL_ROOT);
+      return dirname(self::getDrupalRoot());
     }
     // phpcs:ignore
     global $repo_root;
@@ -232,12 +216,17 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
   }
 
   /**
+   * Returns the Drupal root path.
+   */
+  public static function getDrupalRoot(): string {
+    return defined('DRUPAL_ROOT') ? DRUPAL_ROOT : "";
+  }
+
+  /**
    * List detectable environments and whether they are currently active.
    *
    * @return string[]
    *   Returns an array of environments.
-   *
-   * @throws \ReflectionException
    */
   public static function getEnvironments(): array {
     return [

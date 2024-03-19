@@ -9,7 +9,6 @@ use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
 use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
 use Acquia\Drupal\RecommendedSettings\Robo\Tasks\LoadTasks;
-use Consolidation\AnnotatedCommand\AnnotationData;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drush\Attributes as Cli;
 use Drush\Commands\DrushCommands;
@@ -21,7 +20,6 @@ use Robo\Contract\BuilderAwareInterface;
 use Robo\Contract\ConfigAwareInterface;
 use Robo\Contract\IOAwareInterface;
 use Robo\LoadAllTasks;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
@@ -40,7 +38,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    * {@inheritdoc}
    */
   #[CLI\Hook(type: HookManager::INITIALIZE)]
-  public function init(InputInterface $input, AnnotationData $annotationData): void {
+  public function init(): void {
     $this->initializeConfig();
   }
 
@@ -73,19 +71,17 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    *   The name of the command, e.g., 'status'.
    * @param string[] $args
    *   An array of arguments to pass to the command.
-   *
-   * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
+   * @param string[] $options
+   *   An array of options to pass to the command.
+   * @param bool $display_command
+   *   Decides if command should be displayed on terminal or not. Default is TRUE.
    */
-  protected function invokeCommand(string $command_name, array $args = []): void {
-    $options = $this->input()->getOptions();
-    foreach ($options as $key => $value) {
-      if ($value === NULL || $key === "define" || $value == FALSE) {
-        unset($options[$key]);
-      }
-    }
+  protected function invokeCommand(string $command_name, array $args = [], array $options = [], bool $display_command = TRUE): void {
     $process = Drush::drush(Drush::aliasManager()->getSelf(), $command_name, $args, $options);
-    $this->output->writeln("<comment> > " . $command_name . "</comment>");
     $output = $this->output();
+    if ($display_command) {
+      $output->writeln("<comment> > " . $command_name . "</comment>");
+    }
     $process->setTty(Process::isTtySupported());
     $process->run(static function ($type, $buffer) use ($output): void {
       if (Process::ERR === $type) {

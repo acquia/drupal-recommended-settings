@@ -94,6 +94,16 @@ WARNING;
   }
 
   /**
+   * Ensures that the settings files & directories are writable.
+   *
+   * @param array<string> $files
+   *   An array of files or directories.
+   */
+  protected function ensureFileWritable(array $files): bool {
+    return $this->fileSystem->chmod($files, 0777);
+  }
+
+  /**
    * Generate/Copy settings files.
    *
    * @param string[] $overrideData
@@ -114,6 +124,12 @@ WARNING;
       $config = $config->processConfig();
 
       $docroot = $config->get("docroot");
+
+      $this->ensureFileWritable([
+        $docroot . "/sites/$site",
+        $docroot . "/sites/$site/settings.php",
+      ]);
+
       $this->copyGlobalSettings();
       $this->copySiteSettings();
 
@@ -148,7 +164,7 @@ WARNING;
       $this->fileSystem->ensureDirectoryExists($docroot . "/../config/$site");
     }
     catch (\Exception $e) {
-      throw new SettingsException($e);
+      throw new SettingsException($e->getMessage());
     }
 
   }
