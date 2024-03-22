@@ -5,7 +5,6 @@ namespace Acquia\Drupal\RecommendedSettings;
 use Composer\Composer;
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\OperationInterface;
-use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
@@ -118,9 +117,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   protected function getSettingsPackage(OperationInterface $operation): mixed {
     if ($operation instanceof InstallOperation) {
       $package = $operation->getPackage();
-    }
-    elseif ($operation instanceof UpdateOperation) {
-      $package = $operation->getTargetPackage();
     }
     if (isset($package) && $package instanceof PackageInterface && $package->getName() == "acquia/drupal-recommended-settings") {
       return $package;

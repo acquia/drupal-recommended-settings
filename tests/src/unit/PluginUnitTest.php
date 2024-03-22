@@ -140,7 +140,7 @@ class PluginUnitTest extends FunctionalTestBase {
     $this->plugin->onPostPackageEvent($package_event);
     $method = $this->getReflectionMethod(Plugin::class, "getSettingsPackage");
     $package_name = $method->invokeArgs($this->plugin, [$operation]);
-    $this->assertEquals("acquia/drupal-recommended-settings-1.0", $package_name);
+    $this->assertNull($package_name);
 
     // Assert when any other package is installed.
     $package = new RootPackage("acquia/blt", "14.0", "14.0.0");
