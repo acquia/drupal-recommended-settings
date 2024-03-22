@@ -87,7 +87,11 @@ class ArrayManipulatorTest extends TestCase {
           'black', 'white',
         ],
         'sixth' => TRUE,
+        'seventh' => FALSE,
       ],
+      'eight' => TRUE,
+      'ninth' => FALSE,
+      'tenth' => 'We are testing that there should be a new line after 60 characters.'
     ];
     $expected = [
       0 => [
@@ -106,6 +110,22 @@ class ArrayManipulatorTest extends TestCase {
         0 => 'first.sixth',
         1 => 'true',
       ],
+      4 => [
+        0 => 'first.seventh',
+        1 => 'false',
+      ],
+      5 => [
+        0 => 'eight',
+        1 => 'true',
+      ],
+      6 => [
+        0 => 'ninth',
+        1 => 'false',
+      ],
+      7 => [
+        0 => 'tenth',
+        1 => "We are testing that there should be a new line after 60\ncharacters.",
+      ],
     ];
     $actual = ArrayManipulator::convertArrayToFlatTextArray($actual);
     $this->assertEquals($actual, $expected);
@@ -120,12 +140,12 @@ class ArrayManipulatorTest extends TestCase {
   public static function arrayMergeDataProvider(): array {
     return [
       [
-        [['key' => 'one'], ['key' => ['one', 'two']]],
-        ['key' => ['one', 'two']],
+        [['key' => ['one' => "two"]], ['key' => ['one']]],
+        ['key' => ['one' => 'two', 'one']],
       ],
       [
         [
-          ["key1" => "val1", "key2" => "val2", "key3" => "val3"],
+          ["key1" => "val1", "key2" => "val2", "key3" => ["val3" => "another"]],
           ["key1" => ["value1", "value2"], "key3" => "value3", "key4" => ["value3", "value4"]],
         ],
         ["key1" => ["value1", "value2"], "key2" => "val2", "key3" => "value3", "key4" => ["value3", "value4"]],

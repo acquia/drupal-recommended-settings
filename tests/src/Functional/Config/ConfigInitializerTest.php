@@ -186,6 +186,9 @@ class ConfigInitializerTest extends FunctionalTestBase {
           "port" => 3306,
         ],
       ],
+      "multisites" => [
+        "acms",
+      ],
     ]);
 
     $config = new Config();
@@ -212,6 +215,9 @@ class ConfigInitializerTest extends FunctionalTestBase {
           "host" => "127.0.0.1",
           "port" => 3306,
         ],
+      ],
+      "multisites" => [
+        "acms",
       ],
     ]);
 
@@ -241,6 +247,9 @@ class ConfigInitializerTest extends FunctionalTestBase {
           "host" => "127.0.0.1",
           "port" => 3306,
         ],
+      ],
+      "multisites" => [
+        "acms",
       ],
     ]);
 

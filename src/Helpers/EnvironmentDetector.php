@@ -205,14 +205,7 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
    *   The repo root as an absolute path.
    */
   public static function getRepoRoot(): string {
-    if (self::getDrupalRoot()) {
-      // This is a web or Drush request.
-      return dirname(self::getDrupalRoot());
-    }
-    // phpcs:ignore
-    global $repo_root;
-    // phpcs:enable
-    return $repo_root;
+    return self::getDrupalRoot() ? dirname(self::getDrupalRoot()) : "";
   }
 
   /**

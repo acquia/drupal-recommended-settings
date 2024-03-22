@@ -2,7 +2,6 @@
 
 namespace Acquia\Drupal\RecommendedSettings;
 
-use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Composer\Composer;
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\OperationInterface;
@@ -99,16 +98,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     // Only install the template files, if the drupal-recommended-settings
     // plugin is installed, with drupal project.
     if ($this->settingsPackage && $this->getDrupalRoot()) {
-      try {
-        $vendor_dir = $this->composer->getConfig()->get('vendor-dir');
-        $this->executeCommand(
-          $vendor_dir . "/bin/drush drs:init:settings", [],
-          TRUE
-        );
-      }
-      catch (SettingsException $e) {
-        $this->io->write("<fg=white;bg=red;options=bold>[error]</> " . $e->getMessage());
-      }
+      $vendor_dir = $this->composer->getConfig()->get('vendor-dir');
+      $this->executeCommand(
+        $vendor_dir . "/bin/drush drs:init:settings", [],
+        TRUE
+      );
     }
   }
 

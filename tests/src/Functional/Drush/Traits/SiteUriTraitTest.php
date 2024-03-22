@@ -25,6 +25,7 @@ class SiteUriTraitTest extends FunctionalTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->fileSystem = new Filesystem();
+
     $this->setupSite();
   }
 
@@ -59,6 +60,14 @@ class SiteUriTraitTest extends FunctionalTestBase {
 
     $uri = $this->getSitesSubdirFromUri($drupal_root, "http://acquia.org:8080/developer/acquia_cms");
     $this->assertEquals($uri, "developer.acquia_cms");
+
+    mkdir($drupal_root . "/sites/site3");
+    $uri = $this->getSitesSubdirFromUri($drupal_root, "https://site3");
+    $this->assertEquals($uri, "site3");
+
+    rename($drupal_root . "/sites/default", $drupal_root . "/sites/default.back");
+    $uri = $this->getSitesSubdirFromUri($drupal_root, "https://site4");
+    $this->assertFalse($uri);
   }
 
   /**
@@ -120,7 +129,10 @@ class SiteUriTraitTest extends FunctionalTestBase {
    */
   protected function tearDown(): void {
     parent::tearDown();
+    @rmdir($this->getDrupalRoot() . "/sites/site3");
     @unlink($this->getDrupalRoot() . "/sites/sites.php");
+    @unlink($this->getDrupalRoot() . "/sites/site3");
+    @rename($this->getDrupalRoot() . "/sites/default.back", $this->getDrupalRoot() . "/sites/default");
   }
 
 }
