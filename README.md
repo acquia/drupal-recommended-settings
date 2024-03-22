@@ -30,68 +30,14 @@ on when these events are triggered. You can find the examples of such
 implementations from [here](examples).
 
 # Quick examples
-## Generate settings for a given site
+### Generate settings with default credentials for the default site:
  ```
-<?php
-
-/**
- * @file
- * Include DRS settings.
- */
-
-use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
-use Acquia\Drupal\RecommendedSettings\Settings;
-
-// Create settings object.
-$siteUri = "site1";
-$settings = new Settings(DRUPAL_ROOT, $siteUri);
-
-try {
-  // Call generate method.
-  $settings->generate();
-}
-catch (SettingsException $e) {
-  echo $e->getMessage();
-}
+./vendor/bin/drush init:settings
 ```
 
-## Generate settings for a given site passing database credentials
-
+### Set up a new site with custom credentials for the local environment:
 ```
-<?php
-
-/**
- * @file
- * Include DRS settings.
- */
-
-use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
-use Acquia\Drupal\RecommendedSettings\Settings;
-
-// Create settings object.
-$siteUri = "site1";
-$settings = new Settings(DRUPAL_ROOT, $siteUri);
-
-// Database details.
-$dbSpec = [
-  'drupal' => [
-    'db' => [
-      'database' => 'drupal', // In case of multi-site database name is replaced with the site name.
-      'username' => 'drupal',
-      'password' => 'drupal',
-      'host' => 'localhost',
-      'port' => '3306',
-    ],
-  ],
-];
-
-try {
-  // Call generate method passing database details.
-  $settings->generate($dbSpec);
-}
-catch (SettingsException $e) {
-  echo $e->getMessage();
-}
+./vendor/bin/drush init:settings --database=site1 --username=myuser --password=mypass --host=127.0.0.1 --port=1234 --uri=site1
 ```
 
 # License
