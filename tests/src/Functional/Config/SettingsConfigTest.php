@@ -62,6 +62,13 @@ class SettingsConfigTest extends FunctionalTestBase {
     $settings_config->set("a.b.c", "true");
     $settings_config->set("d", 'This should be boolean ${a.b.c} value.');
     $this->assertEquals($settings_config->get("d"), 'This should be boolean 1 value.');
+
+    $settings_config->set("a.b.c", "false");
+    $settings_config->set("d", 'This should be boolean ${a.b.c} value.');
+    $this->assertEquals($settings_config->get("d"), 'This should be boolean  value.');
+
+    $settings_config->set("e", 'This is ${f} test.');
+    $this->assertEquals($settings_config->get("e"), 'This is ${f} test.');
   }
 
   /**

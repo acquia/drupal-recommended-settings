@@ -15,6 +15,7 @@ use Composer\Package\RootPackage;
  * Functional test for the EnvironmentDetectorTest class.
  *
  * @covers \Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector
+ * @phpcs:disable SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable.DisallowedSuperGlobalVariable
  */
 class EnvironmentDetectorTest extends FunctionalTestBase {
 
@@ -118,6 +119,11 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
     putenv("AH_SITE_ENVIRONMENT=prod");
     $this->assertTrue(EnvironmentDetector::isProdEnv());
+
+    putenv("AH_SITE_ENVIRONMENT=");
+    putenv('PANTHEON_ENVIRONMENT=live');
+    $this->assertTrue(EnvironmentDetector::isProdEnv());
+    putenv("PANTHEON_ENVIRONMENT=");
   }
 
   /**
@@ -132,12 +138,81 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
   }
 
   /**
+   * Test EnvironmentDetector OS related methods.
+   */
+  public function testOS(): void {
+    $os_name = EnvironmentDetector::getOsName();
+
+    $this->assertIsString($os_name);
+    $this->assertNotEmpty($os_name);
+
+    $os_version = EnvironmentDetector::getOsVersion();
+    $this->assertIsString($os_version);
+    $this->assertNotEmpty($os_version);
+
+    $this->assertIsBool(EnvironmentDetector::isDarwin());
+  }
+
+  /**
    * Test EnvironmentDetector::getSiteName().
    * @throws \ReflectionException
    */
   public function testGetSiteName(): void {
     $sitePath = "sites/site1";
     $this->assertSame('site1', EnvironmentDetector::getSiteName($sitePath));
+
+    putenv('AH_SITE_GROUP=test');
+    putenv('AH_SITE_ENVIRONMENT=prod');
+    // Test definitely will be skipped in MacOS due to this, ensure to create
+    // directory/file manually running commands:
+    // sudo mkdir -p /var/www/site-php/test.prod/
+    // sudo touch /var/www/site-php/test.prod/multisite-config.json,
+    // This is important, or else we won't be able to test this functionality
+    if (!is_dir("/var/www/site-php/test.prod/")) {
+      if (!@mkdir("/var/www/site-php/test.prod/", "0777", TRUE)
+        || !@touch("/var/www/site-php/test.prod/multisite-config.json")) {
+        putenv('AH_SITE_GROUP=');
+        putenv('AH_SITE_ENVIRONMENT=');
+        $this->markTestSkipped("Not able to create directory. Please create manually.");
+      }
+    }
+    $GLOBALS['gardens_site_settings']['conf']['acsf_db_name'] = "site1";
+    $this->assertEquals("site1", EnvironmentDetector::getSiteName($sitePath));
+    unset($GLOBALS['gardens_site_settings']);
+    putenv('AH_SITE_GROUP=');
+    putenv('AH_SITE_ENVIRONMENT=');
+  }
+
+  /**
+   * Test EnvironmentDetector::getSiteName().
+   */
+  public function testGetSiteNameForLocalAcsf(): void {
+    if (getenv("ORCA_FIXTURE_DIR")) {
+      // Due to some reasons, we've to manually copy fixture directories to
+      // project directory.
+      // @todo: Revisit on why it's not working & fix it.
+      $this->copyFixtureFiles($this->getFixtureDirectory(), $this->getProjectRoot());
+    }
+    $drsFileSystem = new DrsFilesystem();
+    $drsFileSystem->ensureDirectoryExists($this->drupalRoot . '/sites/g');
+    $drsFileSystem->dumpFile($this->drupalRoot . '/sites/g/random.php', "<?php echo 'hello';");
+    $this->assertFileExists($this->drupalRoot . '/sites/g/random.php');
+    $ci_updated = $host_updated = FALSE;
+    if (getenv("CI")) {
+      putenv("CI=");
+      $ci_updated = TRUE;
+    }
+    if (!getenv('HTTP_HOST')) {
+      putenv("HTTP_HOST=localhost.acms");
+      $host_updated = TRUE;
+    }
+    $this->assertEquals("acms", EnvironmentDetector::getSiteName("sites/site1"));
+    if ($ci_updated) {
+      putenv("CI=true");
+    }
+    if ($host_updated) {
+      putenv("HTTP_HOST=");
+    }
   }
 
   /**
@@ -152,24 +227,34 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
    * @throws \ReflectionException
    */
   public function testGetEnvironments(): void {
+    $ci_updated = FALSE;
+    if (getenv("CI")) {
+      putenv("CI=");
+      $ci_updated = TRUE;
+    }
     $this->assertSame([
-      'local' => FALSE,
+      'local' => TRUE,
       'dev' => FALSE,
       'stage' => FALSE,
-      'prod' => TRUE,
+      'prod' => FALSE,
       'ci' => FALSE,
       'ode' => FALSE,
       'ah_other' => FALSE
     ], EnvironmentDetector::getEnvironments());
+    if ($ci_updated) {
+      putenv("CI=true");
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    parent::tearDown();
     @unlink($this->drupalRoot . '/sites/g/random.php');
     @rmdir($this->drupalRoot . '/sites/g');
+    @unlink('/var/www/site-php/test.prod/multisite-config.json');
+    @rmdir('/var/www');
+    parent::tearDown();
   }
 
 }

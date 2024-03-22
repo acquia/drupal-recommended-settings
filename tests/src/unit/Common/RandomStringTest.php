@@ -43,8 +43,23 @@ class RandomStringTest extends TestCase {
     $this->assertSame(5, strlen($string));
     $this->assertMatchesAllRegularExpression('/[0-9]/', $string);
 
-    $string = RandomString::string(5, TRUE, \Closure::fromCallable([$this, 'validateDigits']), $digits);
+    RandomString::string(5, TRUE, \Closure::fromCallable([$this, 'validateDigits']), $digits);
     $this->assertTrue($this->called);
+  }
+
+  /**
+   * Tests RuntimeException from method string().
+   */
+  public function testRandomStringException(): void {
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage("Unable to generate a unique random name");
+    // With given two characters, we can generate only four unique characters
+    // ie 11, 21, 22, & 12. Then exception should appear
+    RandomString::string(2, TRUE, NULL, '12');
+    RandomString::string(2, TRUE, NULL, '12');
+    RandomString::string(2, TRUE, NULL, '12');
+    RandomString::string(2, TRUE, NULL, '12');
+    RandomString::string(2, TRUE, NULL, '12');
   }
 
   /**

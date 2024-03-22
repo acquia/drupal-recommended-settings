@@ -54,7 +54,7 @@ $settings['update_free_access'] = TRUE;
  * @see https://www.drupal.org/node/3105918
  */
 if (phpversion() >= 8.3 ) {
-  ini_set('zend.assertions', 1);
+  @ini_set('zend.assertions', 1);
 }
 else {
   assert_options(ASSERT_ACTIVE, TRUE);

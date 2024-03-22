@@ -52,7 +52,7 @@ class Filesystem {
     if (!is_dir($directory)) {
       if (file_exists($directory)) {
         throw new \RuntimeException(
-          sprintf("The directory '%s' exists and is not a directory.", $directory)
+          sprintf("The file at path '%s' already exists.", $directory)
         );
       }
       if (!@mkdir($directory, 0777, TRUE)) {
@@ -86,10 +86,7 @@ class Filesystem {
     foreach ($sourceFiles as $sourceFile) {
       $sourceFileName = basename($sourceFile);
       $destFile = $destDir . DIRECTORY_SEPARATOR . $sourceFileName;
-      $status = $this->copyFile($sourceFile, $destFile, $overwrite);
-      if (!$status) {
-        return FALSE;
-      }
+      $this->copyFile($sourceFile, $destFile, $overwrite);
     }
 
     return TRUE;
@@ -114,7 +111,7 @@ class Filesystem {
 
     // Copy the file from source to destination.
     if (is_file($source)) {
-      if (!copy($source, $destination)) {
+      if (!@copy($source, $destination)) {
         throw new \RuntimeException("Failed to copy file: $destination.");
       }
     }
@@ -138,20 +135,11 @@ class Filesystem {
       throw new \RuntimeException("Unable to open the file for writing: " . $filePath);
     }
 
-    // Check if the file is writable.
-    if (!is_writable($filePath)) {
-      fclose($fileHandle);
-      throw new \RuntimeException("The file is not writable: " . $filePath);
-    }
-
     // Append the content to the file.
-    if (fwrite($fileHandle, $content) === FALSE) {
-      fclose($fileHandle);
-      throw new \RuntimeException("Failed to write content to the file: " . $filePath);
-    }
+    $status = fwrite($fileHandle, $content);
 
     fclose($fileHandle);
-    return TRUE;
+    return $status;
   }
 
   /**
@@ -164,17 +152,15 @@ class Filesystem {
    */
   public function dumpFile(string $filePath, string $content): bool {
     $dir = dirname($filePath);
-    $this->ensureDirectoryExists($dir);
+    if (!is_dir($dir)) {
+      $this->ensureDirectoryExists($dir);
+    }
     $fileHandle = @fopen($filePath, 'w');
     if (!$fileHandle) {
       throw new \RuntimeException("Unable to open the file for writing: " . $filePath);
     }
 
-    if (fwrite($fileHandle, $content) === FALSE) {
-      fclose($fileHandle);
-      throw new \RuntimeException("Failed to write content to the file: " . $filePath);
-    }
-    return TRUE;
+    return fwrite($fileHandle, $content);
   }
 
   /**
@@ -199,12 +185,10 @@ class Filesystem {
    *   Given file mode.
    * @param int $umask
    *   Given umask for file.
-   * @param bool $recursive
-   *   Determines if recursive needed.
    */
-  public function chmod(string|iterable $files, int $mode, int $umask = 0000, bool $recursive = FALSE): bool {
+  public function chmod(string|iterable $files, int $mode, int $umask = 0000): bool {
     foreach ($this->toIterable($files) as $file) {
-      if (file_exists($file) && !chmod($file, $mode & ~$umask)) {
+      if (file_exists($file) && !@chmod($file, $mode & ~$umask)) {
         $file_or_directory = is_dir($file) ? "directory" : "file";
         throw new \RuntimeException(
           sprintf("Failed to change permissions for %s: '%s'.", $file_or_directory, $file)

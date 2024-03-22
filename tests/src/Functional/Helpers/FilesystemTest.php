@@ -66,14 +66,46 @@ class FilesystemTest extends FunctionalTestBase {
 
     // Assert that same number of file exits.
     $this->assertSame($this->sourceFileDir, $this->drsFileSystem->loadFilesFromDirectory($this->drupalRoot . '/sites/site1'));
+    // Assert empty array, when directory doesn't exist.
+    $this->assertEmpty($this->drsFileSystem->loadFilesFromDirectory("/test"));
   }
 
   /**
-   * Test  Filesystem::ensureDirectoryExists()
+   * Test Filesystem::ensureDirectoryExists()
    */
   public function testEnsureDirectoryExists(): void {
     $this->drsFileSystem->ensureDirectoryExists($this->testDir);
     $this->assertDirectoryExists($this->testDir);
+
+    $this->expectException(\RuntimeException::class);
+    $test_file = "$this->testDir/abcd";
+    $this->expectExceptionMessage("The file at path '$test_file' already exists.");
+    touch($test_file);
+    $this->drsFileSystem->ensureDirectoryExists($test_file);
+  }
+
+  /**
+   * Test exception for Filesystem::ensureDirectoryExists()
+   */
+  public function testException(): void {
+    $this->expectException(\RuntimeException::class);
+    $test_dir = $this->testDir . "/notwritable";
+    $this->expectExceptionMessage("The directory '$test_dir/abcd' does not exist and could not be created.");
+    $this->drsFileSystem->ensureDirectoryExists($test_dir);
+    $this->drsFileSystem->chmod($test_dir, '555');
+    $this->drsFileSystem->ensureDirectoryExists($test_dir . "/abcd");
+  }
+
+  /**
+   * Test exception for Filesystem::ensureDirectoryExists()
+   */
+  public function testExceptionForDirectoryNotWritable(): void {
+    $this->expectException(\RuntimeException::class);
+    $test_dir = $this->testDir . "/notwritable";
+    $this->expectExceptionMessage("The directory '$test_dir' exist and is not writable.");
+    $this->drsFileSystem->ensureDirectoryExists($test_dir);
+    $this->drsFileSystem->chmod($test_dir, '555');
+    $this->drsFileSystem->ensureDirectoryExists($test_dir);
   }
 
   /**
@@ -106,10 +138,16 @@ class FilesystemTest extends FunctionalTestBase {
     $this->assertFileExists($this->testDir . '/local.settings.php');
     $this->assertFileExists($this->testDir . '/settings.php');
 
+    $test_dir = $this->testDir . "/notwritable";
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage("Failed to copy file: $test_dir/default.services.yml.");
+    $this->drsFileSystem->ensureDirectoryExists($test_dir);
+    $this->drsFileSystem->chmod($test_dir, '555');
+    $this->drsFileSystem->copyFile($this->sourceFileDir[0], $test_dir . '/default.services.yml');
   }
 
   /**
-   * Test  Filesystem::appendToFile()
+   * Test Filesystem::appendToFile()
    */
   public function testAppendToFile(): void {
     $contentOriginal = file_get_contents($this->sourceFileDir[0]);
@@ -117,17 +155,38 @@ class FilesystemTest extends FunctionalTestBase {
     $contentUpdated = file_get_contents($this->sourceFileDir[0]);
     $this->assertNotSame($contentOriginal, $contentUpdated);
     $this->assertStringContainsString($contentUpdated, "<?php echo 'test content';" . PHP_EOL . "New line.");
+
+    $file = $this->drupalRoot . '/test/new-file.txt';
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage("Unable to open the file for writing: " . $file);
+    $this->drsFileSystem->appendToFile($file, PHP_EOL . 'New line.');
   }
 
   /**
    * Test  Filesystem::dumpFile()
    */
   public function testDumpFile(): void {
-    $file = $this->drupalRoot . '/new-file.txt';
+    $file = $this->drupalRoot . '/test/new-file.txt';
     $content = 'Hello there!';
     $this->assertTrue($this->drsFileSystem->dumpFile($file, $content));
     $this->assertFileExists($file);
     $this->assertStringContainsString($content, file_get_contents($file));
+
+    $test_dir = $this->testDir . "/notwritable";
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage("Unable to open the file for writing: $test_dir/new-file.txt");
+    $this->drsFileSystem->ensureDirectoryExists($test_dir);
+    $this->drsFileSystem->chmod($test_dir, '555');
+    $this->drsFileSystem->dumpFile($test_dir . "/new-file.txt", $content);
+  }
+
+  /**
+   * Tests failed to change permissions.
+   */
+  public function testChMod(): void {
+    $this->expectException(\RuntimeException::class);
+    $this->expectExceptionMessage(sprintf("Failed to change permissions for directory: '%s'.", "/usr/bin"));
+    $this->drsFileSystem->chmod('/usr/bin', 777);
   }
 
   /**
@@ -140,14 +199,18 @@ class FilesystemTest extends FunctionalTestBase {
     @unlink($this->testDir . '/default.settings.php');
     @unlink($this->testDir . '/local.settings.php');
     @unlink($this->testDir . '/settings.php');
+    @unlink($this->testDir . "/abcd");
 
     // Delete all files from site1 directory.
     @unlink($this->drupalRoot . '/sites/site1/default.services.yml');
     @unlink($this->drupalRoot . '/sites/site1/default.settings.php');
     @unlink($this->drupalRoot . '/sites/site1/local.settings.php');
     @unlink($this->drupalRoot . '/sites/site1/settings.php');
-    @unlink($this->drupalRoot . '/new-file.txt');
+    @unlink($this->drupalRoot . '/test/new-file.txt');
 
+    $this->drsFileSystem->chmod($this->testDir . "/notwritable", '777');
+    @rmdir($this->testDir . "/notwritable");
+    @rmdir($this->drupalRoot . "/test");
     // Finally delete the tempDir.
     @rmdir($this->testDir);
   }

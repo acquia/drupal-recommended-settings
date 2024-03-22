@@ -32,8 +32,8 @@ trait SiteUriTrait {
     }
     // Strip off the protocol from the provided uri -- however,
     // now we will require that the sites subdir already exist.
-    $dir = preg_replace('#[^/]*/*#', '', $dir);
-    if ($dir && file_exists(Path::join($root, $dir))) {
+    $dir = preg_replace('#[^/]*//#', '', $dir);
+    if ($dir && file_exists(Path::join($root . "/sites", $dir))) {
       return $dir;
     }
 
