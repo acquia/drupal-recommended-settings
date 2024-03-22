@@ -25,7 +25,6 @@ class SiteUriTraitTest extends FunctionalTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->fileSystem = new Filesystem();
-
     $this->setupSite();
   }
 
