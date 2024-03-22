@@ -187,6 +187,12 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
    * Test EnvironmentDetector::getSiteName().
    */
   public function testGetSiteNameForLocalAcsf(): void {
+    if (getenv("ORCA_FIXTURE_DIR")) {
+      // Due to some reasons, we've to manually copy fixture directories to
+      // project directory.
+      // @todo: Revisit on why it's not working & fix it.
+      $this->copyFixtureFiles($this->getFixtureDirectory(), $this->getProjectRoot());
+    }
     $drsFileSystem = new DrsFilesystem();
     $drsFileSystem->ensureDirectoryExists($this->drupalRoot . '/sites/g');
     $drsFileSystem->dumpFile($this->drupalRoot . '/sites/g/random.php', "<?php echo 'hello';");
@@ -244,11 +250,11 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    parent::tearDown();
     @unlink($this->drupalRoot . '/sites/g/random.php');
     @rmdir($this->drupalRoot . '/sites/g');
     @unlink('/var/www/site-php/test.prod/multisite-config.json');
     @rmdir('/var/www');
+    parent::tearDown();
   }
 
 }

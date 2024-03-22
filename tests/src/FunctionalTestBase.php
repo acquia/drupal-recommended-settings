@@ -24,7 +24,7 @@ abstract class FunctionalTestBase extends TestCase {
    * @param string $root_fixture_dir
    *   Given project or root fixture directory.
    */
-  private function copyFixtureFiles(string $base_fixture_dir, string $root_fixture_dir): void {
+  protected function copyFixtureFiles(string $base_fixture_dir, string $root_fixture_dir): void {
     $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($base_fixture_dir));
 
     /** @var \SplFileInfo $file */
@@ -68,7 +68,7 @@ abstract class FunctionalTestBase extends TestCase {
   /**
    * Returs the fixture directory path.
    */
-  private function getFixtureDirectory(): string {
+  protected function getFixtureDirectory(): string {
     return realpath(__DIR__ . "/../fixtures");
   }
 
