@@ -85,7 +85,7 @@ jobs:
       - name: Before Script
         run: ../orca/bin/ci/before_script.sh
       - name: Script
-        run: ../orca/bin/ci/script.sh
+        run: ./tests/scripts/ci/script.sh
       - name: After script
         run: |
           ../orca/bin/ci/after_success.sh
