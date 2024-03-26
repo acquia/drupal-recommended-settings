@@ -10,6 +10,11 @@ use Robo\Collection\CollectionBuilder;
 trait LoadTasks {
 
   /**
+    * An instance of drush task class.
+    */
+  protected string $drushTaskClass = DrushTask::class;
+
+  /**
    * Task drush.
    *
    * @return \Robo\Collection\CollectionBuilder
@@ -17,7 +22,7 @@ trait LoadTasks {
    */
   protected function taskDrush(): CollectionBuilder {
     /** @var \Acquia\Drupal\RecommendedSettings\Robo\Tasks\DrushTask $task */
-    $task = $this->task(DrushTask::class);
+    $task = $this->task($this->drushTaskClass);
     /** @var \Symfony\Component\Console\Output\OutputInterface $output */
     $output = $this->output();
     $task->setVerbosityThreshold($output->getVerbosity());
