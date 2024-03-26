@@ -1,0 +1,5 @@
+drupal:
+  db:
+    database: mydatabase
+multisites:
+  - acms

@@ -26,7 +26,7 @@ jobs:
    env:
      ORCA_JOB: STATIC_CODE_ANALYSIS
    steps:
-     - uses: actions/checkout@v3
+     - uses: actions/checkout@v4
      - uses: shivammathur/setup-php@v2
        with:
          php-version: 8.2
@@ -47,29 +47,45 @@ jobs:
          ../orca/bin/ci/after_failure.sh
          ../orca/bin/ci/after_script.sh
  PHPUNIT_TESTS:
-    name: "Execute PHPUnit tests"
+    name: "Run PHPUnit tests for CORE: ${{ matrix.orca-job }}, PHP: ${{ matrix.php-version }}"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version:
+          - 8.1
+          - 8.2
+          - 8.3
+        orca-job:
+          - ISOLATED_TEST_ON_CURRENT
+          - INTEGRATED_TEST_ON_PREVIOUS_MINOR
+        exclude:
+          - orca-job: INTEGRATED_TEST_ON_PREVIOUS_MINOR
+            php-version: 8.3
+          - orca-job: INTEGRATED_TEST_ON_PREVIOUS_MINOR
+            php-version: 8.2
     env:
-      ORCA_FIXTURE_DIR: "/home/runner/work/drupal-recommended-settings/orca-build"
+      ORCA_JOB: ${{ matrix.orca-job }}
       CI: TRUE
+      ORCA_TEST_BOOTSTRAP_FILE: ${{ github.workspace }}/tests/src/bootstrap.php
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: ${{ matrix.php-version }}
           coverage: xdebug
+          ini-values: assert.active=1, assert.exception=1, zend.assertions=1
       - name: Download ORCA
-        run: composer create-project --no-dev --ignore-platform-req=php acquia/orca ../orca "$ORCA_VERSION" -n
+        run: |
+          composer create-project --no-dev --ignore-platform-req=php acquia/orca ../orca "$ORCA_VERSION" -n
+          curl https://gist.githubusercontent.com/vishalkhode1/ed98372190aac83d7be6c5cc27f2303d/raw/custom-tests-bootstrap.patch | git -C ../orca apply
       - name: Before Install
         run: ../orca/bin/ci/before_install.sh
       - name: Install
         run: ../orca/bin/ci/install.sh
-      - name: Before script
+      - name: Before Script
         run: ../orca/bin/ci/before_script.sh
-      - name: Run PHPUnit tests
-        run: |
-          composer install
-          ./vendor/bin/phpunit tests
+      - name: Script
+        run: ./tests/scripts/ci/script.sh
       - name: After script
         run: |
           ../orca/bin/ci/after_success.sh

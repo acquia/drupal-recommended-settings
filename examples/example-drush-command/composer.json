@@ -1,11 +1,11 @@
 {
-  "name":  "example/example-drush-command",
-  "description":  "Example custom drush commands.",
-  "keywords":  [
+  "name": "example/example-drush-command",
+  "description": "Example custom drush commands.",
+  "license": "GPL-2.0-or-later",
+  "keywords": [
     "drush",
     "drupal"
   ],
-  "license":  "GPL-2.0-or-later",
   "require": {
     "acquia/drupal-recommended-settings": "*"
   },

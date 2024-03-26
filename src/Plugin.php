@@ -2,12 +2,9 @@
 
 namespace Acquia\Drupal\RecommendedSettings;
 
-use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
-use Acquia\Drupal\RecommendedSettings\Helpers\HashGenerator;
 use Composer\Composer;
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\OperationInterface;
-use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
@@ -15,6 +12,7 @@ use Composer\IO\IOInterface;
 use Composer\Package\PackageInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\ScriptEvents;
+use Composer\Util\ProcessExecutor;
 
 /**
  * Composer plugin for handling drupal scaffold.
@@ -34,6 +32,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   protected IOInterface $io;
 
   /**
+   * Process executor.
+   */
+  protected ProcessExecutor $executor;
+
+  /**
    * Stores this plugin package object.
    */
   protected mixed $settingsPackage = NULL;
@@ -44,6 +47,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   public function activate(Composer $composer, IOInterface $io) {
     $this->composer = $composer;
     $this->io = $io;
+    ProcessExecutor::setTimeout(3600);
+    $this->executor = new ProcessExecutor($this->io);
   }
 
   /**
@@ -87,21 +92,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
 
   /**
    * Includes Acquia recommended settings post composer update/install command.
-   *
-   * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
   public function onPostCmdEvent(): void {
     // Only install the template files, if the drupal-recommended-settings
-    // plugin is installed.
-    if ($this->settingsPackage) {
-      try {
-        HashGenerator::generate($this->getProjectRoot(), $this->io);
-        $settings = new Settings($this->getDrupalRoot());
-        $settings->generate();
-      }
-      catch (SettingsException $e) {
-        $this->io->write("<fg=white;bg=red;options=bold>[error]</> " . $e->getMessage());
-      }
+    // plugin is installed, with drupal project.
+    if ($this->settingsPackage && $this->getDrupalRoot()) {
+      $vendor_dir = $this->composer->getConfig()->get('vendor-dir');
+      $this->executeCommand(
+        $vendor_dir . "/bin/drush drs:init:settings", [],
+        TRUE
+      );
     }
   }
 
@@ -117,9 +117,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   protected function getSettingsPackage(OperationInterface $operation): mixed {
     if ($operation instanceof InstallOperation) {
       $package = $operation->getPackage();
-    }
-    elseif ($operation instanceof UpdateOperation) {
-      $package = $operation->getTargetPackage();
     }
     if (isset($package) && $package instanceof PackageInterface && $package->getName() == "acquia/drupal-recommended-settings") {
       return $package;
@@ -137,10 +134,49 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   /**
    * Returns the drupal root directory path.
    */
-  protected function getDrupalRoot(): string {
+  protected function getDrupalRoot(): ?string {
     $extra = $this->composer->getPackage()->getExtra();
-    $docroot = $extra['drupal-scaffold']['locations']['web-root'] ?? "";
-    return realpath($this->getProjectRoot() . "/" . $docroot);
+    $docroot = $extra['drupal-scaffold']['locations']['web-root'] ?? NULL;
+    if ($docroot) {
+      $docroot = realpath($this->getProjectRoot() . DIRECTORY_SEPARATOR . $docroot);
+      return $docroot ?: NULL;
+    }
+    return NULL;
+  }
+
+  /**
+   * Executes a shell command with escaping.
+   *
+   * Example usage: $this->executeCommand("test command %s", [ $value ]).
+   *
+   * @param string $cmd
+   *   Cmd.
+   * @param array<string> $args
+   *   Args.
+   * @param bool $display_output
+   *   Optional. Defaults to FALSE. If TRUE, command output will be displayed
+   *   on screen.
+   *
+   * @return bool
+   *   TRUE if command returns successfully with a 0 exit code.
+   */
+  protected function executeCommand(string $cmd, array $args = [], bool $display_output = FALSE): bool {
+    // Shell-escape all arguments.
+    foreach ($args as $index => $arg) {
+      $args[$index] = escapeshellarg($arg);
+    }
+    // Add command as first arg.
+    array_unshift($args, $cmd);
+    // And replace the arguments.
+    $command = call_user_func_array('sprintf', $args);
+    if ($this->io->isVerbose() || $display_output) {
+      $this->io->write('<comment> > ' . $command . '</comment>');
+      $io = $this->io;
+      function ($type, $buffer) use ($io): void {
+        $io->write($buffer, FALSE);
+      };
+    }
+    return ($this->executor->executeTty($command) == 0);
   }
 
 }

@@ -19,6 +19,6 @@
   <exclude-pattern>var/</exclude-pattern>
   <exclude-pattern>vendor/</exclude-pattern>
 
-  <rule ref="AcquiaDrupalStrict"/>
+  <rule ref="AcquiaPHP"/>
 
 </ruleset>
