@@ -35,6 +35,9 @@
         "phpro/grumphp-shim": "^2.2",
         "phpunit/phpunit": "^9 || ^10"
     },
+    "conflict": {
+        "acquia/blt": "<14"
+    },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
