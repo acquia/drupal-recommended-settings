@@ -16,6 +16,7 @@ use Drush\Attributes as CLI;
 use Drush\Boot\BootstrapManager;
 use Drush\Boot\DrupalBootLevels;
 use Drush\Commands\DrushCommands;
+use Drush\Drush;
 use Psr\Container\ContainerInterface as DrushContainer;
 
 /**
@@ -29,34 +30,19 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
   const POST_GENERATE_SETTINGS = 'post-generate-settings';
 
   /**
-   * Construct an object of Multisite commands.
-   */
-  public function __construct(private BootstrapManager $bootstrapManager) {
-    parent::__construct();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public static function createEarly(DrushContainer $drush_container): self {
-    return new static(
-      $drush_container->get('bootstrap.manager')
-    );
-  }
-
-  /**
    * Execute code before pre-validate site:install.
    */
   #[CLI\Hook(type: HookManager::PRE_ARGUMENT_VALIDATOR, target: 'site-install')]
   public function preValidateSiteInstall(CommandData $commandData): void {
+    $bootstrapManager = Drush::bootstrapManager();
     if ($this->validateGenerateSettings($commandData)) {
       // Get sites subdir which we set in the hook doGenerateSettings.
       $sitesSubdir = $commandData->input()->getOption('sites-subdir');
       // Try to get any already configured database information.
-      $this->bootstrapManager->bootstrapMax(DrupalBootLevels::CONFIGURATION, $commandData->annotationData());
+      $bootstrapManager->bootstrapMax(DrupalBootLevels::CONFIGURATION, $commandData->annotationData());
       // By default, bootstrap manager boot site from default/setting.php
       // hence remove the database connection if site is other than default.
-      if (($sitesSubdir && "sites/$sitesSubdir" !== $this->bootstrapManager->bootstrap()->confpath())) {
+      if (($sitesSubdir && "sites/$sitesSubdir" !== $bootstrapManager->bootstrap()->confpath())) {
         Database::removeConnection('default');
         $db = [
           'database' => 'drupal',
