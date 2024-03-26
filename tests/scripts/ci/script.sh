@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+# NAME
+#     script.sh - Run ORCA tests.
+#
+# SYNOPSIS
+#     script.sh
+#
+# DESCRIPTION
+#     Runs static code analysis and automated tests.
+
+cd "$(dirname "$0")" || exit; source ../../../../orca/bin/ci/_includes.sh
+
+if [[ "$ORCA_ENABLE_NIGHTWATCH" == "TRUE" && "$ORCA_SUT_HAS_NIGHTWATCH_TESTS" && -d "$ORCA_YARN_DIR" ]]; then
+  (
+    cd "$ORCA_YARN_DIR" || exit
+    orca fixture:run-server &
+    SERVER_PID=$!
+
+    if [[ "$GITLAB_CI" ]]; then
+      echo "ChromeDriver initialized via separate container..."
+    else
+      # @todo could we set DRUPAL_TEST_CHROMEDRIVER_AUTOSTART instead of launching Chromedriver manually?
+      chromedriver --disable-dev-shm-usage --disable-extensions --disable-gpu --headless --no-sandbox --port=4444 &
+      CHROMEDRIVER_PID=$!
+    fi
+
+    eval "yarn test:nightwatch \\
+      --headless \\
+      --passWithNoTests \\
+      --tag=$ORCA_SUT_MACHINE_NAME"
+
+    kill -0 $SERVER_PID
+    kill -0 $CHROMEDRIVER_PID
+  )
+fi
+
+if [[ "$ORCA_JOB" ]]; then
+  eval "orca fixture:status"
+  eval "orca qa:automated-tests --sut=$ORCA_SUT_NAME --sut-only"
+fi

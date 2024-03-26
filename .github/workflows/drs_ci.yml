@@ -47,7 +47,7 @@ jobs:
          ../orca/bin/ci/after_failure.sh
          ../orca/bin/ci/after_script.sh
  PHPUNIT_TESTS:
-    name: "Run PHPUnit tests on PHP: ${{ matrix.php-version }}"
+    name: "Run PHPUnit tests for CORE: ${{ matrix.orca-job }}, PHP: ${{ matrix.php-version }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -55,8 +55,16 @@ jobs:
           - 8.1
           - 8.2
           - 8.3
+        orca-job:
+          - ISOLATED_TEST_ON_CURRENT
+          - INTEGRATED_TEST_ON_PREVIOUS_MINOR
+        exclude:
+          - orca-job: INTEGRATED_TEST_ON_PREVIOUS_MINOR
+            php-version: 8.3
+          - orca-job: INTEGRATED_TEST_ON_PREVIOUS_MINOR
+            php-version: 8.2
     env:
-      ORCA_JOB: ISOLATED_TEST_ON_CURRENT
+      ORCA_JOB: ${{ matrix.orca-job }}
       CI: TRUE
       ORCA_TEST_BOOTSTRAP_FILE: ${{ github.workspace }}/tests/src/bootstrap.php
     steps:
@@ -77,7 +85,7 @@ jobs:
       - name: Before Script
         run: ../orca/bin/ci/before_script.sh
       - name: Script
-        run: ../orca/bin/ci/script.sh
+        run: ./tests/scripts/ci/script.sh
       - name: After script
         run: |
           ../orca/bin/ci/after_success.sh
