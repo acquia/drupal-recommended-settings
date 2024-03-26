@@ -46,7 +46,7 @@ class DrushTask extends CommandStack {
   /**
    * Indicates if the command output should be verbose.
    */
-  protected bool $verbose = FALSE;
+  protected bool|int $verbose = FALSE;
 
   /**
    * Indicates if the command output should be very verbose.
@@ -71,7 +71,7 @@ class DrushTask extends CommandStack {
   /**
    * Add or not the --ansi option.
    */
-  protected bool $ansi = FALSE;
+  protected bool|NULL $ansi = NULL;
 
   /**
    * Drush commands to execute when task is run.
@@ -90,12 +90,12 @@ class DrushTask extends CommandStack {
   /**
    * Adds the given drush command to a stack.
    *
-   * @param string $command
+   * @param string|array<string> $commands
    *   The drush command to execute. Do NOT include "drush" prefix.
    *
    * @return $this
    */
-  public function drush(string $command) {
+  public function drush(string|array $commands) {
     // Clear out options associated with previous drush command.
     $this->setOptionsForLastCommand();
 
@@ -103,11 +103,11 @@ class DrushTask extends CommandStack {
       $this->init();
     }
 
-    if (is_array($command)) {
-      $command = implode(' ', array_filter($command));
+    if (is_array($commands)) {
+      $commands = implode(' ', array_filter($commands));
     }
 
-    $this->commands[] = trim($command);
+    $this->commands[] = trim($commands);
     return $this;
   }
 
@@ -156,7 +156,7 @@ class DrushTask extends CommandStack {
    *
    * @return $this
    */
-  public function verbose(bool $verbose) {
+  public function verbose(string|bool|int $verbose) {
     $this->verbose = $this->mixedToBool($verbose);
     return $this;
   }
@@ -169,7 +169,7 @@ class DrushTask extends CommandStack {
    *
    * @return $this
    */
-  public function veryVerbose(bool $verbose) {
+  public function veryVerbose(string|bool $verbose) {
     $this->veryVerbose = $this->mixedToBool($verbose);
     return $this;
   }
@@ -182,7 +182,7 @@ class DrushTask extends CommandStack {
    *
    * @return $this
    */
-  public function debug(bool $verbose) {
+  public function debug(string|bool $verbose) {
     $this->debug = $this->mixedToBool($verbose);
     return $this;
   }
@@ -203,12 +203,12 @@ class DrushTask extends CommandStack {
   /**
    * Include or not the --ansi option for drush commands.
    *
-   * @param bool $ansi
+   * @param string|bool $ansi
    *   The flag for including --ansi option.
    *
    * @return $this
    */
-  public function ansi(bool $ansi) {
+  public function ansi(string|bool $ansi) {
     $this->ansi = $ansi;
     return $this;
   }
@@ -237,7 +237,7 @@ class DrushTask extends CommandStack {
       $this->interactive(FALSE);
     }
     if (!isset($this->ansi)) {
-      $this->ansi($this->getConfig()->get('drush.ansi'));
+      $this->ansi($this->getConfig()->get('drush.ansi', FALSE));
     }
 
     $this->defaultsInitialized = TRUE;
@@ -249,13 +249,16 @@ class DrushTask extends CommandStack {
    * @param mixed $mixedVar
    *   Mixed.
    *
-   * @return bool
+   * @return int|bool
    *   TRUE/FALSE as per PHP's cast to boolean ruleset, with the exception that
    *   a string value not equal to 'yes' or 'true' will evaluate to FALSE.
    */
-  protected function mixedToBool(mixed $mixedVar): bool {
+  protected function mixedToBool(mixed $mixedVar): int|bool {
     if (is_string($mixedVar)) {
       $boolVar = ($mixedVar === 'yes' || $mixedVar === 'true');
+    }
+    elseif (is_int($mixedVar)) {
+      $boolVar = $mixedVar;
     }
     else {
       $boolVar = (bool) $mixedVar;
@@ -290,8 +293,8 @@ class DrushTask extends CommandStack {
       $this->option('no-interaction');
     }
 
-    if ($this->verbose !== FALSE) {
-      $verbosity_threshold = $this->verbosityThreshold();
+    if ($this->verbose !== FALSE || ($this->verbosityThreshold() >= OutputInterface::VERBOSITY_VERBOSE)) {
+      $verbosity_threshold = ($this->verbose !== FALSE) ? $this->verbose : $this->verbosityThreshold();
       switch ($verbosity_threshold) {
         case OutputInterface::VERBOSITY_VERBOSE:
           $this->verbose(TRUE);
@@ -304,11 +307,8 @@ class DrushTask extends CommandStack {
         case OutputInterface::VERBOSITY_DEBUG:
           $this->debug(TRUE);
           break;
+
       }
-    }
-    if ($this->verbosityThreshold() >= OutputInterface::VERBOSITY_VERBOSE
-      && $this->verbose !== FALSE) {
-      $this->verbose(TRUE);
     }
 
     if (($this->debug || $this->getConfig()->get('drush.debug'))
@@ -359,9 +359,6 @@ class DrushTask extends CommandStack {
    */
   public function run() {
     $this->setupExecution();
-    if (empty($this->exec)) {
-      throw new TaskException($this, 'You must add at least one command');
-    }
 
     // If 'stopOnFail' is not set, or if there is only one command to run,
     // then execute the single command to run.
