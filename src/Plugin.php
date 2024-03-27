@@ -5,6 +5,7 @@ namespace Acquia\Drupal\RecommendedSettings;
 use Composer\Composer;
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\DependencyResolver\Operation\OperationInterface;
+use Composer\DependencyResolver\Operation\UpdateOperation;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvent;
 use Composer\Installer\PackageEvents;
@@ -40,6 +41,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
    * Stores this plugin package object.
    */
   protected mixed $settingsPackage = NULL;
+
+  /**
+   * Checks if acquia/blt is updated.
+   */
+  protected bool $bltUpdated = FALSE;
 
   /**
    * {@inheritdoc}
@@ -96,7 +102,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   public function onPostCmdEvent(): void {
     // Only install the template files, if the drupal-recommended-settings
     // plugin is installed, with drupal project.
-    if ($this->settingsPackage && $this->getDrupalRoot()) {
+    if ($this->settingsPackage && $this->getDrupalRoot() && !$this->bltUpdated) {
       $vendor_dir = $this->composer->getConfig()->get('vendor-dir');
       $this->executeCommand(
         $vendor_dir . "/bin/drush drs:init:settings", [],
@@ -117,6 +123,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   protected function getSettingsPackage(OperationInterface $operation): mixed {
     if ($operation instanceof InstallOperation) {
       $package = $operation->getPackage();
+    }
+    elseif ($operation instanceof UpdateOperation && $operation->getTargetPackage() instanceof PackageInterface) {
+      $this->bltUpdated = ($operation->getTargetPackage()->getName() == "acquia/blt");
     }
     if (isset($package) && $package instanceof PackageInterface && $package->getName() == "acquia/drupal-recommended-settings") {
       return $package;
