@@ -53,7 +53,7 @@ $settings['update_free_access'] = TRUE;
  * Drupal\Component\Assertion\Handle is deprecated.
  * @see https://www.drupal.org/node/3105918
  */
-if (phpversion() >= 8.3 ) {
+if (phpversion() >= 8.3) {
   @ini_set('zend.assertions', 1);
 }
 else {
