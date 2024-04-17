@@ -22,7 +22,10 @@
  *   $settings['hash_salt'] = file_get_contents('/home/example/salt.txt');
  * @endcode
  */
-$settings['hash_salt'] = file_get_contents(DRUPAL_ROOT . '/../salt.txt');
+$drupal_salt_file_path = DRUPAL_ROOT . '/../salt.txt';
+if (file_exists($drupal_salt_file_path)) {
+  $settings['hash_salt'] = file_get_contents($drupal_salt_file_path);
+}
 
 /**
  * Deployment identifier.
