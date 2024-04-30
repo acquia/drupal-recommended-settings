@@ -10,7 +10,7 @@ use Consolidation\Log\SymfonyLogOutputStyler;
 class NullLogOutputStylers extends SymfonyLogOutputStyler {
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   #[Override]
   public function error($symfonyStyle, $level, $message, $context): void {

@@ -56,7 +56,7 @@ trait SiteUriTrait {
   }
 
   /**
-   * Preparing site uri if --uri="https://www.example.com"
+   * Preparing site uri if --uri="https://www.example.com".
    *
    * @param string $uri
    *   Site uri in a url format.

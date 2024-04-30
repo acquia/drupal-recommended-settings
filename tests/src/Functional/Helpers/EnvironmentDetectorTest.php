@@ -41,6 +41,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Set up test environment.
+   *
    * @throws \ReflectionException
    */
   public function setUp(): void {
@@ -50,7 +51,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
     $package->setExtra([
       "drupal-scaffold" => [
         "locations" => [
-          "web-root" => "docroot"
+          "web-root" => "docroot",
         ],
       ],
     ]);
@@ -140,7 +141,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
   /**
    * Test EnvironmentDetector OS related methods.
    */
-  public function testOS(): void {
+  public function testOperatingSystem(): void {
     $os_name = EnvironmentDetector::getOsName();
 
     $this->assertIsString($os_name);
@@ -155,6 +156,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Test EnvironmentDetector::getSiteName().
+   *
    * @throws \ReflectionException
    */
   public function testGetSiteName(): void {
@@ -167,7 +169,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
     // directory/file manually running commands:
     // sudo mkdir -p /var/www/site-php/test.prod/
     // sudo touch /var/www/site-php/test.prod/multisite-config.json,
-    // This is important, or else we won't be able to test this functionality
+    // This is important, or else we won't be able to test this functionality.
     if (!is_dir("/var/www/site-php/test.prod/")) {
       if (!@mkdir("/var/www/site-php/test.prod/", "0777", TRUE)
         || !@touch("/var/www/site-php/test.prod/multisite-config.json")) {
@@ -190,7 +192,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
     if (getenv("ORCA_FIXTURE_DIR")) {
       // Due to some reasons, we've to manually copy fixture directories to
       // project directory.
-      // @todo: Revisit on why it's not working & fix it.
+      // @todo Revisit on why it's not working & fix it.
       $this->copyFixtureFiles($this->getFixtureDirectory(), $this->getProjectRoot());
     }
     $drsFileSystem = new DrsFilesystem();
@@ -224,6 +226,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Test EnvironmentDetector::getEnvironments().
+   *
    * @throws \ReflectionException
    */
   public function testGetEnvironments(): void {
@@ -239,7 +242,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
       'prod' => FALSE,
       'ci' => FALSE,
       'ode' => FALSE,
-      'ah_other' => FALSE
+      'ah_other' => FALSE,
     ], EnvironmentDetector::getEnvironments());
     if ($ci_updated) {
       putenv("CI=true");

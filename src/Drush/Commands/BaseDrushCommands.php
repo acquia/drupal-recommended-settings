@@ -50,7 +50,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    *
    * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
-  protected function invokeCommands(array $commands): void {
+  public function invokeCommands(array $commands): void {
     foreach ($commands as $key => $value) {
       if (is_numeric($key)) {
         $command = $value;
@@ -74,9 +74,9 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    * @param string[] $options
    *   An array of options to pass to the command.
    * @param bool $display_command
-   *   Decides if command should be displayed on terminal or not. Default is TRUE.
+   *   Decides if command should be displayed on terminal or not. Default TRUE.
    */
-  protected function invokeCommand(string $command_name, array $args = [], array $options = [], bool $display_command = TRUE): void {
+  public function invokeCommand(string $command_name, array $args = [], array $options = [], bool $display_command = TRUE): void {
     $process = Drush::drush(Drush::aliasManager()->getSelf(), $command_name, $args, $options);
     $output = $this->output();
     if ($display_command) {
