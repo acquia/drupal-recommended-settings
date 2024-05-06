@@ -2,6 +2,7 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Tests\unit\Common;
 
+use Acquia\Drupal\RecommendedSettings\Common\IO;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,15 +14,8 @@ use Symfony\Component\Console\Question\Question;
  *
  * @covers \Acquia\Drupal\RecommendedSettings\Common\IO
  */
-// Revert changes made in this file once consolidation/robo is having some fix.
-// For more details follow issue : https://github.com/consolidation/robo/issues/1155
 class IOTest extends TestCase {
-
-  // use IO, RoboIO {
-  //   IO::say insteadof RoboIO;
-  //   IO::formatQuestion insteadof RoboIO;
-  //   IO::yell insteadof RoboIO;
-  // }
+  use IO;
 
   /**
    * Stores the messages to print.
@@ -40,7 +34,6 @@ class IOTest extends TestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->markTestSkipped('must be revisited.');
     $this->print = [];
     $this->output = $this->getOutput();
   }
