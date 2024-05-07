@@ -91,7 +91,7 @@ class ArrayManipulatorTest extends TestCase {
       ],
       'eight' => TRUE,
       'ninth' => FALSE,
-      'tenth' => 'We are testing that there should be a new line after 60 characters.'
+      'tenth' => 'We are testing that there should be a new line after 60 characters.',
     ];
     $expected = [
       0 => [

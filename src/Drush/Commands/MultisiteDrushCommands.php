@@ -13,11 +13,9 @@ use Consolidation\AnnotatedCommand\Events\CustomEventAwareTrait;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drupal\Core\Database\Database;
 use Drush\Attributes as CLI;
-use Drush\Boot\BootstrapManager;
 use Drush\Boot\DrupalBootLevels;
 use Drush\Commands\DrushCommands;
 use Drush\Drush;
-use Psr\Container\ContainerInterface as DrushContainer;
 
 /**
  * A Drush command to generate settings.php for Multisite.

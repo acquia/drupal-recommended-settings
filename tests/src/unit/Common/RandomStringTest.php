@@ -54,7 +54,7 @@ class RandomStringTest extends TestCase {
     $this->expectException(\RuntimeException::class);
     $this->expectExceptionMessage("Unable to generate a unique random name");
     // With given two characters, we can generate only four unique characters
-    // ie 11, 21, 22, & 12. Then exception should appear
+    // ie 11, 21, 22, & 12. Then exception should appear.
     RandomString::string(2, TRUE, NULL, '12');
     RandomString::string(2, TRUE, NULL, '12');
     RandomString::string(2, TRUE, NULL, '12');

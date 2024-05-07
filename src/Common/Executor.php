@@ -4,26 +4,29 @@ namespace Acquia\Drupal\RecommendedSettings\Common;
 
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
+use Consolidation\SiteProcess\ProcessManager;
+use Consolidation\SiteProcess\ProcessManagerAwareInterface;
+use Consolidation\SiteProcess\ProcessManagerAwareTrait;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Robo\Collection\CollectionBuilder;
 use Robo\Common\ProcessExecutor;
 use Robo\Contract\ConfigAwareInterface;
 use Robo\Robo;
-use Robo\Task\Base\Exec;
-use Symfony\Component\Process\Process;
 
 /**
  * A class for executing commands.
  *
  * This allows non-Robo-command classes to execute commands easily.
  */
-class Executor implements ConfigAwareInterface, LoggerAwareInterface {
+class Executor implements ConfigAwareInterface, LoggerAwareInterface, ProcessManagerAwareInterface {
 
   use ConfigAwareTrait;
   use IO;
   use LoggerAwareTrait;
+  use ProcessManagerAwareTrait;
 
   /**
    * A copy of the Robo builder.
@@ -31,14 +34,23 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
   protected CollectionBuilder $builder;
 
   /**
+   * An instance of GuzzleClient.
+   */
+  protected ClientInterface $client;
+
+  /**
    * Executor constructor.
    *
    * @param \Robo\Collection\CollectionBuilder $builder
    *   This is a copy of the collection builder, required for calling various
    *   Robo tasks from non-command files.
+   * @param \GuzzleHttp\ClientInterface|null $client
+   *   The client interface object.
    */
-  public function __construct(CollectionBuilder $builder) {
+  public function __construct(CollectionBuilder $builder, ?ClientInterface $client = NULL) {
     $this->builder = $builder;
+    $this->client = $client ?? new Client();
+    $this->processManager = new ProcessManager();
   }
 
   /**
@@ -58,10 +70,10 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    *   The command string|array.
    *   Warning: symfony/process 5.x expects an array.
    *
-   * @return \Robo\Task\Base\Exec
+   * @return \Robo\Collection\CollectionBuilder
    *   The task. You must call run() on this to execute it!
    */
-  public function taskExec(string $command): Exec {
+  public function taskExec(string $command): CollectionBuilder {
     return $this->builder->taskExec($command);
   }
 
@@ -82,7 +94,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
 
     // URIs do not work on remote drush aliases in Drush 9. Instead, it is
     // expected that the alias define the uri in its configuration.
-    if ($this->getConfigValue('site') !== 'default') {
+    if ($this->getConfigValue('drush.uri') !== 'default') {
       $drush_array[] = '--uri=' . $this->getConfigValue('drush.uri');
     }
 
@@ -102,16 +114,15 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
   /**
    * Executes a command.
    *
-   * @param mixed $command
-   *   The command string|array.
-   *   Warning: symfony/process 5.x expects an array.
+   * @param array<string> $commands
+   *   An array of commands.
    *
    * @return \Robo\Common\ProcessExecutor
    *   The unexecuted command.
    */
-  public function execute(mixed $command): ProcessExecutor {
+  public function execute(array $commands): ProcessExecutor {
     /** @var \Robo\Common\ProcessExecutor $process_executor */
-    $process_executor = Robo::process(new Process($command));
+    $process_executor = Robo::process($this->processManager->process($commands));
     return $process_executor->dir($this->getConfigValue('repo.root'))
       ->printOutput(FALSE)
       ->printMetadata(FALSE)
@@ -128,7 +139,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    *   The unexecuted command.
    */
   public function executeShell(string $command): ProcessExecutor {
-    $process_executor = Robo::process(Process::fromShellCommandline($command));
+    $process_executor = Robo::process($this->processManager->shell($command));
     return $process_executor->dir($this->getConfigValue('repo.root'))
       ->printOutput(FALSE)
       ->printMetadata(FALSE)
@@ -144,11 +155,8 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
   public function killProcessByPort(string $port): void {
     $this->logger->info("Killing all processes on port '$port'...");
     // This is allowed to fail.
-    // @todo Replace with standardized call to Symfony Process.
-    // phpcs:ignore
-    exec("command -v lsof && lsof -ti tcp:$port | xargs kill l 2>&1");
-    // phpcs:ignore
-    exec("pkill -f $port 2>&1");
+    $this->processManager->shell("command -v lsof && lsof -ti tcp:$port | xargs kill l 2>&1")->run();
+    $this->processManager->shell("pkill -f $port 2>&1")->run();
   }
 
   /**
@@ -160,9 +168,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
   public function killProcessByName(string $name): void {
     $this->logger->info("Killing all processing containing string '$name'...");
     // This is allowed to fail.
-    // @todo Replace with standardized call to Symfony Process.
-    // phpcs:ignore
-    exec("ps aux | grep -i $name | grep -v grep | awk '{print $2}' | xargs kill -9 2>&1");
+    $this->processManager->shell("ps aux | grep -i $name | grep -v grep | awk '{print $2}' | xargs kill -9 2>&1")->run();
     // exec("ps aux | awk '/$name/ {print $2}' 2>&1 | xargs kill -9");.
   }
 
@@ -189,14 +195,15 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    *   Arguments to pass to $callable.
    * @param string $message
    *   The message to display when this function is called.
+   * @param string $maxWait
+   *   The maximum time to wait. Default is 1 min.
    *
    * @return bool
    *   TRUE if callable returns TRUE.
    *
    * @throws \Exception
    */
-  public function wait(callable $callable, array $args, string $message = ''): bool {
-    $maxWait = 60 * 1000;
+  public function wait(callable $callable, array $args, string $message = '', int $maxWait = 60 * 1000): bool {
     $checkEvery = 1 * 1000;
     $start = microtime(TRUE) * 1000;
     $end = $start + $maxWait;
@@ -234,8 +241,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
    */
   public function checkUrl(string $url): bool {
     try {
-      $client = new Client();
-      $res = $client->request('GET', $url, [
+      $res = $this->client->request('GET', $url, [
         'connection_timeout' => 2,
         'timeout' => 2,
         'http_errors' => FALSE,

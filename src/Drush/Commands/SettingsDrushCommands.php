@@ -64,6 +64,7 @@ class SettingsDrushCommands extends BaseDrushCommands {
       $site_directory = $this->getSitesSubdirFromUri($this->getConfigValue("docroot"), $this->getConfigValue("drush.uri"));
       $settings = new Settings($this->getConfigValue("docroot"), $site_directory);
       $settings->generate($db);
+
       if (!$this->output()->isQuiet()) {
         $this->print(
           sprintf("Settings generated successfully for site '%s'.", $this->getConfigValue("drush.uri"))
@@ -74,7 +75,7 @@ class SettingsDrushCommands extends BaseDrushCommands {
       if (!$this->output()->isQuiet()) {
         $this->print($e->getMessage(), "error", "red");
         if ($this->output()->isVerbose()) {
-          $this->io()->writeln($e->getTraceAsString());
+          $this->print($e->getTraceAsString(), "notice");
         }
       }
       return ResultData::EXITCODE_ERROR;

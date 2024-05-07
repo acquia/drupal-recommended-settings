@@ -10,8 +10,8 @@ use Robo\Collection\CollectionBuilder;
 trait LoadTasks {
 
   /**
-    * An instance of drush task class.
-    */
+   * An instance of drush task class.
+   */
   protected string $drushTaskClass = DrushTask::class;
 
   /**

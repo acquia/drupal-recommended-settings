@@ -32,7 +32,6 @@ class PluginUnitTest extends FunctionalTestBase {
 
   /**
    * Stores the message.
-   *
    */
   protected string $message = '';
 
@@ -81,11 +80,11 @@ class PluginUnitTest extends FunctionalTestBase {
    */
   public function testGetSubscribedEvents(): void {
     $this->assertEquals([
-     "post-package-install" => "onPostPackageEvent",
-     "post-package-update" => "onPostPackageEvent",
-     "post-update-cmd" => "onPostCmdEvent",
-     "post-install-cmd" => "onPostCmdEvent",
-   ], Plugin::getSubscribedEvents());
+      "post-package-install" => "onPostPackageEvent",
+      "post-package-update" => "onPostPackageEvent",
+      "post-update-cmd" => "onPostCmdEvent",
+      "post-install-cmd" => "onPostCmdEvent",
+    ], Plugin::getSubscribedEvents());
   }
 
   /**

@@ -19,6 +19,9 @@ class DrushTaskTest extends CommandsTestBase {
   use LoadTasks;
   use LoadAllTasks;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
     $this->getConfig()->set("drush.alias", "self");
@@ -186,8 +189,8 @@ class DrushTaskTest extends CommandsTestBase {
   }
 
   /**
-    * Tests the Robo Drush command exception.
-    */
+   * Tests the Robo Drush command exception.
+   */
   public function testDrushTaskCommandException(): void {
     $result = $this->taskDrush()
       ->stopOnFail()

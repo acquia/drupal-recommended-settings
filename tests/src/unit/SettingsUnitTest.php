@@ -2,6 +2,7 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Tests\Unit;
 
+use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Settings;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 
@@ -83,6 +84,18 @@ class SettingsUnitTest extends FunctionalTestBase {
     ]);
     $this->assertEquals($content, file_get_contents($settings_file));
     unlink($settings_file);
+  }
+
+  /**
+   * Tests the settings exception.
+   */
+  public function testSettingsException(): void {
+    $settings = new Settings($this->drupalRoot, $this->siteName);
+    if (!file_exists("$this->drupalRoot/sites/default/default.settings.php")) {
+      $this->expectException(SettingsException::class);
+      $this->expectExceptionMessageMatches("/^Source file.*/");
+      $settings->generate();
+    }
   }
 
   /**

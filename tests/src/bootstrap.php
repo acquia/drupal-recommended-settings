@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ */
+
 use DrupalFinder\DrupalFinder;
 
 $finder = new DrupalFinder();
@@ -17,7 +21,8 @@ if (!file_exists($autoload)) {
   throw new Exception("Unable to determine autoload file.");
 }
 
-/** @var \Composer\Autoload\ClassLoader $class_loader */
+/**
+ * @var \Composer\Autoload\ClassLoader $class_loader */
 // Require Project's autoloader.
 $class_loader = require $autoload;
 

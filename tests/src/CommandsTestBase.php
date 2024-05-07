@@ -3,15 +3,15 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests;
 
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
+use Acquia\Drupal\RecommendedSettings\Tests\Helpers\NullCollectionBuilder;
 use Acquia\Drupal\RecommendedSettings\Tests\Helpers\NullLogOutputStylers;
 use Consolidation\Log\Logger;
+use Drush\Config\DrushConfig;
 use League\Container\Container;
-use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Robo\Collection\CollectionBuilder;
 use Robo\Common\BuilderAwareTrait;
 use Robo\Common\OutputAwareTrait;
-use Robo\Config\Config;
+use Robo\Contract\BuilderAwareInterface;
 use Robo\Robo;
 use Robo\Tasks;
 use Symfony\Component\Console\Output\NullOutput;
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\NullOutput;
 /**
  * Base commands to test drush commands/tasks.
  */
-abstract class CommandsTestBase extends TestCase {
+abstract class CommandsTestBase extends FunctionalTestBase implements BuilderAwareInterface {
   use BuilderAwareTrait;
   use OutputAwareTrait;
   use ConfigAwareTrait;
@@ -40,7 +40,7 @@ abstract class CommandsTestBase extends TestCase {
   /**
    * Initialize the Container.
    *
-   * @param ContainerInterface|null $container
+   * @param \League\Container\ContainerInterface|null $container
    *   An instance of container object or NULL.
    */
   protected function createContainer(?ContainerInterface $container = NULL): void {
@@ -49,10 +49,10 @@ abstract class CommandsTestBase extends TestCase {
       $output = new NullOutput();
       $this->setOutput($output);
 
-      $config = new Config();
+      $config = new DrushConfig();
       $this->setConfig($config);
       $logger = new Logger($this->output());
-      $null_log_output = new NullLogOutputStylers;
+      $null_log_output = new NullLogOutputStylers();
       $logger->setLogOutputStyler($null_log_output);
       $container->add("logger", $logger);
 
@@ -60,7 +60,10 @@ abstract class CommandsTestBase extends TestCase {
       Robo::configureContainer($container, $app, $this->getConfig());
 
       $tasks = new Tasks();
-      $builder = CollectionBuilder::create($container, $tasks);
+      $builder = NullCollectionBuilder::create($container, $tasks);
+      $tasks->setBuilder($builder)
+        ->setInput($container->get("input"))
+        ->setOutput($container->get("output"));
       $this->setBuilder($builder);
       $container->add("builder", $builder);
     }
