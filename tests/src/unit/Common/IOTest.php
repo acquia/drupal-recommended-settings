@@ -2,9 +2,8 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Tests\Unit\Common;
 
-use Acquia\Drupal\RecommendedSettings\Common\IO;
+use Acquia\Drupal\RecommendedSettings\Tests\Traits\DrsIO;
 use PHPUnit\Framework\TestCase;
-use Robo\Common\IO as RoboIO;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
@@ -15,12 +14,7 @@ use Symfony\Component\Console\Question\Question;
  * @covers \Acquia\Drupal\RecommendedSettings\Common\IO
  */
 class IOTest extends TestCase {
-
-  use IO, RoboIO {
-    IO::say insteadof RoboIO;
-    IO::formatQuestion insteadof RoboIO;
-    IO::yell insteadof RoboIO;
-  }
+  use DrsIO;
 
   /**
    * Stores the messages to print.
@@ -46,7 +40,7 @@ class IOTest extends TestCase {
     parent::setUp();
     $this->print = [];
     $this->answer = "";
-    $this->output = $this->output();
+    $this->output = $this->getOutput();
   }
 
   /**
@@ -239,7 +233,7 @@ class IOTest extends TestCase {
   /**
    * Returns the mocked output object.
    */
-  protected function output(): OutputInterface {
+  protected function getOutput(): OutputInterface {
     $output = $this->createMock(OutputInterface::class);
     $output->method("writeln")->willReturnCallback(fn ($input) => $this->mockPrint($input));
     $output->method("getVerbosity")->willReturn(OutputInterface::VERBOSITY_VERY_VERBOSE);

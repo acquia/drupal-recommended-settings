@@ -24,7 +24,7 @@ trait LoadTasks {
     /** @var \Acquia\Drupal\RecommendedSettings\Robo\Tasks\DrushTask $task */
     $task = $this->task($this->drushTaskClass);
     /** @var \Symfony\Component\Console\Output\OutputInterface $output */
-    $output = $this->output();
+    $output = $this->getOutput();
     $task->setVerbosityThreshold($output->getVerbosity());
 
     return $task;
