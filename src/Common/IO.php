@@ -145,9 +145,9 @@ trait IO {
    *   The verbosity level at which to display the logged message.
    */
   protected function logConfig(array $array, string $prefix = '', int $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE): void {
-    if ($this->output()->getVerbosity() >= $verbosity) {
+    if ($this->getOutput()->getVerbosity() >= $verbosity) {
       if ($prefix) {
-        $this->output()->writeln("<comment>Configuration for $prefix:</comment>");
+        $this->getOutput()->writeln("<comment>Configuration for $prefix:</comment>");
         foreach ($array as $key => $value) {
           $array["$prefix.$key"] = $value;
           unset($array[$key]);
