@@ -22,9 +22,8 @@
         "php": ">=8.1",
         "composer-plugin-api": "^2",
         "acquia/drupal-environment-detector": "^1.5.3",
-        "consolidation/config": "^2.0.0",
-        "drush/drush": "^11.6 || ^12",
-        "grasmash/yaml-expander": "^3.0",
+        "consolidation/config": "^2 || ^3",
+        "drush/drush": "^11.6 || ^12 || ^13",
         "loophp/phposinfo": "^1.7.1"
     },
     "require-dev": {
