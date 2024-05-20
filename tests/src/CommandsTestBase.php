@@ -4,7 +4,7 @@ namespace Acquia\Drupal\RecommendedSettings\Tests;
 
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
 use Acquia\Drupal\RecommendedSettings\Tests\Helpers\NullLogOutputStylers;
-use Acquia\Drupal\RecommendedSettings\Tests\Traits\DrsIO;
+use Acquia\Drupal\RecommendedSettings\Tests\Traits\OutputAwareTrait;
 use Consolidation\Log\Logger;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\NullOutput;
  */
 abstract class CommandsTestBase extends TestCase {
   use BuilderAwareTrait;
-  use DrsIO;
+  use OutputAwareTrait;
   use ConfigAwareTrait;
 
   /**

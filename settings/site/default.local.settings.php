@@ -57,8 +57,10 @@ if (phpversion() >= 8.3) {
   @ini_set('zend.assertions', 1);
 }
 else {
+  // phpcs:disable
   assert_options(ASSERT_ACTIVE, TRUE);
   assert_options(ASSERT_EXCEPTION, TRUE);
+  // phpcs:enable
 }
 
 /**

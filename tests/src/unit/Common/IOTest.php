@@ -1,6 +1,6 @@
 <?php
 
-namespace Acquia\Drupal\RecommendedSettings\Tests\Unit\Common;
+namespace Acquia\Drupal\RecommendedSettings\Tests\unit\Common;
 
 use Acquia\Drupal\RecommendedSettings\Common\IO;
 use Acquia\Drupal\RecommendedSettings\Tests\Traits\DrsIO;
@@ -15,11 +15,7 @@ use Symfony\Component\Console\Question\Question;
  * @covers \Acquia\Drupal\RecommendedSettings\Common\IO
  */
 class IOTest extends TestCase {
-  use IO, DrsIO {
-    IO::say insteadof DrsIO;
-    IO::formatQuestion insteadof DrsIO;
-    IO::yell insteadof DrsIO;
-  }
+  use IO, DrsIO;
 
   /**
    * Stores the messages to print.
