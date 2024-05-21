@@ -4,13 +4,13 @@ namespace Acquia\Drupal\RecommendedSettings\Tests;
 
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
 use Acquia\Drupal\RecommendedSettings\Tests\Helpers\NullLogOutputStylers;
+use Acquia\Drupal\RecommendedSettings\Tests\Traits\OutputAwareTrait;
 use Consolidation\Log\Logger;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Robo\Collection\CollectionBuilder;
 use Robo\Common\BuilderAwareTrait;
-use Robo\Common\OutputAwareTrait;
 use Robo\Config\Config;
 use Robo\Robo;
 use Robo\Tasks;
@@ -51,7 +51,7 @@ abstract class CommandsTestBase extends TestCase {
 
       $config = new Config();
       $this->setConfig($config);
-      $logger = new Logger($this->output());
+      $logger = new Logger($this->getOutput());
       $null_log_output = new NullLogOutputStylers;
       $logger->setLogOutputStyler($null_log_output);
       $container->add("logger", $logger);
