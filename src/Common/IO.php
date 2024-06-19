@@ -17,7 +17,7 @@ trait IO {
   /**
    * Writes text to screen, without decoration.
    *
-   * @param string $text
+   * @param string|iterable[string] $text
    *   The text to write.
    */
   protected function say($text): void {
@@ -145,9 +145,12 @@ trait IO {
    *   The verbosity level at which to display the logged message.
    */
   protected function logConfig(array $array, string $prefix = '', int $verbosity = OutputInterface::VERBOSITY_VERY_VERBOSE): void {
-    if ($this->output()->getVerbosity() >= $verbosity) {
+    // We can't directly use $this->output() as it throws error with PHPUnit 10
+    // because it defines output() method with a different method signature.
+    $output = ($this->output() instanceof OutputInterface) ? $this->output() : $this->getOutput();
+    if ($output->getVerbosity() >= $verbosity) {
       if ($prefix) {
-        $this->output()->writeln("<comment>Configuration for $prefix:</comment>");
+        $output->writeln("<comment>Configuration for $prefix:</comment>");
         foreach ($array as $key => $value) {
           $array["$prefix.$key"] = $value;
           unset($array[$key]);
