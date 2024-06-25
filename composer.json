@@ -23,7 +23,7 @@
         "composer-plugin-api": "^2",
         "acquia/drupal-environment-detector": "^1.5.3",
         "consolidation/config": "^2 || ^3",
-        "drush/drush": "^11.6 || ^12 || ^13",
+        "drush/drush": "^12 || ^13",
         "grasmash/yaml-expander": "^3.0",
         "loophp/phposinfo": "^1.7.1"
     },
