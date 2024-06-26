@@ -2,13 +2,12 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Config;
 
-use Consolidation\Config\Config;
 use Drush\Config\DrushConfig;
 
 /**
  * The configuration for settings.
  */
-class DefaultDrushConfig extends Config {
+class DefaultDrushConfig extends DrushConfig {
 
   /**
    * Config Constructor.
@@ -17,15 +16,24 @@ class DefaultDrushConfig extends Config {
    *   The drush config object.
    */
   public function __construct(DrushConfig $config) {
-    $config->set('repo.root', $config->get("runtime.project"));
-    $config->set('docroot', $config->get("options.root"));
-    $config->set('composer.bin', $config->get("drush.vendor-dir") . '/bin');
-    if ($config->get("options.ansi")) {
-      $config->set('drush.ansi', $config->get("options.ansi"));
+    parent::__construct();
+    $this->set('repo.root', $config->get("runtime.project"));
+    $this->set('docroot', $config->get("options.root"));
+    $this->set('composer.bin', $config->get("drush.vendor-dir") . '/bin');
+    if ($config->get("options.ansi") !== NULL) {
+      $this->set('drush.ansi', $config->get("options.ansi"));
     }
-    $config->set('drush.bin', $config->get("runtime.drush-script"));
-    $config->setDefault('drush.alias', "self");
-    parent::__construct($config->export());
+    $this->set('drush.bin', $config->get("runtime.drush-script"));
+    $this->setDefault('drush.alias', "self");
+    $this->combine($config->export());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function combine($data) {
+    $this->getContext(self::PROCESS_CONTEXT)->combine($data);
+    return $this;
   }
 
 }
