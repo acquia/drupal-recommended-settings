@@ -3,9 +3,9 @@
 namespace Acquia\Drupal\RecommendedSettings\Config;
 
 use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
-use Consolidation\Config\Config;
 use Consolidation\Config\ConfigInterface;
 use Consolidation\Config\Loader\YamlConfigLoader;
+use Drush\Config\DrushConfig;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
@@ -18,7 +18,7 @@ class ConfigInitializer {
   /**
    * Config.
    */
-  protected Config $config;
+  protected DrushConfig $config;
 
   /**
    * Loader.
@@ -43,7 +43,7 @@ class ConfigInitializer {
   /**
    * ConfigInitializer constructor.
    *
-   * @param \Consolidation\Config\ConfigInterface|\Consolidation\Config\Config $config
+   * @param \Consolidation\Config\ConfigInterface|\Drush\Config\DrushConfig $config
    *   The config object.
    * @param \Symfony\Component\Console\Input\InputInterface|null $input
    *   An input object or null.
@@ -147,7 +147,7 @@ class ConfigInitializer {
    * @param string[] $data
    *   An array of data.
    */
-  public function addConfig(array $data): Config {
+  public function addConfig(array $data): DrushConfig {
     $this->processor->add($data);
     return $this->config;
   }
@@ -170,7 +170,7 @@ class ConfigInitializer {
   /**
    * Process config.
    */
-  public function processConfig(): Config {
+  public function processConfig(): DrushConfig {
     $this->config->replace($this->processor->export());
     return $this->config;
   }

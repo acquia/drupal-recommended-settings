@@ -4,9 +4,9 @@ acquia/drupal-recommended-settings:
 drush/drush:
   is_company_package: false
   core_matrix:
-    10.1.x:
-      version: 11.x
-      version_dev: 11.x
-    '*':
+    10.x:
       version: 12.x
       version_dev: 12.x-dev
+    '*':
+      version: 13.x
+      version_dev: 13.x-dev

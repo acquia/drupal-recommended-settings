@@ -48,7 +48,7 @@ jobs:
          ../orca/bin/ci/after_script.sh
  PHPUNIT_TESTS:
     name: "Run PHPUnit tests for CORE: ${{ matrix.orca-job }}, PHP: ${{ matrix.php-version }}"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         php-version:
@@ -58,10 +58,15 @@ jobs:
         orca-job:
           - ISOLATED_TEST_ON_CURRENT
           - INTEGRATED_TEST_ON_PREVIOUS_MINOR
+          - ISOLATED_TEST_ON_NEXT_MAJOR_LATEST_MINOR_BETA_OR_LATER
         exclude:
           - orca-job: INTEGRATED_TEST_ON_PREVIOUS_MINOR
             php-version: 8.3
           - orca-job: INTEGRATED_TEST_ON_PREVIOUS_MINOR
+            php-version: 8.2
+          - orca-job: ISOLATED_TEST_ON_NEXT_MAJOR_LATEST_MINOR_BETA_OR_LATER
+            php-version: 8.1
+          - orca-job: ISOLATED_TEST_ON_NEXT_MAJOR_LATEST_MINOR_BETA_OR_LATER
             php-version: 8.2
     env:
       ORCA_JOB: ${{ matrix.orca-job }}

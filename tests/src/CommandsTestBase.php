@@ -6,12 +6,12 @@ use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
 use Acquia\Drupal\RecommendedSettings\Tests\Helpers\NullLogOutputStylers;
 use Acquia\Drupal\RecommendedSettings\Tests\Traits\OutputAwareTrait;
 use Consolidation\Log\Logger;
+use Drush\Config\DrushConfig;
 use League\Container\Container;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Robo\Collection\CollectionBuilder;
 use Robo\Common\BuilderAwareTrait;
-use Robo\Config\Config;
 use Robo\Robo;
 use Robo\Tasks;
 use Symfony\Component\Console\Output\NullOutput;
@@ -49,7 +49,7 @@ abstract class CommandsTestBase extends TestCase {
       $output = new NullOutput();
       $this->setOutput($output);
 
-      $config = new Config();
+      $config = new DrushConfig();
       $this->setConfig($config);
       $logger = new Logger($this->getOutput());
       $null_log_output = new NullLogOutputStylers;
