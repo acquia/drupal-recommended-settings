@@ -2,8 +2,6 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Config;
 
-#use Consolidation\Config\Config;
-
 /**
  * The configuration for settings.
  */
