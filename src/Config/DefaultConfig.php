@@ -2,12 +2,10 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Config;
 
-use Consolidation\Config\Config;
-
 /**
  * The configuration for settings.
  */
-class DefaultConfig extends Config {
+class DefaultConfig extends DefaultDrushConfig {
 
   /**
    * Config Constructor.
