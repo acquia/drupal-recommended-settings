@@ -3,8 +3,8 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Config;
 
 use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
+use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
-use Consolidation\Config\Config;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
@@ -22,7 +22,7 @@ class ConfigInitializerTest extends FunctionalTestBase {
    * @throws \ReflectionException
    */
   public function testSetSite(): void {
-    $config = new Config();
+    $config = new DefaultDrushConfig();
     $config_initializer = new ConfigInitializer($config);
 
     $method = $this->getReflectionMethod($config_initializer::class, "setSite");
@@ -46,7 +46,7 @@ class ConfigInitializerTest extends FunctionalTestBase {
    * @throws \ReflectionException
    */
   public function testDetermineSite(): void {
-    $config = new Config();
+    $config = new DefaultDrushConfig();
     $config_initializer = new ConfigInitializer($config);
     $method = $this->getReflectionMethod($config_initializer::class, "determineSite");
     $result = $method->invoke($config_initializer);
@@ -74,7 +74,7 @@ class ConfigInitializerTest extends FunctionalTestBase {
    */
   public function testDetermineEnvironment(): void {
     putenv("CI=");
-    $config = new Config();
+    $config = new DefaultDrushConfig();
     $config_initializer = new ConfigInitializer($config);
     $method = $this->getReflectionMethod($config_initializer::class, "determineEnvironment");
     $result = $method->invoke($config_initializer);
@@ -85,7 +85,7 @@ class ConfigInitializerTest extends FunctionalTestBase {
     $this->assertSame("ci", $result);
     putenv("CI=");
 
-    $config = new Config();
+    $config = new DefaultDrushConfig();
     $config->set("environment", "dev");
     $config_initializer = new ConfigInitializer($config);
     $method = $this->getReflectionMethod($config_initializer::class, "determineEnvironment");
@@ -98,7 +98,7 @@ class ConfigInitializerTest extends FunctionalTestBase {
    */
   public function testInitialize(): void {
     putenv("CI=");
-    $config = new Config();
+    $config = new DefaultDrushConfig();
     $config_initializer = new ConfigInitializer($config);
     $config_initializer->initialize();
     $this->assertEquals($config_initializer->processConfig()->export(), [
@@ -122,7 +122,7 @@ class ConfigInitializerTest extends FunctionalTestBase {
     ]);
 
     putenv("CI=true");
-    $config = new Config();
+    $config = new DefaultDrushConfig();
     $config_initializer = new ConfigInitializer($config);
     $config_initializer->initialize();
 
@@ -141,7 +141,7 @@ class ConfigInitializerTest extends FunctionalTestBase {
    */
   public function testLoadAllConfig(): void {
     putenv("CI=");
-    $config = new Config();
+    $config = new DefaultDrushConfig();
     $config_initializer = new ConfigInitializer($config);
     $config = $config_initializer->initialize()->loadAllConfig()->processConfig();
     $this->assertEquals($config->export(), [
@@ -161,7 +161,7 @@ class ConfigInitializerTest extends FunctionalTestBase {
       ],
     ]);
 
-    $config = new Config();
+    $config = new DefaultDrushConfig();
     $project_root = $this->getProjectRoot();
     $drupal_root = $this->getDrupalRoot();
     $config->set("repo.root", $project_root);
@@ -191,7 +191,7 @@ class ConfigInitializerTest extends FunctionalTestBase {
       ],
     ]);
 
-    $config = new Config();
+    $config = new DefaultDrushConfig();
     $config->set("repo.root", $project_root);
     $config->set("docroot", $this->getDrupalRoot());
     $config_initializer = new ConfigInitializer($config);

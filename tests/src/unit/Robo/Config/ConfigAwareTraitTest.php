@@ -20,15 +20,19 @@ class ConfigAwareTraitTest extends TestCase {
    * Tests the getConfigValue() for ConfigAwareTrait trait.
    */
   public function testGetConfigValue(): void {
+    $this->config = new DrushConfig();
+    // Tests when no value exist for the key, then default value must return.
     $this->assertEquals(
-      "/var/www/html/acms.prod/vendor",
-      $this->getConfigValue("composer.bin", "/var/www/html/acms.prod/vendor"),
+      "/var/www/html/acms.prod/vendor/bin",
+      $this->getConfigValue("composer.bin", "/var/www/html/acms.prod/vendor/bin"),
     );
-    $config = new DrushConfig();
-    $config->set("runtime.project", "/var/www/html/acms.prod");
-    $config->set("options.root", "/var/www/html/acms.prod/docroot");
-    $drush_config = new DefaultDrushConfig($config);
-    $this->setConfig($drush_config);
+    $drush_config = new DrushConfig();
+    $drush_config->set("runtime.project", "/var/www/html/acms.prod");
+    $drush_config->set("options.root", "/var/www/html/acms.prod/docroot");
+    $drush_config->set("drush.vendor-dir", $drush_config->get("runtime.project") . "/vendor");
+    $drush_config->set("options.root", "/var/www/html/acms.prod");
+    $default_drush_config = new DefaultDrushConfig($drush_config);
+    $this->setConfig($default_drush_config);
     $this->assertEquals("/var/www/html/acms.prod", $this->getConfigValue("repo.root"));
   }
 
