@@ -33,7 +33,7 @@
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0.0",
         "ergebnis/composer-normalize": "^2.30.2",
         "phpro/grumphp-shim": "^2.2",
-        "phpunit/phpunit": "^9 || ^10"
+        "phpunit/phpunit": "^11.2.7"
     },
     "conflict": {
         "acquia/blt": "<14"
