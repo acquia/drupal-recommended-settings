@@ -76,6 +76,11 @@ if ($ip) {
 
 $settings_files = [];
 
+// Add mysql57 backport module.
+if (file_exists(DRUPAL_ROOT . '/modules/contrib/mysql57/settings.inc')) {
+  require DRUPAL_ROOT . '/modules/contrib/mysql57/settings.inc';
+}
+
 /**
  * Site path.
  *
