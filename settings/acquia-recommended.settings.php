@@ -78,6 +78,8 @@ $settings_files = [];
 
 // Add mysql57 backport module.
 if (file_exists(DRUPAL_ROOT . '/modules/contrib/mysql57/settings.inc')) {
+  global $conf, $databases;
+  $conf['acquia_hosting_settings_autoconnect'] = FALSE;
   require DRUPAL_ROOT . '/modules/contrib/mysql57/settings.inc';
 }
 
