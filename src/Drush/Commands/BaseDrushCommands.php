@@ -113,7 +113,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    */
   protected function initializeConfig(string $site_name = ""): void {
     $config = new DefaultDrushConfig($this->getConfig());
-    $configInitializer = new ConfigInitializer($config, $this->input());
+    $configInitializer = new ConfigInitializer($config);
     if ($site_name) {
       $configInitializer->setSite($site_name);
     }

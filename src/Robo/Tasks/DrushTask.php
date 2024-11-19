@@ -2,6 +2,7 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Robo\Tasks;
 
+use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
 use Robo\Common\CommandArguments;
 use Robo\Exception\TaskException;
 use Robo\Task\CommandStack;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DrushTask extends CommandStack {
 
+  use ConfigAwareTrait;
   use CommandArguments {
     option as traitOption;
   }
