@@ -25,6 +25,7 @@ class DefaultDrushConfigTest extends FunctionalTestBase {
     $drushConfig->set("options.root", $drupal_root);
     $drushConfig->set("drush.vendor-dir", $project_root . "/vendor");
     $drushConfig->set("options.ansi", TRUE);
+    $drushConfig->set('drush.uri', '/var/www/html/acms.prod/vendor/bin');
     $drushConfig->set("runtime.drush-script", $project_root . "/vendor/bin/drush");
 
     $default_drush_config = new DefaultDrushConfig($drushConfig);
@@ -32,9 +33,10 @@ class DefaultDrushConfigTest extends FunctionalTestBase {
     $this->assertEquals($actual, [
       "drush" => [
         "alias" => "self",
-        "vendor-dir" => $project_root . "/vendor",
+        "uri" => '/var/www/html/acms.prod/vendor/bin',
         "ansi" => TRUE,
         "bin" => $project_root . "/vendor/bin/drush",
+        "vendor-dir" => $project_root . "/vendor",
       ],
       "runtime" => [
         "project" => $project_root,
