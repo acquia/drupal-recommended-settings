@@ -26,6 +26,7 @@ class DefaultDrushConfig extends DrushConfig {
       }
       $this->set('drush.bin', $config->get("runtime.drush-script"));
       $this->setDefault('drush.alias', "self");
+      $this->setDefault('drush.uri', $config->get('options.uri'));
       $this->combine($config->export());
     }
   }
