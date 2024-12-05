@@ -47,19 +47,18 @@ class SettingsDrushCommands extends BaseDrushCommands {
     description: 'Generates the settings.php for site2 passing db credentials.',
   )]
   public function initSettings(array $options = [
-    'database' => 'drupal',
-    'username' => 'drupal',
-    'password' => 'drupal',
-    'host' => 'localhost',
-    'port' => "3306",
+    'database' => NULL,
+    'username' => NULL,
+    'password' => NULL,
+    'host' => NULL,
+    'port' => NULL,
   ]): int {
-    $db["drupal"]["db"] = [
-      'database' => $options['database'],
-      'username' => $options['username'],
-      'password' => $options['password'],
-      'host' => $options['host'],
-      'port' => $options['port'],
-    ];
+    $db = [];
+    $db['drupal']['db'] = array_filter(
+      $options,
+      fn($value, $key) => in_array($key, ['database', 'username', 'password', 'host', 'port']) && $value !== NULL,
+      ARRAY_FILTER_USE_BOTH
+    );
     try {
       $site_directory = $this->getSitesSubdirFromUri($this->getConfigValue("docroot"), $this->getConfigValue("drush.uri"));
       $settings = new Settings($this->getConfigValue("docroot"), $site_directory);
