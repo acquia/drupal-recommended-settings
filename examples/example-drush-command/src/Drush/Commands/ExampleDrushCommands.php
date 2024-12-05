@@ -3,10 +3,12 @@
 namespace Example\Drush\Commands;
 
 use Acquia\Drupal\RecommendedSettings\Drush\Commands\MultisiteDrushCommands;
+use Acquia\Drupal\RecommendedSettings\Drush\Commands\SettingsDrushCommands;
 use Consolidation\AnnotatedCommand\CommandData;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drush\Attributes as CLI;
 use Drush\Commands\DrushCommands;
+use Robo\ResultData;
 
 /**
  * An example drush command file.
@@ -32,6 +34,19 @@ class ExampleDrushCommands extends DrushCommands {
   public function showSuccessMessage(CommandData $commandData): void {
     $uri = $commandData->input()->getOption("uri");
     $this->io()->info("The settings.php generated successfully for site `" . $uri . "`.");
+  }
+
+  /**
+   * Skip settings.php generation if current environment is CI environment.
+   */
+  #[CLI\Hook(type: HookManager::PRE_COMMAND_HOOK, target: SettingsDrushCommands::SETTINGS_COMMAND)]
+  public function validate(): ?ResultData {
+    $isCI = getenv('CI');
+    if (!$isCI) {
+      return NULL;
+    }
+    $this->io()->info("Skip settings.php generation for CI environment.");
+    return new ResultData(ResultData::EXITCODE_OK);
   }
 
 }
