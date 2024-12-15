@@ -24,6 +24,20 @@ automatically generate the settings.php in the backend.
 ```
 drush site:install --uri site1
 ```
+##### To pass url in the --uri parameter, user need to do some prerequisites:
+- Copy example.sites.php and paste in your /sites/
+- Rename example.sites copy.php to sites.php
+- Add your domain or url in the sites.php which you want to pass in the --uri
+    
+    ```For example: $sites[‘acquia.com’] = ‘acquia’;```
+- Now users can run with domain/url in the –uri parameter 
+  
+  ```./vendor/bin/drush site:install --uri=”acquia.com”```
+
+From the above example, the acquia directory will be created under the sites folder.
+
+Note: Ignore the first two steps if user already setup the multi-site with simple uri like --uri=site1 or --uri=mysite
+First two steps only necessary if the user is setting up the very first multi-site with url or domain.
 
 The plugin offers various events that allow you to implement custom logic based
 on when these events are triggered. You can find the examples of such
