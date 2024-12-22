@@ -21,12 +21,13 @@ class ConfigAwareTraitTest extends TestCase {
    */
   public function testGetConfigValue(): void {
     $this->config = new DrushConfig();
-    // Tests when no value exist for the key, then default value must return.
+    // Tests that default value for key is always set to /bin.
     $this->assertEquals(
-      "/var/www/html/acms.prod/vendor/bin",
-      $this->getConfigValue("composer.bin", "/var/www/html/acms.prod/vendor/bin"),
+      "/bin",
+      $this->getConfigValue("composer.bin"),
     );
     $drush_config = new DrushConfig();
+    $drush_config->set('drush.uri', '/var/www/html/acms.prod/vendor/bin');
     $drush_config->set("runtime.project", "/var/www/html/acms.prod");
     $drush_config->set("options.root", "/var/www/html/acms.prod/docroot");
     $drush_config->set("drush.vendor-dir", $drush_config->get("runtime.project") . "/vendor");
