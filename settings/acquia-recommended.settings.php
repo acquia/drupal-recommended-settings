@@ -84,9 +84,17 @@ $settings_files = [];
  */
 // phpcs:ignore
 $site_name = EnvironmentDetector::getSiteName($site_path);
+
 // Acquia Cloud settings.
 if (EnvironmentDetector::isAhEnv()) {
   try {
+    // Acquia cloud expects mysql57 settings file
+    // to be included before any settings.
+    // Though Cloud IDE expect it to be included after db settings.
+    // @todo: Remove this line once acquia platform start supporting myslql 8.0
+    if(!EnvironmentDetector::isAhIdeEnv()) {
+      $settings_files[] = __DIR__ . "/mysql57.settings.php";
+    }
     if (!EnvironmentDetector::isAcsfEnv()) {
       $settings_files[] = FilePaths::ahSettingsFile(EnvironmentDetector::getAhGroup(), $site_name);
     }
@@ -101,7 +109,6 @@ if (EnvironmentDetector::isAhEnv()) {
   $settings_files[] = EnvironmentDetector::getAhFilesRoot() . '/secrets.settings.php';
   $settings_files[] = EnvironmentDetector::getAhFilesRoot() . "/$site_name/secrets.settings.php";
 }
-
 // Default global settings.
 $acquia_settings_files = [
   'cache',
@@ -109,8 +116,12 @@ $acquia_settings_files = [
   'logging',
   'filesystem',
   'misc',
-  'mysql57',
 ];
+// Cloud IDE expect mysql57 driver to be included after db settings.
+if(EnvironmentDetector::isAhIdeEnv()) {
+  $acquia_settings_files[] = 'mysql57';
+}
+
 foreach ($acquia_settings_files as $recommended_settings_file) {
   $settings_files[] = __DIR__ . "/$recommended_settings_file.settings.php";
 }
