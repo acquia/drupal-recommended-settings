@@ -109,6 +109,7 @@ $acquia_settings_files = [
   'logging',
   'filesystem',
   'misc',
+  'mysql57',
 ];
 foreach ($acquia_settings_files as $recommended_settings_file) {
   $settings_files[] = __DIR__ . "/$recommended_settings_file.settings.php";
