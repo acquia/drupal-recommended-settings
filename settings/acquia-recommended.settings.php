@@ -85,18 +85,26 @@ $settings_files = [];
 // phpcs:ignore
 $site_name = EnvironmentDetector::getSiteName($site_path);
 
-// Acquia Cloud settings.
+// Acquia platform settings includes a require line that
+// opens database connection, hence the mysql57 settings
+// file should be added before platform require line.
+// @see: https://www.drupal.org/project/mysql57
+// @todo: Remove this line once acquia platform start supporting mysql 8.0
+if(!EnvironmentDetector::isAhIdeEnv()) {
+  $settings_files[] = __DIR__ . "/mysql57.settings.php";
+}
+
+// Acquia Cloud settings
 if (EnvironmentDetector::isAhEnv()) {
   try {
-    // Acquia cloud expects mysql57 settings file
-    // to be included before any settings.
-    // Though Cloud IDE expect it to be included after db settings.
-    // @todo: Remove this line once acquia platform start supporting myslql 8.0
-    if(!EnvironmentDetector::isAhIdeEnv()) {
-      $settings_files[] = __DIR__ . "/mysql57.settings.php";
-    }
     if (!EnvironmentDetector::isAcsfEnv()) {
       $settings_files[] = FilePaths::ahSettingsFile(EnvironmentDetector::getAhGroup(), $site_name);
+    }
+    // Acquia Cloud IDE settings have $databases variable defined hence
+    // the mysql57 setting file should be added after platform require line.
+    // @todo: Remove this line once acquia platform start supporting mysql 8.0
+    if(EnvironmentDetector::isAhIdeEnv()) {
+      $settings_files[] = __DIR__ . "/mysql57.settings.php";
     }
   }
   catch (SettingsException $e) {
@@ -117,11 +125,6 @@ $acquia_settings_files = [
   'filesystem',
   'misc',
 ];
-// Cloud IDE expect mysql57 driver to be included after db settings.
-if(EnvironmentDetector::isAhIdeEnv()) {
-  $acquia_settings_files[] = 'mysql57';
-}
-
 foreach ($acquia_settings_files as $recommended_settings_file) {
   $settings_files[] = __DIR__ . "/$recommended_settings_file.settings.php";
 }
