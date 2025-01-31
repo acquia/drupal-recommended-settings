@@ -85,8 +85,8 @@ $settings_files = [];
 // phpcs:ignore
 $site_name = EnvironmentDetector::getSiteName($site_path);
 
-// Acquia platform settings includes a require line that
-// opens database connection, hence the mysql57 settings
+// Acquia platform settings (and local / CI) includes a require line
+// that opens database connection, hence the mysql57 settings
 // file should be added before platform require line.
 // @see: https://www.drupal.org/project/mysql57
 // @todo: Remove this line once acquia platform start supporting mysql 8.0
