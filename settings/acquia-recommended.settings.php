@@ -139,6 +139,8 @@ if (EnvironmentDetector::isCiEnv()) {
   // Custom global and site-specific CI settings.
   $settings_files[] = DRUPAL_ROOT . "/sites/settings/ci.settings.php";
   $settings_files[] = DRUPAL_ROOT . "/sites/$site_name/settings/ci.settings.php";
+  // Include mysql57 settings file for CI/Codestudio environments.
+  $settings_files[] = __DIR__ . "/mysql57.settings.php";
 }
 
 // Local global and site-specific settings.
@@ -146,7 +148,7 @@ if (EnvironmentDetector::isLocalEnv()) {
   $settings_files[] = DRUPAL_ROOT . '/sites/settings/local.settings.php';
   $settings_files[] = DRUPAL_ROOT . "/sites/$site_name/settings/local.settings.php";
 }
-print_r($settings_files);die;
+
 foreach ($settings_files as $settings_file) {
   if (file_exists($settings_file)) {
     // phpcs:ignore
