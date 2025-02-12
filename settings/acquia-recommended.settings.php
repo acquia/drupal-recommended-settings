@@ -146,7 +146,7 @@ if (EnvironmentDetector::isLocalEnv()) {
   $settings_files[] = DRUPAL_ROOT . '/sites/settings/local.settings.php';
   $settings_files[] = DRUPAL_ROOT . "/sites/$site_name/settings/local.settings.php";
 }
-
+print_r($settings_files);die;
 foreach ($settings_files as $settings_file) {
   if (file_exists($settings_file)) {
     // phpcs:ignore
