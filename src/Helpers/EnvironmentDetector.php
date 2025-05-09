@@ -189,6 +189,22 @@ class EnvironmentDetector extends AcquiaDrupalEnvironmentDetector {
         }
       }
     }
+    if (self::isAhEnv()) {
+      $env = self::getAhEnv();
+      // Ideally this should be moved to acquia/drupal-environment-detector.
+      // @see \Acquia\DrupalEnvironmentDetector\EnvironmentNames::getAhSiteName.
+      $site_name = getenv('AH_SITE_NAME');
+
+      // Env variable tends to have the environment appended to the site name.
+      // Eg. "sitenamedev" or "sitenameprod".
+      if (substr($site_name, -strlen($env)) === $env) {
+        $site_name = substr($site_name, 0, -strlen($env));
+      }
+
+      if ($site_name) {
+        return $site_name;
+      }
+    }
 
     return str_replace('sites/', '', $site_path);
   }
