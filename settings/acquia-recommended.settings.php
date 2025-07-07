@@ -76,6 +76,10 @@ if ($ip) {
 
 $settings_files = [];
 
+// Get overridden config & site studio sync directory path set from settings.php file.
+$overridden_config_sync_dir = $settings['config_sync_directory'] ?? NULL;
+$overridden_site_studio_sync_dir = $settings['site_studio_sync'] ?? NULL;
+
 /**
  * Site path.
  *
