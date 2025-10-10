@@ -126,7 +126,7 @@ trait IO {
    */
   protected function printArrayAsTable(
     array $array,
-    array $headers = ['Property', 'Value']
+    array $headers = ['Property', 'Value'],
   ): void {
     $table = new Table($this->output);
     $table->setHeaders($headers)

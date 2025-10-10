@@ -12,11 +12,7 @@ class SettingsException extends \Exception {
   /**
    * {@inheritdoc}
    */
-  public function __construct(
-        $message = "",
-        $code = 0,
-        \Throwable $previous = NULL
-    ) {
+  public function __construct($message = "", $code = 0, ?\Throwable $previous = NULL) {
     $message .= PHP_EOL . " For troubleshooting guidance and support, see https://github.com/acquia/drupal-recommended-settings";
     parent::__construct($message, $code, $previous);
 
