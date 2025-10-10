@@ -2,11 +2,11 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Robo\Inspector;
 
-//use Acquia\Blt\Robo\Common\ArrayManipulator;
-//use Acquia\Blt\Robo\Common\IO;
-#use Acquia\Blt\Robo\Config\BltConfig;
-//use Acquia\Blt\Robo\Config\YamlConfigProcessor;
-#use Acquia\Blt\Robo\Exceptions\BltException;
+// Use Acquia\Blt\Robo\Common\ArrayManipulator;
+// use Acquia\Blt\Robo\Common\IO;
+// use Acquia\Blt\Robo\Config\BltConfig;
+// use Acquia\Blt\Robo\Config\YamlConfigProcessor;
+// use Acquia\Blt\Robo\Exceptions\BltException;.
 use Acquia\Drupal\RecommendedSettings\Common\ArrayManipulator;
 use Acquia\Drupal\RecommendedSettings\Common\Executor;
 use Acquia\Drupal\RecommendedSettings\Common\IO;
@@ -36,38 +36,32 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
 
   /**
    * Process executor.
-   *
    */
-  protected \Acquia\Drupal\RecommendedSettings\Common\Executor $executor;
+  protected Executor $executor;
 
   /**
    * Is MYSQL available.
-   *
    */
   protected bool $isMySqlAvailable;
 
   /**
    * Is PostgreSQL available.
-   *
    */
   protected bool $isPostgreSqlAvailable;
 
   /**
    * Is Sqlite available.
-   *
    */
   protected bool $isSqliteAvailable;
 
 
   /**
    * Filesystem.
-   *
    */
-  protected \Symfony\Component\Filesystem\Filesystem $fs;
+  protected Filesystem $fs;
 
   /**
    * Warnings were issued.
-   *
    */
   protected bool $warningsIssued = FALSE;
 
@@ -88,7 +82,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    * @return \Symfony\Component\Filesystem\Filesystem
    *   Filesystem.
    */
-  public function getFs(): \Symfony\Component\Filesystem\Filesystem {
+  public function getFs(): Filesystem {
     return $this->fs;
   }
 
@@ -224,8 +218,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
     ];
 
     $status['composer-version'] = $this->getComposerVersion();
-    //$status['blt-version'] = Blt::getVersion();
-
+    // $status['blt-version'] = Blt::getVersion();
     $status = ArrayManipulator::arrayMergeRecursiveDistinct($defaults, $status);
     ksort($status);
 
@@ -465,25 +458,6 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
     exec("git config user.email", $output, $email_not_set);
     return !($name_not_set || $email_not_set);
   }
-
-  /**
-   * Gets the local behat configuration defined in local.yml.
-   *
-   * @return \Acquia\Blt\Robo\Config\BltConfig
-   *   The local Behat configuration.
-   */
-  //  public function getLocalBehatConfig() {
-  //    $behat_local_config_file = $this->getConfigValue('repo.root') . '/tests/behat/local.yml';
-  //
-  //    $behat_local_config = new BltConfig();
-  //    $loader = new YamlConfigLoader();
-  //    $processor = new YamlConfigProcessor();
-  //    $processor->extend($loader->load($behat_local_config_file));
-  //    $processor->extend($loader->load($this->getConfigValue('repo.root') . '/tests/behat/behat.yml'));
-  //    $behat_local_config->replace($processor->export());
-  //
-  //    return $behat_local_config;
-  //  }
 
   /**
    * Returns an array of required Behat files, as defined by Behat config.

@@ -186,8 +186,8 @@ class DrushTaskTest extends CommandsTestBase {
   }
 
   /**
-    * Tests the Robo Drush command exception.
-    */
+   * Tests the Robo Drush command exception.
+   */
   public function testDrushTaskCommandException(): void {
     $result = $this->taskDrush()
       ->stopOnFail()

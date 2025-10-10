@@ -74,7 +74,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    * @param string[] $options
    *   An array of options to pass to the command.
    * @param bool $display_command
-   *   Decides if command should be displayed on terminal or not. Default is TRUE.
+   *   Decides if command should be displayed on terminal or not.
    */
   protected function invokeCommand(string $command_name, array $args = [], array $options = [], bool $display_command = TRUE): void {
     $process = Drush::drush(Drush::aliasManager()->getSelf(), $command_name, $args, $options);
