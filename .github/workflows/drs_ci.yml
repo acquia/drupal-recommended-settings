@@ -52,17 +52,10 @@ jobs:
     strategy:
       matrix:
         php-version:
-          # - 8.1
           - 8.3
         orca-job:
           - ISOLATED_TEST_ON_CURRENT
-#          - INTEGRATED_TEST_ON_PREVIOUS_MINOR
           - INTEGRATED_TEST_ON_LATEST_LTS
-        # exclude:
-#          - orca-job: INTEGRATED_TEST_ON_PREVIOUS_MINOR
-#            php-version: 8.1
-          # - orca-job: ISOLATED_TEST_ON_CURRENT
-          #   php-version: 8.1
     env:
       ORCA_JOB: ${{ matrix.orca-job }}
       CI: TRUE

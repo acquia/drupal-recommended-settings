@@ -2,11 +2,6 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Robo\Inspector;
 
-// Use Acquia\Blt\Robo\Common\ArrayManipulator;
-// use Acquia\Blt\Robo\Common\IO;
-// use Acquia\Blt\Robo\Config\BltConfig;
-// use Acquia\Blt\Robo\Config\YamlConfigProcessor;
-// use Acquia\Blt\Robo\Exceptions\BltException;.
 use Acquia\Drupal\RecommendedSettings\Common\ArrayManipulator;
 use Acquia\Drupal\RecommendedSettings\Common\Executor;
 use Acquia\Drupal\RecommendedSettings\Common\IO;
@@ -153,9 +148,7 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    */
   public function isDrupalSettingsFileValid(): bool {
     $settings_file_contents = file_get_contents($this->getConfigValue('drupal.settings_file'));
-    if (!strstr($settings_file_contents,
-      '/../vendor/acquia/blt/settings/blt.settings.php')
-    ) {
+    if (!str_contains($settings_file_contents, '/../vendor/acquia/blt/settings/blt.settings.php')) {
       return FALSE;
     }
 
@@ -187,14 +180,12 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    */
   public function getDrushStatus(): array {
     $docroot = $this->getConfigValue('docroot');
-    $status_info = (array) json_decode($this->executor->drush([
+    return (array) json_decode($this->executor->drush([
       'status',
       '--format=json',
       '--fields=*',
       "--root=$docroot",
     ])->run()->getMessage(), TRUE);
-
-    return $status_info;
   }
 
   /**
@@ -218,7 +209,6 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
     ];
 
     $status['composer-version'] = $this->getComposerVersion();
-    // $status['blt-version'] = Blt::getVersion();
     $status = ArrayManipulator::arrayMergeRecursiveDistinct($defaults, $status);
     ksort($status);
 
@@ -256,17 +246,12 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    */
   public function isDatabaseAvailable(): bool {
     $db = $this->getDrushStatus()['db-driver'];
-    switch ($db) {
-      case 'mysql':
-        return $this->isMySqlAvailable();
-
-      case 'pgsql':
-        return $this->isPostgreSqlAvailable();
-
-      case 'sqlite':
-        return $this->isSqliteAvailable();
-    }
-    return FALSE;
+    return match ($db) {
+      'mysql' => $this->isMySqlAvailable(),
+      'pgsql' => $this->isPostgreSqlAvailable(),
+      'sqlite' => $this->isSqliteAvailable(),
+      default => FALSE,
+    };
   }
 
   /**
@@ -385,13 +370,11 @@ class Inspector implements BuilderAwareInterface, ConfigAwareInterface, Containe
    *   The version of Composer.
    */
   public function getComposerVersion(): string {
-    $version = $this->executor->execute(["composer", "--version"])
+    return $this->executor->execute(["composer", "--version"])
       ->interactive(FALSE)
       ->silent(TRUE)
       ->run()
       ->getMessage();
-
-    return $version;
   }
 
   /**
