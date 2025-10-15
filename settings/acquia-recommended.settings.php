@@ -76,8 +76,11 @@ if ($ip) {
 
 $settings_files = [];
 
-// Get overridden config & site studio sync directory path set from settings.php file.
+// Get overridden config & site studio sync directory path
+// set from settings.php file.
+// phpcs:ignore
 $overridden_config_sync_dir = $settings['config_sync_directory'] ?? NULL;
+// phpcs:ignore
 $overridden_site_studio_sync_dir = $settings['site_studio_sync'] ?? NULL;
 
 /**
@@ -96,8 +99,8 @@ if (EnvironmentDetector::isAhEnv()) {
     // that opens database connection, hence the mysql57 settings
     // file should be added before platform require line.
     // @see: https://www.drupal.org/project/mysql57
-    // @todo: Remove this line once acquia platform start supporting mysql 8.0
-    if(!EnvironmentDetector::isAhIdeEnv()) {
+    // @todo Remove this line once acquia platform start supporting mysql 8.0
+    if (!EnvironmentDetector::isAhIdeEnv()) {
       $settings_files[] = __DIR__ . "/mysql57.settings.php";
     }
     if (!EnvironmentDetector::isAcsfEnv()) {
@@ -105,8 +108,8 @@ if (EnvironmentDetector::isAhEnv()) {
     }
     // Acquia Cloud IDE settings have $databases variable defined hence
     // the mysql57 setting file should be added after platform require line.
-    // @todo: Remove this line once acquia platform start supporting mysql 8.0
-    if(EnvironmentDetector::isAhIdeEnv()) {
+    // @todo Remove this line once acquia platform start supporting mysql 8.0
+    if (EnvironmentDetector::isAhIdeEnv()) {
       $settings_files[] = __DIR__ . "/mysql57.settings.php";
     }
   }

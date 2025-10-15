@@ -92,7 +92,7 @@ class Executor implements ConfigAwareInterface, LoggerAwareInterface {
       $process_executor = $this->execute($command_array);
     }
     else {
-      $drush_string = implode (" ", $drush_array);
+      $drush_string = implode(" ", $drush_array);
       $this->logger->info("$drush_string $command");
       $process_executor = $this->executeShell("$drush_string $command");
     }

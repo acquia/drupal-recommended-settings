@@ -24,9 +24,10 @@ class FilesystemTest extends FunctionalTestBase {
 
   /**
    * The source file directory.
+   *
    * @var array<string>
    */
-  protected  array $sourceFileDir;
+  protected array $sourceFileDir;
 
   /**
    * The test directory.

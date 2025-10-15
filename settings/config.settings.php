@@ -61,13 +61,15 @@ else {
 // if $settings['site_studio_sync'] isn't set by users, then the DRS set it to
 // "../sitestudio/default" and if $drs_override_site_studio_sync_directories is
 // set to FALSE then user needs to provide the value of
-// $settings['site_studio_sync'] =  "../sitestudio/$site_dir" in settings file;
+// $settings['site_studio_sync'] =  "../sitestudio/$site_dir" in settings file.
 if ($drs_override_site_studio_sync_directories) {
   $settings['site_studio_sync'] = "../sitestudio/default";
-} else {
+}
+else {
   if (isset($overridden_site_studio_sync_dir)) {
     $settings['site_studio_sync'] = $overridden_site_studio_sync_dir;
-  } else {
+  }
+  else {
     $settings['site_studio_sync'] = "../sitestudio/$site_name";
   }
 }

@@ -46,13 +46,15 @@ class SettingsDrushCommands extends BaseDrushCommands {
     name: 'drush ' . self::SETTINGS_COMMAND . ' --database=mydb --username=myuser --password=mypass --host=127.0.0.1 --port=1234 --uri=site1',
     description: 'Generates the settings.php for site2 passing db credentials.',
   )]
-  public function initSettings(array $options = [
-    'database' => NULL,
-    'username' => NULL,
-    'password' => NULL,
-    'host' => NULL,
-    'port' => NULL,
-  ]): int {
+  public function initSettings(
+    array $options = [
+      'database' => NULL,
+      'username' => NULL,
+      'password' => NULL,
+      'host' => NULL,
+      'port' => NULL,
+    ],
+  ): int {
     $db = [];
     $db['drupal']['db'] = array_filter(
       $options,
