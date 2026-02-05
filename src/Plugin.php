@@ -118,45 +118,13 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
   /**
    * Determines if settings generation should be skipped.
    *
-   * Checks multiple sources in order of priority:
-   * 1. Environment variable (DRS_GENERATE_SETTINGS)
-   * 2. Composer configuration (extra.drupal-recommended-settings)
-   * 3. Automatic environment detection.
+   * Uses automatic environment detection to skip in CI/production environments.
    *
    * @return bool
    *   TRUE if settings generation should be skipped, FALSE otherwise.
    */
   protected function shouldSkipSettingsGeneration(): bool {
-    // Priority 1: Check environment variable (explicit override).
-    $envVar = getenv('DRS_GENERATE_SETTINGS');
-    if ($envVar !== FALSE) {
-      if ($envVar === 'false' || $envVar === '0') {
-        $this->io->write(
-          '<info>Skipping settings generation (DRS_GENERATE_SETTINGS=false)</info>'
-        );
-        return TRUE;
-      }
-      // If set to 'true' or '1', don't skip.
-      return FALSE;
-    }
-
-    // Priority 2: Check composer.json configuration.
-    $extra = $this->composer->getPackage()->getExtra();
-    $drsConfig = $extra['drupal-recommended-settings'] ?? [];
-
-    // Check auto-generate-on-install setting.
-    if (isset($drsConfig['auto-generate-on-install'])) {
-      if ($drsConfig['auto-generate-on-install'] === FALSE) {
-        $this->io->write(
-          '<info>Skipping settings generation (auto-generate-on-install is disabled)</info>'
-        );
-        return TRUE;
-      }
-      // If explicitly set to TRUE, don't skip.
-      return FALSE;
-    }
-
-    // Priority 3: Automatic environment detection.
+    // Check automatic environment detection.
     if ($this->isNonLocalEnvironment()) {
       $this->io->write(
         '<info>Skipping settings generation (non-local environment detected)</info>'

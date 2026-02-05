@@ -45,11 +45,6 @@ implementations from [here](examples).
 ./vendor/bin/drush init:settings --no-local
 ```
 
-### Generate only core settings without default templates:
-```
-./vendor/bin/drush init:settings --no-defaults
-```
-
 # Environment-Aware Settings Generation
 
 The plugin intelligently manages settings file generation based on your environment to prevent local development files from being created in production or CI/CD pipelines.
@@ -68,46 +63,12 @@ Skipping settings generation (non-local environment detected)
 
 ## Controlling Settings Generation
 
-You have multiple ways to control settings generation, listed in order of priority:
+You have multiple ways to control settings generation:
 
-### 1. Environment Variable (Highest Priority)
+### 1. Composer Configuration (Recommended for Production Artifacts)
 
-Use the `DRS_GENERATE_SETTINGS` environment variable to explicitly control whether settings are generated:
+Configure behavior in your project's `composer.json` to skip local development files in production artifacts:
 
-**Disable settings generation:**
-```bash
-export DRS_GENERATE_SETTINGS=false
-composer install
-```
-
-**Force settings generation:**
-```bash
-export DRS_GENERATE_SETTINGS=true
-composer install
-```
-
-**Control local.settings.php generation specifically:**
-```bash
-export DRS_GENERATE_LOCAL_SETTINGS=false
-composer install
-```
-
-### 2. Composer Configuration
-
-Configure behavior in your project's `composer.json`:
-
-**Disable all automatic generation:**
-```json
-{
-  "extra": {
-    "drupal-recommended-settings": {
-      "auto-generate-on-install": false
-    }
-  }
-}
-```
-
-**Disable only local.settings.php generation (recommended for production artifacts):**
 ```json
 {
   "extra": {
@@ -118,9 +79,26 @@ Configure behavior in your project's `composer.json`:
 }
 ```
 
-**Configuration Options:**
-- `auto-generate-on-install`: Set to `false` to completely disable automatic settings generation during `composer install/update`
-- `generate-local-settings`: Set to `false` to prevent generating `local.settings.php` while still creating other settings files (ideal for production artifact builds)
+This will skip generating:
+- `local.settings.php` - Active local settings with credentials
+- `default.local.settings.php` - Local settings template
+- `default.includes.settings.php` - Custom includes template
+
+Global settings and core configuration will still be created.
+
+**Configuration Option:**
+- `generate-local-settings`: Set to `false` to prevent generating local development files - ideal for production artifact builds
+
+### 2. Environment Variable (Runtime Override)
+
+Use `DRS_GENERATE_LOCAL_SETTINGS` to control local file generation at runtime:
+
+```bash
+export DRS_GENERATE_LOCAL_SETTINGS=false
+composer install
+```
+
+This is useful for one-time builds or testing scenarios.
 
 ### 3. Automatic Detection (Default)
 
@@ -128,54 +106,17 @@ If no environment variable or composer configuration is set, the plugin uses int
 
 ## Production & CI/CD Best Practices
 
-### GitHub Actions Example
-```yaml
-name: Build
-on: [push]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install dependencies
-        env:
-          DRS_GENERATE_SETTINGS: false
-        run: composer install --no-dev --optimize-autoloader
-```
+### CI/CD Pipeline Example
 
-### GitLab CI Example
-```yaml
-build:
-  script:
-    - export DRS_GENERATE_SETTINGS=false
-    - composer install --no-dev --optimize-autoloader
-```
+The plugin automatically detects CI/CD environments and skips local file generation. Simply run:
 
-### Acquia Cloud Hooks Example
-Create `hooks/common/post-code-deploy/install-dependencies.sh`:
 ```bash
-#!/bin/bash
-export DRS_GENERATE_SETTINGS=false
 composer install --no-dev --optimize-autoloader
 ```
 
+No additional configuration needed - works with GitHub Actions, GitLab CI, CircleCI, Jenkins, and other CI platforms.
+
 ### Using Composer Configuration
-
-**For projects that never want automatic generation (managing settings manually):**
-```json
-{
-  "extra": {
-    "drupal-recommended-settings": {
-      "auto-generate-on-install": false
-    }
-  }
-}
-```
-
-Then generate settings manually when needed:
-```bash
-./vendor/bin/drush init:settings
-```
 
 **For production artifact builds (generate settings but not local files):**
 ```json
@@ -209,57 +150,31 @@ When in a local environment, the following files are created:
 **Other files:**
 - `salt.txt` - Hash salt for Drupal
 
-### CI/Production Environments (Skipped by Default)
-In CI or production environments, only essential global files are created, and local development files like `local.settings.php` are **not generated**, preventing:
+### CI/Production Environments (Auto-detected or `generate-local-settings: false`)
+When `generate-local-settings` is disabled (via composer config, environment variable, or auto-detection), the following files are **not generated**:
+- `default.includes.settings.php` - Template for custom includes
+- `default.local.settings.php` - Template for local overrides
+- `local.settings.php` - Active local settings (with credentials)
+
+Only essential files are created:
+- `default.global.settings.php` - Global settings (shared)
+- `settings.php` - Core settings file with acquia-recommended.settings.php include
+- `config/default/` - Configuration sync directory
+- `salt.txt` - Hash salt
+
+This prevents:
 - ❌ Local database credentials in production artifacts
 - ❌ Development-only settings in production
 - ❌ Unnecessary files in deployment packages
-
-## Troubleshooting
-
-**Q: Settings are generated in my CI pipeline, but I don't want them**
-
-A: Set the environment variable in your CI configuration:
-```bash
-export DRS_GENERATE_SETTINGS=false
-```
-
-**Q: I want to generate settings manually only**
-
-A: Disable auto-generation in composer.json:
-```json
-{
-  "extra": {
-    "drupal-recommended-settings": {
-      "auto-generate-on-install": false
-    }
-  }
-}
-```
-
-Then run manually when needed:
-```bash
-./vendor/bin/drush init:settings
-```
-
-**Q: Settings aren't being generated in my local environment**
-
-A: Check if you're using a CI-like environment variable. Explicitly enable generation:
-```bash
-export DRS_GENERATE_SETTINGS=true
-composer install
-```
 
 ## Quick Reference
 
 | Method | Use Case | Command/Configuration |
 |--------|----------|----------------------|
-| **Environment Variable** | CI/CD pipelines, temporary override | `export DRS_GENERATE_SETTINGS=false` |
-| **Environment Variable** | Skip only local.settings.php | `export DRS_GENERATE_LOCAL_SETTINGS=false` |
-| **Composer Config** | Never auto-generate (manual control) | `"auto-generate-on-install": false` |
-| **Composer Config** | Skip local files in artifacts (recommended) | `"generate-local-settings": false` |
-| **Drush Flag** | One-time generation without local files | `drush init:settings --no-local` |
-| **Auto Detection** | Default behavior (recommended) | No configuration needed |
+| **Composer Config** | Skip local files in production artifacts (recommended) | `"generate-local-settings": false` |
+| **Environment Variable** | Temporary/runtime skip of local files | `export DRS_GENERATE_LOCAL_SETTINGS=false` |
+| **Drush Flag** | One-time manual generation without local files | `drush init:settings --no-local` |
+| **Auto Detection** | Automatic in CI/production (default) | No configuration needed |
 
 ## Drush Command Options
 
@@ -273,7 +188,6 @@ The `drush init:settings` command supports the following options:
 | `--host` | Database host | `--host=127.0.0.1` |
 | `--port` | Database port | `--port=3306` |
 | `--no-local` | Skip generating local.settings.php | `--no-local` |
-| `--no-defaults` | Skip copying default template files | `--no-defaults` |
 | `--uri` | Multisite URI | `--uri=site1` |
 
 # License

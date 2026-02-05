@@ -110,8 +110,7 @@ WARNING;
    *   An array of data to override.
    * @param array<string, bool> $options
    *   Optional settings to control file generation:
-   *   - 'generate-local': Whether to generate local.settings.php (default: TRUE)
-   *   - 'generate-defaults': Whether to copy default template files (default: TRUE).
+   *   - 'generate-local': Whether to generate local.settings.php (default: TRUE).
    *
    * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
@@ -136,7 +135,6 @@ WARNING;
 
       // Parse generation options with defaults.
       $generateLocal = $options['generate-local'] ?? TRUE;
-      $generateDefaults = $options['generate-defaults'] ?? TRUE;
 
       // Check composer.json configuration for local settings generation.
       $composerJsonPath = $config->get('repo.root') . '/composer.json';
@@ -156,7 +154,10 @@ WARNING;
 
       $this->copyGlobalSettings();
 
-      if ($generateDefaults) {
+      // Only copy site-specific templates if generating local settings.
+      // These templates (default.local.settings.php, default.includes.settings.php)
+      // are primarily for local development setup.
+      if ($generateLocal) {
         $this->copySiteSettings();
       }
 
