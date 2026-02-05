@@ -96,6 +96,7 @@ composer install
 
 Configure behavior in your project's `composer.json`:
 
+**Disable all automatic generation:**
 ```json
 {
   "extra": {
@@ -106,8 +107,20 @@ Configure behavior in your project's `composer.json`:
 }
 ```
 
+**Disable only local.settings.php generation (recommended for production artifacts):**
+```json
+{
+  "extra": {
+    "drupal-recommended-settings": {
+      "generate-local-settings": false
+    }
+  }
+}
+```
+
 **Configuration Options:**
 - `auto-generate-on-install`: Set to `false` to completely disable automatic settings generation during `composer install/update`
+- `generate-local-settings`: Set to `false` to prevent generating `local.settings.php` while still creating other settings files (ideal for production artifact builds)
 
 ### 3. Automatic Detection (Default)
 
@@ -147,7 +160,8 @@ composer install --no-dev --optimize-autoloader
 ```
 
 ### Using Composer Configuration
-For projects that never want automatic generation (managing settings manually):
+
+**For projects that never want automatic generation (managing settings manually):**
 ```json
 {
   "extra": {
@@ -162,6 +176,19 @@ Then generate settings manually when needed:
 ```bash
 ./vendor/bin/drush init:settings
 ```
+
+**For production artifact builds (generate settings but not local files):**
+```json
+{
+  "extra": {
+    "drupal-recommended-settings": {
+      "generate-local-settings": false
+    }
+  }
+}
+```
+
+This is ideal when building artifacts for deployment - you get all the recommended settings structure without local development files. This configuration persists in version control and doesn't rely on environment variables during the build process.
 
 ## Files Created by Environment
 
@@ -228,7 +255,9 @@ composer install
 | Method | Use Case | Command/Configuration |
 |--------|----------|----------------------|
 | **Environment Variable** | CI/CD pipelines, temporary override | `export DRS_GENERATE_SETTINGS=false` |
+| **Environment Variable** | Skip only local.settings.php | `export DRS_GENERATE_LOCAL_SETTINGS=false` |
 | **Composer Config** | Never auto-generate (manual control) | `"auto-generate-on-install": false` |
+| **Composer Config** | Skip local files in artifacts (recommended) | `"generate-local-settings": false` |
 | **Drush Flag** | One-time generation without local files | `drush init:settings --no-local` |
 | **Auto Detection** | Default behavior (recommended) | No configuration needed |
 

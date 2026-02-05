@@ -138,7 +138,17 @@ WARNING;
       $generateLocal = $options['generate-local'] ?? TRUE;
       $generateDefaults = $options['generate-defaults'] ?? TRUE;
 
-      // Check environment variable for local settings generation.
+      // Check composer.json configuration for local settings generation.
+      $composerJsonPath = $config->get('repo.root') . '/composer.json';
+      if (file_exists($composerJsonPath)) {
+        $composerData = json_decode(file_get_contents($composerJsonPath), TRUE);
+        $drsConfig = $composerData['extra']['drupal-recommended-settings'] ?? [];
+        if (isset($drsConfig['generate-local-settings'])) {
+          $generateLocal = (bool) $drsConfig['generate-local-settings'];
+        }
+      }
+
+      // Check environment variable for local settings generation (highest priority).
       $envGenerateLocal = getenv('DRS_GENERATE_LOCAL_SETTINGS');
       if ($envGenerateLocal !== FALSE) {
         $generateLocal = ($envGenerateLocal !== 'false' && $envGenerateLocal !== '0');
