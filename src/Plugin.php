@@ -103,12 +103,116 @@ class Plugin implements PluginInterface, EventSubscriberInterface {
     // Only install the template files, if the drupal-recommended-settings
     // plugin is installed, with drupal project.
     if ($this->settingsPackage && $this->getDrupalRoot() && !$this->bltUpdated) {
+      // Check if settings generation should be skipped.
+      if ($this->shouldSkipSettingsGeneration()) {
+        return;
+      }
       $vendor_dir = $this->composer->getConfig()->get('vendor-dir');
       $this->executeCommand(
         $vendor_dir . "/bin/drush drs:init:settings", [],
         TRUE
       );
     }
+  }
+
+  /**
+   * Determines if settings generation should be skipped.
+   *
+   * Checks multiple sources in order of priority:
+   * 1. Environment variable (DRS_GENERATE_SETTINGS)
+   * 2. Composer configuration (extra.drupal-recommended-settings)
+   * 3. Automatic environment detection.
+   *
+   * @return bool
+   *   TRUE if settings generation should be skipped, FALSE otherwise.
+   */
+  protected function shouldSkipSettingsGeneration(): bool {
+    // Priority 1: Check environment variable (explicit override).
+    $envVar = getenv('DRS_GENERATE_SETTINGS');
+    if ($envVar !== FALSE) {
+      if ($envVar === 'false' || $envVar === '0') {
+        $this->io->write(
+          '<info>Skipping settings generation (DRS_GENERATE_SETTINGS=false)</info>'
+        );
+        return TRUE;
+      }
+      // If set to 'true' or '1', don't skip.
+      return FALSE;
+    }
+
+    // Priority 2: Check composer.json configuration.
+    $extra = $this->composer->getPackage()->getExtra();
+    $drsConfig = $extra['drupal-recommended-settings'] ?? [];
+
+    // Check auto-generate-on-install setting.
+    if (isset($drsConfig['auto-generate-on-install'])) {
+      if ($drsConfig['auto-generate-on-install'] === FALSE) {
+        $this->io->write(
+          '<info>Skipping settings generation (auto-generate-on-install is disabled)</info>'
+        );
+        return TRUE;
+      }
+      // If explicitly set to TRUE, don't skip.
+      return FALSE;
+    }
+
+    // Priority 3: Automatic environment detection.
+    if ($this->isNonLocalEnvironment()) {
+      $this->io->write(
+        '<info>Skipping settings generation (non-local environment detected)</info>'
+      );
+      return TRUE;
+    }
+
+    // Default: proceed with generation.
+    return FALSE;
+  }
+
+  /**
+   * Detects if current environment is non-local (CI/Production).
+   *
+   * @return bool
+   *   TRUE if in CI or production environment, FALSE otherwise.
+   */
+  protected function isNonLocalEnvironment(): bool {
+    // Check for CI environments.
+    $ciEnvVars = [
+      'CI',
+      'CONTINUOUS_INTEGRATION',
+      'GITHUB_ACTIONS',
+      'GITLAB_CI',
+      'CIRCLECI',
+      'JENKINS_HOME',
+      'TRAVIS',
+      'PIPELINE_ENV',
+    ];
+
+    foreach ($ciEnvVars as $var) {
+      if (getenv($var) !== FALSE) {
+        return TRUE;
+      }
+    }
+
+    // Check for Acquia production environments.
+    $ahEnv = getenv('AH_SITE_ENVIRONMENT');
+    if ($ahEnv !== FALSE && in_array($ahEnv, ['prod', 'test', 'ode'], TRUE)) {
+      return TRUE;
+    }
+
+    // Check for other production indicators.
+    $prodEnvVars = [
+      'ACQUIA_ENVIRONMENT' => ['prod', 'test'],
+      'PLATFORM_BRANCH' => ['production', 'master', 'main'],
+    ];
+
+    foreach ($prodEnvVars as $var => $prodValues) {
+      $value = getenv($var);
+      if ($value !== FALSE && in_array($value, $prodValues, TRUE)) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
   }
 
   /**

@@ -108,10 +108,14 @@ WARNING;
    *
    * @param string[] $overrideData
    *   An array of data to override.
+   * @param array<string, bool> $options
+   *   Optional settings to control file generation:
+   *   - 'generate-local': Whether to generate local.settings.php (default: TRUE)
+   *   - 'generate-defaults': Whether to copy default template files (default: TRUE).
    *
    * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
-  public function generate(array $overrideData = []): void {
+  public function generate(array $overrideData = [], array $options = []): void {
     try {
       $site = $this->config->get("site");
       // Replace variables in local.settings.php file.
@@ -130,8 +134,21 @@ WARNING;
         $docroot . "/sites/$site/settings.php",
       ]);
 
+      // Parse generation options with defaults.
+      $generateLocal = $options['generate-local'] ?? TRUE;
+      $generateDefaults = $options['generate-defaults'] ?? TRUE;
+
+      // Check environment variable for local settings generation.
+      $envGenerateLocal = getenv('DRS_GENERATE_LOCAL_SETTINGS');
+      if ($envGenerateLocal !== FALSE) {
+        $generateLocal = ($envGenerateLocal !== 'false' && $envGenerateLocal !== '0');
+      }
+
       $this->copyGlobalSettings();
-      $this->copySiteSettings();
+
+      if ($generateDefaults) {
+        $this->copySiteSettings();
+      }
 
       // Create settings.php file from default.settings.php.
       $this->fileSystem->copyFile(
@@ -150,14 +167,17 @@ WARNING;
        '#Do not include additional settings here#', $this->settingsWarning . PHP_EOL
       );
 
-      // Create local.settings.php file from default.local.settings.php.
-      $this->fileSystem->copyFile(
-        $docroot . "/sites/$site/settings/default.local.settings.php",
-        $docroot . "/sites/$site/settings/local.settings.php"
-      );
+      // Only generate local.settings.php if requested.
+      if ($generateLocal) {
+        // Create local.settings.php file from default.local.settings.php.
+        $this->fileSystem->copyFile(
+          $docroot . "/sites/$site/settings/default.local.settings.php",
+          $docroot . "/sites/$site/settings/local.settings.php"
+        );
 
-      $settings = new SettingsConfig($config->export());
-      $settings->replaceFileVariables($docroot . "/sites/$site/settings/local.settings.php");
+        $settings = new SettingsConfig($config->export());
+        $settings->replaceFileVariables($docroot . "/sites/$site/settings/local.settings.php");
+      }
 
       // The config directory for given site must exists, otherwise Drupal will
       // add database credentials to settings.php.

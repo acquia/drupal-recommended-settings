@@ -42,9 +42,15 @@ class SettingsDrushCommands extends BaseDrushCommands {
   #[CLI\Option(name: 'password', description: 'Local database password')]
   #[CLI\Option(name: 'host', description: 'Local database host')]
   #[CLI\Option(name: 'port', description: 'Local database port')]
+  #[CLI\Option(name: 'no-local', description: 'Skip generating local.settings.php file')]
+  #[CLI\Option(name: 'no-defaults', description: 'Skip generating default template files')]
   #[CLI\Usage(
     name: 'drush ' . self::SETTINGS_COMMAND . ' --database=mydb --username=myuser --password=mypass --host=127.0.0.1 --port=1234 --uri=site1',
     description: 'Generates the settings.php for site2 passing db credentials.',
+  )]
+  #[CLI\Usage(
+    name: 'drush ' . self::SETTINGS_COMMAND . ' --no-local',
+    description: 'Generate settings without creating local.settings.php (useful for CI/production).',
   )]
   public function initSettings(
     array $options = [
@@ -53,6 +59,8 @@ class SettingsDrushCommands extends BaseDrushCommands {
       'password' => NULL,
       'host' => NULL,
       'port' => NULL,
+      'no-local' => FALSE,
+      'no-defaults' => FALSE,
     ],
   ): int {
     $db = [];
@@ -61,10 +69,17 @@ class SettingsDrushCommands extends BaseDrushCommands {
       fn($value, $key) => in_array($key, ['database', 'username', 'password', 'host', 'port']) && $value !== NULL,
       ARRAY_FILTER_USE_BOTH
     );
+
+    // Prepare generation options.
+    $generationOptions = [
+      'generate-local' => !$options['no-local'],
+      'generate-defaults' => !$options['no-defaults'],
+    ];
+
     try {
       $site_directory = $this->getSitesSubdirFromUri($this->getConfigValue("docroot"), $this->getConfigValue("drush.uri"));
       $settings = new Settings($this->getConfigValue("docroot"), $site_directory);
-      $settings->generate($db);
+      $settings->generate($db, $generationOptions);
       if (!$this->output()->isQuiet()) {
         $this->print(
           sprintf("Settings generated successfully for site '%s'.", $this->getConfigValue("drush.uri"))
