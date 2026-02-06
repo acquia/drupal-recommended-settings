@@ -37,10 +37,12 @@ abstract class FunctionalTestBase extends TestCase {
       if (!file_exists($root_fixture_dir . $file_path)) {
         $root_base_dir = dirname($root_fixture_dir . $file_path);
         $dir_exist = FALSE;
-        if (mkdir($root_base_dir, 0777, 'TRUE')) {
-          $dir_exist = TRUE;
+        if (!is_dir($root_base_dir)) {
+          if (@mkdir($root_base_dir, 0777, TRUE)) {
+            $dir_exist = TRUE;
+          }
         }
-        if (copy($file->getRealPath(), $root_fixture_dir . $file_path)) {
+        if (@copy($file->getRealPath(), $root_fixture_dir . $file_path)) {
           $this->fixtureFiles[] = $root_fixture_dir . $file_path;
         }
         if ($dir_exist) {

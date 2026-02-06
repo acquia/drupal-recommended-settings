@@ -121,7 +121,10 @@ class ConfigInitializer {
    *   Config.
    */
   protected function loadProjectConfig(): ConfigInitializer {
-    $this->processor->extend($this->loader->load($this->config->get('repo.root') . "/drs/config.yml"));
+    $config_file = $this->config->get('repo.root') . "/drs/config.yml";
+    if (file_exists($config_file)) {
+      $this->processor->extend($this->loader->load($config_file));
+    }
     return $this;
   }
 
@@ -135,7 +138,10 @@ class ConfigInitializer {
     if ($this->site) {
       // Since docroot can change in the project, we need to respect that here.
       $this->config->replace($this->processor->export());
-      $this->processor->extend($this->loader->load($this->config->get('docroot') . "/sites/{$this->site}/drs/config.yml"));
+      $config_file = $this->config->get('docroot') . "/sites/{$this->site}/drs/config.yml";
+      if (file_exists($config_file)) {
+        $this->processor->extend($this->loader->load($config_file));
+      }
     }
 
     return $this;
