@@ -110,7 +110,8 @@ WARNING;
    *   An array of data to override.
    * @param array<string, bool> $options
    *   Optional settings to control file generation:
-   *   - 'generate-local': Whether to generate local.settings.php (default: TRUE).
+   *   - 'generate-local': Whether to generate local.settings.php
+   *     (default: TRUE).
    *
    * @throws \Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException
    */
@@ -146,7 +147,8 @@ WARNING;
         }
       }
 
-      // Check environment variable for local settings generation (highest priority).
+      // Check environment variable for local settings generation
+      // (highest priority).
       $envGenerateLocal = getenv('DRS_GENERATE_LOCAL_SETTINGS');
       if ($envGenerateLocal !== FALSE) {
         $generateLocal = ($envGenerateLocal !== 'false' && $envGenerateLocal !== '0');
@@ -155,8 +157,9 @@ WARNING;
       $this->copyGlobalSettings();
 
       // Only copy site-specific templates if generating local settings.
-      // These templates (default.local.settings.php, default.includes.settings.php)
-      // are primarily for local development setup.
+      // These templates (default.local.settings.php,
+      // default.includes.settings.php) are primarily for local development
+      // setup.
       if ($generateLocal) {
         $this->copySiteSettings();
       }

@@ -21,4 +21,24 @@
 
   <rule ref="AcquiaDrupalStrict"/>
 
+  <!-- Exclude PHP 7.4 compatibility checks since this project requires PHP 8.1+ -->
+  <!-- AcquiaDrupalStrict includes PHPCompatibility checks for PHP 7.4, but we use PHP 8.1+ features -->
+  <rule ref="PHPCompatibility">
+    <exclude name="PHPCompatibility.Attributes.NewAttributes.Found"/>
+    <exclude name="PHPCompatibility.Attributes.NewAttributes.FoundMultiLine"/>
+    <exclude name="PHPCompatibility.Classes.NewTypedProperties.mixedFound"/>
+    <exclude name="PHPCompatibility.Classes.NewTypedProperties.nullFound"/>
+    <exclude name="PHPCompatibility.Classes.NewTypedProperties.UnionTypeFound"/>
+    <exclude name="PHPCompatibility.Constants.NewMagicClassConstant.UsedOnObject"/>
+    <exclude name="PHPCompatibility.FunctionDeclarations.NewParamTypeDeclarations.mixedFound"/>
+    <exclude name="PHPCompatibility.FunctionDeclarations.NewParamTypeDeclarations.UnionTypeFound"/>
+    <exclude name="PHPCompatibility.FunctionDeclarations.NewReturnTypeDeclarations.falseFound"/>
+    <exclude name="PHPCompatibility.FunctionDeclarations.NewReturnTypeDeclarations.mixedFound"/>
+    <exclude name="PHPCompatibility.FunctionDeclarations.NewReturnTypeDeclarations.UnionTypeFound"/>
+    <exclude name="PHPCompatibility.FunctionDeclarations.NewTrailingComma.InParameterList"/>
+    <exclude name="PHPCompatibility.FunctionUse.NewFunctions.str_containsFound"/>
+    <exclude name="PHPCompatibility.FunctionUse.NewNamedParameters.Found"/>
+    <exclude name="PHPCompatibility.Keywords.NewKeywords.t_matchFound"/>
+  </rule>
+
 </ruleset>
