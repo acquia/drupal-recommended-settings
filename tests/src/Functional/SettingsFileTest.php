@@ -38,8 +38,8 @@ class SettingsFileTest extends FunctionalTestBase {
   public function testAcquiaRecommendedSettingsFile(): void {
     // Drupal expects these variables to be predeclared in the scope.
     $site_path = 'default';
+    $app_root = $this->projectRoot;
     $settings = [];
-    dump(file_get_contents(DRUPAL_ROOT . "/sites/default/settings.php"));
     include_once DRUPAL_ROOT . '/sites/default/settings.php';
     $this->assertNotEmpty($settings);
     $this->assertArrayHasKey('config_sync_directory', $settings);
@@ -50,7 +50,7 @@ class SettingsFileTest extends FunctionalTestBase {
     $this->assertSame("../config/$site_path", $settings['config_sync_directory']);
     $this->assertSame("../sitestudio/$site_path", $settings['site_studio_sync']);
     $this->assertSame("sites/$site_path/files", $settings['file_public_path']);
-    $this->assertSame($this->projectRoot . "/files-private/$site_path", $settings['file_private_path']);
+    $this->assertSame($app_root . "/files-private/$site_path", $settings['file_private_path']);
     $this->assertNotEmpty($settings['hash_salt']);
   }
 
@@ -67,6 +67,7 @@ class SettingsFileTest extends FunctionalTestBase {
    */
   private function createFixture(): void {
     if (defined('DRUPAL_ROOT')) {
+      $this->projectRoot = dirname(DRUPAL_ROOT);
       return;
     }
     $this->projectRoot = sys_get_temp_dir() . DIRECTORY_SEPARATOR . RandomString::string(5, TRUE, NULL, 'abcdefghijklmnopqrstuvwxyz');
