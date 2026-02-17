@@ -71,6 +71,10 @@ class ConfigInitializerTest extends FunctionalTestBase {
   /**
    * Tests determineEnvironment() method.
    *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
+   *
    * @throws \ReflectionException
    */
   #[RunInSeparateProcess]
@@ -97,6 +101,10 @@ class ConfigInitializerTest extends FunctionalTestBase {
 
   /**
    * Tests the initialize() method.
+   *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
    */
   #[RunInSeparateProcess]
   public function testInitialize(): void {
@@ -141,6 +149,10 @@ class ConfigInitializerTest extends FunctionalTestBase {
 
   /**
    * Tests the loadAllConfig() method.
+   *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
    */
   #[RunInSeparateProcess]
   public function testLoadAllConfig(): void {

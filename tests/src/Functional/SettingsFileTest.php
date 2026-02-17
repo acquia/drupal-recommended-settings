@@ -36,6 +36,10 @@ class SettingsFileTest extends FunctionalTestBase {
 
   /**
    * Verifies settings.php generates expected values.
+   *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
    */
   #[RunInSeparateProcess]
   public function testAcquiaRecommendedSettingsFile(): void {

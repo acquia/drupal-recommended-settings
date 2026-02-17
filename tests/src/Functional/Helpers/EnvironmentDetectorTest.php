@@ -74,6 +74,10 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
   /**
    * Tests EnvironmentDetector::getCiEnv().
    *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
+   *
    * @throws \ReflectionException
    */
   #[RunInSeparateProcess]
@@ -98,6 +102,10 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
   /**
    * Verify Ci settings file suggestion exists.
    *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
+   *
    * @throws \ReflectionException
    */
   #[RunInSeparateProcess]
@@ -108,6 +116,10 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Verify multiple environment.
+   *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
    *
    * @throws \ReflectionException
    */
@@ -134,6 +146,10 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Test EnvironmentDetector::isAcsfInited().
+   *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
    */
   #[RunInSeparateProcess]
   public function testIsAcsfInited(): void {
@@ -163,6 +179,10 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Test EnvironmentDetector::getSiteName().
+   *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
    *
    * @throws \ReflectionException
    */
@@ -195,6 +215,10 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Test EnvironmentDetector::getSiteName().
+   *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
    */
   #[RunInSeparateProcess]
   public function testGetSiteNameForLocalAcsf(): void {
@@ -235,6 +259,10 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Test EnvironmentDetector::getEnvironments().
+   *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
    *
    * @throws \ReflectionException
    */
