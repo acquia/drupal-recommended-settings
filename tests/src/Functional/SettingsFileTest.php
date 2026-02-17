@@ -70,8 +70,7 @@ class SettingsFileTest extends FunctionalTestBase {
    * Builds a temporary Drupal fixture for tests.
    */
   private function createFixtureForLocal(): void {
-    if (EnvironmentDetector::isCiEnv()) {
-      $this->assertTrue(defined(DRUPAL_ROOT));
+    if (defined('DRUPAL_ROOT')) {
       $this->projectRoot = dirname(DRUPAL_ROOT);
       return;
     }
