@@ -5,10 +5,12 @@
  * Common settings for CI envs.
  */
 
+use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
+
 $config['system.logging']['error_level'] = 'verbose';
 
-$dir = dirname(DRUPAL_ROOT);
-$settings['file_private_path'] = $dir . '/files-private';
+$settings['file_private_path'] = EnvironmentDetector::getRepoRoot() . '/files-private/' . EnvironmentDetector::getSiteName($site_path);
+
 $settings['trusted_host_patterns'] = [
   '^.+$',
 ];
