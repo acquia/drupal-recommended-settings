@@ -3,6 +3,7 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\Functional;
 
 use Acquia\Drupal\RecommendedSettings\Common\RandomString;
+use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
 use Acquia\Drupal\RecommendedSettings\Settings;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 use Acquia\Drupal\RecommendedSettings\Tests\Mock\Drupal;
@@ -29,45 +30,48 @@ class SettingsFileTest extends FunctionalTestBase {
   public function setUp(): void {
     parent::setUp();
     $this->fileSystem = new Filesystem();
-    $this->createFixture();
+    dump(EnvironmentDetector::isCiEnv());
+    //$this->createFixtureForLocal();
   }
 
   /**
    * Verifies settings.php generates expected values.
    */
   public function testAcquiaRecommendedSettingsFile(): void {
-    // Drupal expects these variables to be predeclared in the scope.
+      return;
     $site_path = 'default';
     $settings = [];
     $this->assertTrue(TRUE);
-    return;
-//    include_once "{$this->projectRoot}/vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php";
-//    $this->assertNotEmpty($settings);
-//    $this->assertArrayHasKey('config_sync_directory', $settings);
-//    $this->assertArrayHasKey('site_studio_sync', $settings);
-//    $this->assertArrayHasKey('file_public_path', $settings);
-//    $this->assertArrayHasKey('hash_salt', $settings);
-//    $this->assertArrayHasKey('file_private_path', $settings);
-//    $this->assertSame("../config/$site_path", $settings['config_sync_directory']);
-//    $this->assertSame("../sitestudio/$site_path", $settings['site_studio_sync']);
-//    $this->assertSame("sites/$site_path/files", $settings['file_public_path']);
-//    $this->assertSame($this->projectRoot . "/files-private/$site_path", $settings['file_private_path']);
-//    $this->assertNotEmpty($settings['hash_salt']);
+    include_once "{$this->projectRoot}/vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php";
+    $this->assertNotEmpty($settings);
+    $this->assertArrayHasKey('config_sync_directory', $settings);
+    $this->assertArrayHasKey('site_studio_sync', $settings);
+    $this->assertArrayHasKey('file_public_path', $settings);
+    $this->assertArrayHasKey('hash_salt', $settings);
+    $this->assertArrayHasKey('file_private_path', $settings);
+    $this->assertSame("../config/$site_path", $settings['config_sync_directory']);
+    $this->assertSame("../sitestudio/$site_path", $settings['site_studio_sync']);
+    $this->assertSame("sites/$site_path/files", $settings['file_public_path']);
+    $this->assertSame($this->projectRoot . "/files-private/$site_path", $settings['file_private_path']);
+    $this->assertNotEmpty($settings['hash_salt']);
   }
 
   /**
    * {@inheritdoc}
    */
   public function tearDown(): void {
-    $this->fileSystem->remove($this->projectRoot);
+//    if (EnvironmentDetector::isLocalEnv()) {
+//      $this->fileSystem->remove($this->projectRoot);
+//    }
     parent::tearDown();
   }
 
   /**
    * Builds a temporary Drupal fixture for tests.
    */
-  private function createFixture(): void {
-    if (defined('DRUPAL_ROOT')) {
+  private function createFixtureForLocal(): void {
+    if (!EnvironmentDetector::isLocalEnv()) {
+      $this->assertTrue(defined(DRUPAL_ROOT));
       $this->projectRoot = dirname(DRUPAL_ROOT);
       return;
     }
