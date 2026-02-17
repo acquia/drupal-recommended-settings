@@ -95,7 +95,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
     putenv("GITLAB_CI_TOKEN=");
     putenv("CI=");
     $this->assertFalse(EnvironmentDetector::isCiEnv());
-    putenv("CI=true");
+    putenv("CI=TRUE");
     $this->assertTrue(EnvironmentDetector::isCiEnv());
   }
 
