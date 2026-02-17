@@ -3,10 +3,10 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\Functional;
 
 use Acquia\Drupal\RecommendedSettings\Common\RandomString;
-use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
 use Acquia\Drupal\RecommendedSettings\Settings;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 use Acquia\Drupal\RecommendedSettings\Tests\Mock\Drupal;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -30,15 +30,14 @@ class SettingsFileTest extends FunctionalTestBase {
   public function setUp(): void {
     parent::setUp();
     $this->fileSystem = new Filesystem();
-    dump(EnvironmentDetector::isCiEnv());
-    //$this->createFixtureForLocal();
+    $this->createFixtureForLocal();
   }
 
   /**
    * Verifies settings.php generates expected values.
    */
+  #[RunInSeparateProcess]
   public function testAcquiaRecommendedSettingsFile(): void {
-      return;
     $site_path = 'default';
     $settings = [];
     $this->assertTrue(TRUE);
@@ -60,9 +59,9 @@ class SettingsFileTest extends FunctionalTestBase {
    * {@inheritdoc}
    */
   public function tearDown(): void {
-//    if (EnvironmentDetector::isLocalEnv()) {
-//      $this->fileSystem->remove($this->projectRoot);
-//    }
+    if (!getenv("ORCA_FIXTURE_DIR")) {
+      $this->fileSystem->remove($this->projectRoot);
+    }
     parent::tearDown();
   }
 
@@ -70,7 +69,12 @@ class SettingsFileTest extends FunctionalTestBase {
    * Builds a temporary Drupal fixture for tests.
    */
   private function createFixtureForLocal(): void {
-    if (!EnvironmentDetector::isLocalEnv()) {
+    if (getenv("ORCA_FIXTURE_DIR")) {
+      // As some tests are updating CI environment, due to this the
+      // EnvironmentDetector::isCiEnv() is returning false here.
+      // Hence, we are using 'ORCA_FIXTURE_DIR' environment check here.
+      // @todo Revisit and fix those tests to not update CI environment and
+      //   update this check.
       $this->assertTrue(defined(DRUPAL_ROOT));
       $this->projectRoot = dirname(DRUPAL_ROOT);
       return;
