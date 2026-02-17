@@ -39,6 +39,7 @@ class SettingsFileTest extends FunctionalTestBase {
     // Drupal expects these variables to be predeclared in the scope.
     $site_path = 'default';
     $settings = [];
+    dump(file_get_contents(DRUPAL_ROOT . "/sites/default/settings.php"));
     include_once DRUPAL_ROOT . '/sites/default/settings.php';
     $this->assertNotEmpty($settings);
     $this->assertArrayHasKey('config_sync_directory', $settings);
