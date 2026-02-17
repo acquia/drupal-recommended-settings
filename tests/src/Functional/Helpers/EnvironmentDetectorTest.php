@@ -10,6 +10,7 @@ use Composer\Composer;
 use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\Package\RootPackage;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 
 /**
  * Functional test for the EnvironmentDetectorTest class.
@@ -75,6 +76,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
    *
    * @throws \ReflectionException
    */
+  #[RunInSeparateProcess]
   public function testGetCiEnv(): void {
 
     putenv("PIPELINE_ENV=TRUE");
@@ -87,8 +89,9 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
     putenv("PIPELINE_ENV=");
     putenv("GITLAB_CI_TOKEN=");
+    putenv("CI=");
     $this->assertFalse(EnvironmentDetector::isCiEnv());
-    putenv("CI=TRUE");
+    putenv("CI=true");
     $this->assertTrue(EnvironmentDetector::isCiEnv());
   }
 
@@ -97,6 +100,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
    *
    * @throws \ReflectionException
    */
+  #[RunInSeparateProcess]
   public function testGetCiSettingsFile(): void {
     putenv("PIPELINE_ENV=TRUE");
     $this->assertStringEndsWith('/acquia/drupal-recommended-settings/settings/pipelines.settings.php', EnvironmentDetector::getCiSettingsFile());
@@ -107,6 +111,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
    *
    * @throws \ReflectionException
    */
+  #[RunInSeparateProcess]
   public function testMultipleEnv(): void {
     putenv("PIPELINE_ENV=");
     putenv("CI=");
@@ -130,6 +135,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
   /**
    * Test EnvironmentDetector::isAcsfInited().
    */
+  #[RunInSeparateProcess]
   public function testIsAcsfInited(): void {
     // Generate folder/files for ACSF.
     $drsFileSystem = new DrsFilesystem();
@@ -160,6 +166,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
    *
    * @throws \ReflectionException
    */
+  #[RunInSeparateProcess]
   public function testGetSiteName(): void {
     $sitePath = "sites/site1";
     $this->assertSame('site1', EnvironmentDetector::getSiteName($sitePath));
@@ -189,6 +196,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
   /**
    * Test EnvironmentDetector::getSiteName().
    */
+  #[RunInSeparateProcess]
   public function testGetSiteNameForLocalAcsf(): void {
     if (getenv("ORCA_FIXTURE_DIR")) {
       // Due to some reasons, we've to manually copy fixture directories to
@@ -230,6 +238,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
    *
    * @throws \ReflectionException
    */
+  #[RunInSeparateProcess]
   public function testGetEnvironments(): void {
     $ci_updated = FALSE;
     if (getenv("CI")) {

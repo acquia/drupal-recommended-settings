@@ -5,6 +5,7 @@ namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Config;
 use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
 use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
@@ -72,6 +73,7 @@ class ConfigInitializerTest extends FunctionalTestBase {
    *
    * @throws \ReflectionException
    */
+  #[RunInSeparateProcess]
   public function testDetermineEnvironment(): void {
     putenv("CI=");
     $config = new DefaultDrushConfig();
@@ -96,6 +98,7 @@ class ConfigInitializerTest extends FunctionalTestBase {
   /**
    * Tests the initialize() method.
    */
+  #[RunInSeparateProcess]
   public function testInitialize(): void {
     putenv("CI=");
     $config = new DefaultDrushConfig();
@@ -139,6 +142,7 @@ class ConfigInitializerTest extends FunctionalTestBase {
   /**
    * Tests the loadAllConfig() method.
    */
+  #[RunInSeparateProcess]
   public function testLoadAllConfig(): void {
     putenv("CI=");
     $config = new DefaultDrushConfig();
