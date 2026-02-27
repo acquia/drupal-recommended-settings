@@ -1,11 +1,24 @@
 <?php
 
+//phpcs:disable
 namespace Acquia\Drupal\RecommendedSettings\Helpers;
 
 /**
  * Helper class to perform file operations.
+ *
+ * @deprecated in acquia/drupal-recommended-settings:1.2.0 and will be removed from acquia/drupal-recommended-settings:1.3.0.
+ * Use \Acquia\Drupal\RecommendedSettings\Filesystem\Filesystem class for file
+ * operations instead and implement any custom file operations in your own
+ * codebase as needed.
  */
 class Filesystem {
+
+  /**
+   * Filesystem constructor.
+   */
+  public function __construct() {
+    trigger_error("The " . __CLASS__ . " class is deprecated in acquia/drupal-recommended-settings:1.2.0 and will be removed from acquia/drupal-recommended-settings:1.3.0.", \E_USER_DEPRECATED);
+  }
 
   /**
    * Return all files for given directory.

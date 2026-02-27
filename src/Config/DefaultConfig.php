@@ -2,6 +2,8 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Config;
 
+use Acquia\Drupal\RecommendedSettings\Settings;
+
 /**
  * The configuration for settings.
  */
@@ -21,6 +23,7 @@ class DefaultConfig extends DefaultDrushConfig {
     $this->set('composer.bin', $repo_root . '/vendor/bin');
     $this->set('site', 'default');
     $this->set('tmp.dir', sys_get_temp_dir());
+    $this->set('drs.root', Settings::getPluginPath());
   }
 
 }

@@ -14,14 +14,12 @@ use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drupal\Core\Database\Database;
 use Drush\Attributes as CLI;
 use Drush\Boot\DrupalBootLevels;
-use Drush\Commands\DrushCommands;
 use Drush\Drush;
 
 /**
  * A Drush command to generate settings.php for Multisite.
  */
-class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareInterface {
-
+class MultisiteDrushCommands extends BaseDrushCommands implements CustomEventAwareInterface {
   use CustomEventAwareTrait;
 
   const VALIDATE_GENERATE_SETTINGS = 'validate-generate-settings';
@@ -32,6 +30,7 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
    */
   #[CLI\Hook(type: HookManager::PRE_ARGUMENT_VALIDATOR, target: 'site-install')]
   public function preValidateSiteInstall(CommandData $commandData): void {
+    $this->init();
     $bootstrapManager = Drush::bootstrapManager();
     if ($this->validateGenerateSettings($commandData)) {
       // Get sites subdir which we set in the hook doGenerateSettings.
@@ -64,7 +63,8 @@ class MultisiteDrushCommands extends DrushCommands implements CustomEventAwareIn
             "mysql://" . $db['username'] . ":" . $db['password'] . "@" . $db['host'] . ":" . $db['port'] . "/" . $db['database']
           );
         }
-        $settings = new Settings(DRUPAL_ROOT, $sitesSubdir);
+        $settings = new Settings();
+        $settings->setConfig($this->getConfig());
         try {
           // Generate settings files with db specs.
           $settings->generate($dbSpec);

@@ -3,8 +3,8 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Drush\Traits;
 
 use Acquia\Drupal\RecommendedSettings\Drush\Traits\SiteUriTrait;
-use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Functional test for the SiteUriTrait trait.
@@ -110,7 +110,7 @@ class SiteUriTraitTest extends FunctionalTestBase {
     $sites_file = $drupal_root . "/sites/sites.php";
     $this->assertFileDoesNotExist($sites_file);
     if (file_exists($drupal_root . "/sites/example.sites.php")) {
-      $this->fileSystem->copyFile($drupal_root . "/sites/example.sites.php", $sites_file);
+      $this->fileSystem->copy($drupal_root . "/sites/example.sites.php", $sites_file);
     }
     else {
       touch($sites_file);

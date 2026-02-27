@@ -3,6 +3,7 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\Functional;
 
 use Acquia\Drupal\RecommendedSettings\Common\RandomString;
+use Acquia\Drupal\RecommendedSettings\Config\DefaultConfig;
 use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
 use Acquia\Drupal\RecommendedSettings\Settings;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
@@ -31,7 +32,6 @@ class SettingsFileTest extends FunctionalTestBase {
   public function setUp(): void {
     parent::setUp();
     $this->fileSystem = new Filesystem();
-    $this->createFixtureForLocal();
   }
 
   /**
@@ -43,9 +43,10 @@ class SettingsFileTest extends FunctionalTestBase {
    */
   #[RunInSeparateProcess]
   public function testAcquiaRecommendedSettingsFile(): void {
+    $this->createFixtureForLocal();
+    $this->assertTrue(TRUE);
     $site_path = 'default';
     $settings = [];
-    $this->assertTrue(TRUE);
     include_once "{$this->projectRoot}/vendor/acquia/drupal-recommended-settings/settings/acquia-recommended.settings.php";
     $this->assertNotEmpty($settings);
     $this->assertArrayHasKey('config_sync_directory', $settings);
@@ -58,6 +59,7 @@ class SettingsFileTest extends FunctionalTestBase {
     $this->assertSame("sites/$site_path/files", $settings['file_public_path']);
     $this->assertSame($this->projectRoot . "/files-private/$site_path", $settings['file_private_path']);
     $this->assertNotEmpty($settings['hash_salt']);
+    $this->assertDirectoryExists("{$this->projectRoot}/config/$site_path");
   }
 
   /**
@@ -65,6 +67,7 @@ class SettingsFileTest extends FunctionalTestBase {
    */
   public function tearDown(): void {
     if (EnvironmentDetector::isLocalEnv()) {
+      $this->fileSystem->chmod($this->projectRoot, 0777, 0o000, TRUE);
       $this->fileSystem->remove($this->projectRoot);
     }
     parent::tearDown();
@@ -88,7 +91,9 @@ class SettingsFileTest extends FunctionalTestBase {
     class_alias(Drupal::class, 'Drupal');
     $this->fileSystem->dumpFile("{$this->projectRoot}/salt.txt", RandomString::string(55));
     $this->fileSystem->dumpFile(DRUPAL_ROOT . "/sites/default/default.settings.php", "<?php\n");
-    $settings = new Settings(DRUPAL_ROOT, "default");
+    $settings = new Settings();
+    $settings->setConfig(new DefaultConfig($this->projectRoot . '/docroot'));
+    $this->fileSystem->dumpFile("{$this->projectRoot}/composer.json", "{}");
     $settings->generate([
       'drupal' => [
         'db' => [

@@ -3,6 +3,7 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Config;
 
 use Acquia\Drupal\RecommendedSettings\Config\DefaultConfig;
+use Acquia\Drupal\RecommendedSettings\Settings;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 
 /**
@@ -24,7 +25,7 @@ class DefaultConfigTest extends FunctionalTestBase {
     $this->assertArrayHasKey("tmp", $actual);
     $this->assertArrayHasKey("dir", $actual['tmp']);
     unset($actual['tmp']);
-    $this->assertEquals($actual, [
+    $this->assertEquals([
       "repo" => [
         "root" => $project_root,
       ],
@@ -33,7 +34,10 @@ class DefaultConfigTest extends FunctionalTestBase {
         "bin" => $project_root . "/vendor/bin",
       ],
       "site" => "default",
-    ]);
+      "drs" => [
+        "root" => Settings::getPluginPath(),
+      ],
+    ], $actual);
   }
 
 }

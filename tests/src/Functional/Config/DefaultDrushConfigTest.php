@@ -3,6 +3,7 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Config;
 
 use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
+use Acquia\Drupal\RecommendedSettings\Settings;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 use Drush\Config\DrushConfig;
 
@@ -26,26 +27,13 @@ class DefaultDrushConfigTest extends FunctionalTestBase {
     $drushConfig->set("drush.vendor-dir", $project_root . "/vendor");
     $drushConfig->set("options.ansi", TRUE);
     $drushConfig->set('drush.uri', '/var/www/html/acms.prod/vendor/bin');
+    $drushConfig->set('drush.vendor-dir', "$project_root/vendor");
     $drushConfig->set("runtime.drush-script", $project_root . "/vendor/bin/drush");
 
     $default_drush_config = new DefaultDrushConfig($drushConfig);
     $actual = $default_drush_config->export();
-    $this->assertEquals($actual, [
-      "drush" => [
-        "alias" => "self",
-        "uri" => '/var/www/html/acms.prod/vendor/bin',
-        "ansi" => TRUE,
-        "bin" => $project_root . "/vendor/bin/drush",
-        "vendor-dir" => $project_root . "/vendor",
-      ],
-      "runtime" => [
-        "project" => $project_root,
-        "drush-script" => $project_root . "/vendor/bin/drush",
-      ],
-      "options" => [
-        "root" => $drupal_root,
-        "ansi" => TRUE,
-      ],
+
+    $this->assertEquals([
       "repo" => [
         "root" => $project_root,
       ],
@@ -53,7 +41,14 @@ class DefaultDrushConfigTest extends FunctionalTestBase {
       "composer" => [
         "bin" => $project_root . "/vendor/bin",
       ],
-    ]);
+      "drush" => [
+        "ansi" => TRUE,
+        "bin" => $project_root . "/vendor/bin/drush",
+      ],
+      "drs" => [
+        "root" => Settings::getPluginPath(),
+      ],
+    ], $actual);
   }
 
 }

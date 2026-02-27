@@ -6,7 +6,7 @@ namespace Acquia\Drupal\RecommendedSettings\Drush\Commands;
 
 use Acquia\Drupal\RecommendedSettings\Common\IO;
 use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
-use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
+use Acquia\Drupal\RecommendedSettings\Drush\Traits\SiteUriTrait;
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
 use Acquia\Drupal\RecommendedSettings\Robo\Tasks\LoadTasks;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
@@ -33,13 +33,20 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
   use ConfigAwareTrait;
   use LoadTasks;
   use IO;
+  use SiteUriTrait;
 
   /**
    * {@inheritdoc}
    */
   #[CLI\Hook(type: HookManager::INITIALIZE)]
   public function init(): void {
-    $this->initializeConfig();
+    $input = $this->input();
+    $uri = $input->getOption("uri");
+    if ($uri) {
+      $site = $this->getSitesSubdirFromUri($input->getOption("root"), $uri);
+    }
+    $site ??= "default";
+    $this->initializeConfig($site);
   }
 
   /**
@@ -111,12 +118,10 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    * @param string $site_name
    *   Given site name.
    */
-  protected function initializeConfig(string $site_name = ""): void {
-    $config = new DefaultDrushConfig($this->getConfig());
+  protected function initializeConfig(string $site_name): void {
+    $config = $this->getConfig();
     $configInitializer = new ConfigInitializer($config);
-    if ($site_name) {
-      $configInitializer->setSite($site_name);
-    }
+    $configInitializer->setSite($site_name);
     $config = $configInitializer->initialize()->loadAllConfig()->processConfig();
     $this->setConfig($config);
   }

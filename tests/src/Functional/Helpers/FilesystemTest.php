@@ -4,12 +4,15 @@ namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Helpers;
 
 use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem as DrsFilesystem;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Functional test for the Filesystem class.
  *
  * @covers \Acquia\Drupal\RecommendedSettings\Helpers\Filesystem
+ * @ignoreDeprecations
  */
+#[IgnoreDeprecations]
 class FilesystemTest extends FunctionalTestBase {
 
   /**

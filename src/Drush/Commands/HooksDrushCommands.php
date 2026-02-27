@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Acquia\Drupal\RecommendedSettings\Drush\Commands;
 
 use Acquia\Drupal\RecommendedSettings\Drush\Traits\SiteUriTrait;
+use Acquia\Drupal\RecommendedSettings\Filesystem\Filesystem;
 use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
 use Consolidation\AnnotatedCommand\CommandData;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
@@ -56,6 +57,25 @@ class HooksDrushCommands extends DrushCommands {
     }
 
     return FALSE;
+  }
+
+  /**
+   * Adds write permission to the site directory and its contents.
+   */
+  #[CLI\Hook(type: HookManager::POST_COMMAND_HOOK, target: SettingsDrushCommands::SETTINGS_COMMAND)]
+  public function writePermissionToDir(): void {
+    // When ORCA_FIXTURE_DIR environment variable is set, it means we are
+    // running tests in CI. Hence, we need to provide write permission to the
+    // site directory and its contents as ORCA updates the settings.php file
+    // during tests, and it needs write permission to do so.
+    if (getenv("ORCA_FIXTURE_DIR")) {
+      $uri = $this->input()->getOption("uri") ?? "default";
+      $root = $this->input()->getOption("root");
+      $path = $root . DIRECTORY_SEPARATOR . "sites" . DIRECTORY_SEPARATOR . $uri;
+      $file_system = new Filesystem();
+      $currentPerms = fileperms($path) & 0777;
+      $file_system->chmod($path, $currentPerms | 0222, 0o000, TRUE);
+    }
   }
 
 }
