@@ -63,11 +63,16 @@ final class Filesystem implements FilesystemInterface {
     if (method_exists($file_system, 'readFile')) {
       return $file_system->readFile($filename);
     }
-    $content = file_get_contents($filename);
+    // @codeCoverageIgnoreStart
+    // The @ suppresses the E_WARNING emitted by file_get_contents() when the
+    // file does not exist. Older PHPUnit versions convert unhandled warnings
+    // into errors, causing the test to fail before our IOException is thrown.
+    $content = @file_get_contents($filename);
     if ($content === FALSE) {
       throw new IOException(\sprintf('Failed to read file "%s": ', $filename));
     }
     return $content;
+    // @codeCoverageIgnoreEnd
   }
 
   /**

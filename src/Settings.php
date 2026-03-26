@@ -92,7 +92,11 @@ DRS_REQUIRE;
    */
   protected function ensureFileWritable(array $files): void {
     foreach ($files as $file) {
-      if (file_exists($file) && !is_writable($file)) {
+      if (!file_exists($file)) {
+        continue;
+      }
+      $needs_chmod = !is_writable($file) || (is_dir($file) && !is_executable($file));
+      if ($needs_chmod) {
         $this->fileSystem->chmod($file, 0777);
       }
     }
