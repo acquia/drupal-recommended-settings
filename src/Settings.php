@@ -7,8 +7,9 @@ use Acquia\Drupal\RecommendedSettings\Config\ConfigResolver;
 use Acquia\Drupal\RecommendedSettings\Config\DefaultConfig;
 use Acquia\Drupal\RecommendedSettings\Event\PreSettingsFileGenerateEvent;
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
+use Acquia\Drupal\RecommendedSettings\Filesystem\Filesystem;
+use Acquia\Drupal\RecommendedSettings\Filesystem\FilesystemInterface;
 use Acquia\Drupal\RecommendedSettings\Filesystem\Operation\FileOperationHandler;
-use Acquia\Drupal\RecommendedSettings\Filesystem\StatefulDirectoryCreator;
 use Consolidation\AnnotatedCommand\Events\CustomEventAwareInterface;
 use Consolidation\AnnotatedCommand\Events\CustomEventAwareTrait;
 use Consolidation\Config\ConfigAwareTrait;
@@ -25,6 +26,13 @@ use Robo\Config\Config;
 class Settings implements CustomEventAwareInterface {
   use ConfigAwareTrait;
   use CustomEventAwareTrait;
+
+  /**
+   * The filesystem interface for file operations.
+   *
+   * @var \Acquia\Drupal\RecommendedSettings\Filesystem\FilesystemInterface
+   */
+  private FilesystemInterface $fileSystem;
 
   /**
    * Settings warning.
@@ -66,6 +74,7 @@ DRS_REQUIRE;
         \E_USER_DEPRECATED,
       );
     }
+    $this->fileSystem = new Filesystem();
   }
 
   /**
@@ -73,6 +82,20 @@ DRS_REQUIRE;
    */
   public static function getPluginPath(): string {
     return dirname(__DIR__);
+  }
+
+  /**
+   * Ensures that the settings files & directories are writable.
+   *
+   * @param array<string> $files
+   *   An array of files or directories.
+   */
+  protected function ensureFileWritable(array $files): void {
+    foreach ($files as $file) {
+      if (file_exists($file) && !is_writable($file)) {
+        $this->fileSystem->chmod($file, 0777);
+      }
+    }
   }
 
   /**
@@ -88,16 +111,17 @@ DRS_REQUIRE;
       $config = $this->mergeConfigWithOverrides($overrideData);
       $site = $config->get('site');
       $docroot = $config->get('docroot');
-      $operations = $this->prepareOperations($config);
-      $stateful = new StatefulDirectoryCreator();
-      $stateful->preparePaths(array_keys($operations));
-      $handler = new FileOperationHandler($config);
-      $results = $this->executeOperations($handler, $operations);
-      $this->handleOperationResults($stateful, $results);
       assert(
         is_string($docroot) && is_string($site) && !empty($docroot) && !empty($site),
         "The docroot and site must be non-empty strings."
       );
+      $operations = $this->prepareOperations($config);
+      $handler = new FileOperationHandler($config);
+      $this->ensureFileWritable([
+        $docroot . "/sites/$site",
+        $docroot . "/sites/$site/settings.php",
+      ]);
+      $this->executeOperations($handler, $operations);
       // The config directory for given site must exist, otherwise Drupal will
       // add database credentials to settings.php.
       if (!is_dir($docroot . "/../config/$site")) {
@@ -163,54 +187,15 @@ DRS_REQUIRE;
    * @param array $operations
    *   The operations to execute.
    *
-   * @return array[]
-   *   Array with keys: success, skip, failed.
+   * @throws \Exception
    */
-  private function executeOperations(FileOperationHandler $handler, array $operations): array {
-    $results = [
-      'success' => [],
-      'skip' => [],
-      'failed' => [],
-    ];
+  private function executeOperations(FileOperationHandler $handler, array $operations): void {
     $operations = $handler->handle($operations);
     foreach ($operations as $operation) {
       $result = $operation->execute();
-      $dest = $result->getOperation()->getDestination();
-      if ($result->isSuccess()) {
-        $results['success'][$dest] = $result->getMessage();
-      }
-      if ($result->isSkipped()) {
-        $results['skip'][$dest] = $result->getMessage();
-      }
       if ($result->isFailed()) {
-        $results['failed'][$dest] = $result->getMessage();
+        throw new \Exception($result->getMessage());
       }
-    }
-    return $results;
-  }
-
-  /**
-   * Handle the results of file operations.
-   *
-   * Locks, rollbacks, restores, and throws if failed.
-   *
-   * @param \Acquia\Drupal\RecommendedSettings\Filesystem\StatefulDirectoryCreator $stateful
-   *   The stateful directory creator.
-   * @param array $results
-   *   The results array from executeOperations().
-   *
-   * @throws \Exception
-   */
-  private function handleOperationResults(StatefulDirectoryCreator $stateful, array $results): void {
-    if ($results['success']) {
-      $stateful->lockPath(array_keys($results['success']));
-    }
-    if ($results['skip']) {
-      $stateful->rollbackPath(array_keys($results['skip']));
-    }
-    if ($results['failed']) {
-      $stateful->restorePath();
-      throw new \Exception(implode(PHP_EOL, $results['failed']));
     }
   }
 
