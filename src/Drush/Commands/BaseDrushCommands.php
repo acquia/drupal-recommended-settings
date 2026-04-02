@@ -9,6 +9,7 @@ use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
 use Acquia\Drupal\RecommendedSettings\Drush\Traits\SiteUriTrait;
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
 use Acquia\Drupal\RecommendedSettings\Robo\Tasks\LoadTasks;
+use Acquia\Drupal\RecommendedSettings\Settings;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drush\Attributes as Cli;
 use Drush\Commands\DrushCommands;
@@ -124,6 +125,26 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
     $configInitializer->setSite($site_name);
     $config = $configInitializer->initialize()->loadAllConfig()->processConfig();
     $this->setConfig($config);
+  }
+
+  /**
+   * Creates and returns a fully wired Settings instance.
+   *
+   * Ensures the HookManager is always injected so that listeners registered
+   * via #[CLI\Hook(ON_EVENT, PreSettingsFileGenerateEvent::NAME)] are
+   * discovered and invoked regardless of which command path triggers
+   * settings generation.
+   *
+   * @return \Acquia\Drupal\RecommendedSettings\Settings
+   *   A Settings instance with config and HookManager set.
+   */
+  protected function buildSettings(): Settings {
+    $settings = new Settings();
+    $hookManager = $this->getContainer()->get('hookManager');
+    assert($hookManager instanceof HookManager);
+    $settings->setHookManager($hookManager);
+    $settings->setConfig($this->getConfig());
+    return $settings;
   }
 
 }

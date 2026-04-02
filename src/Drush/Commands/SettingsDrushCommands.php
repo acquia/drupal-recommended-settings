@@ -6,7 +6,6 @@ namespace Acquia\Drupal\RecommendedSettings\Drush\Commands;
 
 use Acquia\Drupal\RecommendedSettings\Common\RandomString;
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
-use Acquia\Drupal\RecommendedSettings\Settings;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drush\Attributes as Cli;
 use Drush\Boot\DrupalBootLevels;
@@ -61,11 +60,7 @@ class SettingsDrushCommands extends BaseDrushCommands {
       ARRAY_FILTER_USE_BOTH
     );
     try {
-      $settings = new Settings();
-      $hookManager = $this->getContainer()->get('hookManager');
-      assert($hookManager instanceof HookManager);
-      $settings->setHookManager($hookManager);
-      $settings->setConfig($this->getConfig());
+      $settings = $this->buildSettings();
       $settings->generate($db);
       if (!$this->output()->isQuiet()) {
         $this->print(

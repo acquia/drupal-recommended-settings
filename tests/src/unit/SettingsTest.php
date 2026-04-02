@@ -20,9 +20,9 @@ class SettingsTest extends TestCase {
   protected Settings $settings;
 
   /**
-   * The path to drupal webroot directory.
+   * The path to the project root directory.
    */
-  protected string $drupalRoot;
+  protected string $projectRoot;
 
   /**
    * The symfony file-system object.
@@ -33,19 +33,19 @@ class SettingsTest extends TestCase {
    * Set up test environment.
    */
   public function setUp(): void {
-    $this->drupalRoot = sys_get_temp_dir() . DIRECTORY_SEPARATOR . RandomString::string(5, TRUE, NULL, 'abcdefghijklmnopqrstuvwxyz');
-    $docroot = $this->drupalRoot . '/docroot';
+    $this->projectRoot = sys_get_temp_dir() . DIRECTORY_SEPARATOR . RandomString::string(5, TRUE, NULL, 'abcdefghijklmnopqrstuvwxyz');
+    $docroot = $this->projectRoot . '/docroot';
     mkdir($docroot . '/sites/default', 0777, TRUE);
     $this->fileSystem = new Filesystem();
     $this->fileSystem->dumpFile($docroot . '/sites/default/default.settings.php', "<?php");
-    $this->fileSystem->dumpFile($this->drupalRoot . '/composer.json', '{}');
+    $this->fileSystem->dumpFile($this->projectRoot . '/composer.json', '{}');
   }
 
   /**
    * Test that the file is created.
    */
   public function testFileIsCreated(): void {
-    $docroot = $this->drupalRoot . '/docroot';
+    $docroot = $this->projectRoot . '/docroot';
     $config = new DefaultConfig($docroot);
     $settings = new Settings();
     $this->fileSystem->chmod($docroot . '/sites/default/default.settings.php', 0777);
@@ -63,9 +63,9 @@ class SettingsTest extends TestCase {
       ],
     ]);
     // Assert that settings/default.global.settings.php file exist.
-    $this->assertTrue($this->fileSystem->exists($this->drupalRoot . '/docroot/sites/settings/default.global.settings.php'));
+    $this->assertTrue($this->fileSystem->exists($this->projectRoot . '/docroot/sites/settings/default.global.settings.php'));
     // Assert that settings.php file exist.
-    $this->assertTrue($this->fileSystem->exists($this->drupalRoot . '/docroot/sites/default/settings.php'));
+    $this->assertTrue($this->fileSystem->exists($this->projectRoot . '/docroot/sites/default/settings.php'));
     // Assert that settings.php file has content.
     $content = <<<CONTENT
 <?php
@@ -80,16 +80,16 @@ require DRUPAL_ROOT . "/../vendor/acquia/drupal-recommended-settings/settings/ac
  */
 
 CONTENT;
-    $this->assertEquals($content, file_get_contents($this->drupalRoot . '/docroot/sites/default/settings.php'));
+    $this->assertEquals($content, file_get_contents($this->projectRoot . '/docroot/sites/default/settings.php'));
 
     // Assert that default.includes.settings.php file exist.
-    $this->assertTrue($this->fileSystem->exists($this->drupalRoot . '/docroot/sites/default/settings/default.includes.settings.php'));
+    $this->assertTrue($this->fileSystem->exists($this->projectRoot . '/docroot/sites/default/settings/default.includes.settings.php'));
     // Assert that default.local.settings.php file exist.
-    $this->assertTrue($this->fileSystem->exists($this->drupalRoot . '/docroot/sites/default/settings/default.local.settings.php'));
+    $this->assertTrue($this->fileSystem->exists($this->projectRoot . '/docroot/sites/default/settings/default.local.settings.php'));
     // Assert that local.settings.php file exist.
-    $this->assertTrue($this->fileSystem->exists($this->drupalRoot . '/docroot/sites/default/settings/local.settings.php'));
+    $this->assertTrue($this->fileSystem->exists($this->projectRoot . '/docroot/sites/default/settings/local.settings.php'));
     // Get the local.settings.php file content.
-    $localSettings = file_get_contents($this->drupalRoot . '/docroot/sites/default/settings/local.settings.php');
+    $localSettings = file_get_contents($this->projectRoot . '/docroot/sites/default/settings/local.settings.php');
     // Verify database credentials.
     $this->assertStringContainsString("db_name = 'drs'", $localSettings, "The local.settings.php doesn't contains the 'drs' database.");
     $this->assertStringContainsString("'username' => 'drupal'", $localSettings, "The local.settings.php doesn't contains the 'drupal' username.");
@@ -99,7 +99,7 @@ CONTENT;
   }
 
   public function testExpectSettingsException(): void {
-    $docroot = $this->drupalRoot . '/docroot';
+    $docroot = $this->projectRoot . '/docroot';
     $config = new DefaultConfig($docroot);
     $settings = new Settings();
     $this->expectException(SettingsException::class);
@@ -131,7 +131,7 @@ CONTENT;
     set_error_handler(function ($errno, $errstr) {
       $this->assertSame("Since acquia/drupal-recommended-settings:1.1.3: Creating an object by passing (\$drupal_root, \$site) arguments is deprecated and will cause an error in 1.2.0.", $errstr);
     }, \E_USER_DEPRECATED);
-    $docroot = $this->drupalRoot . '/docroot';
+    $docroot = $this->projectRoot . '/docroot';
     new Settings($docroot);
     restore_error_handler();
   }
@@ -140,11 +140,11 @@ CONTENT;
    * Test that inline operations defined in composer.json are merged and run.
    */
   public function testCombineProjectOperationsWithInlineOperations(): void {
-    $docroot = $this->drupalRoot . '/docroot';
+    $docroot = $this->projectRoot . '/docroot';
     $extraDest = $docroot . '/sites/default/settings/extra.settings.php';
 
     $this->fileSystem->dumpFile(
-      $this->drupalRoot . '/composer.json',
+      $this->projectRoot . '/composer.json',
       json_encode([
         'extra' => [
           'drupal-recommended-settings' => [
@@ -177,20 +177,21 @@ CONTENT;
    * Test that an operations-file path is loaded when operations key is absent.
    */
   public function testCombineProjectOperationsWithOperationsFile(): void {
-    $docroot = $this->drupalRoot . '/docroot';
+    $docroot = $this->projectRoot . '/docroot';
     $extraDest = $docroot . '/sites/default/settings/extra-from-file.settings.php';
-    $operationsFile = $this->drupalRoot . '/custom-operations.json';
+    $relativeOperationsFile = 'custom-operations.json';
+    $absoluteOperationsFile = $this->projectRoot . '/' . $relativeOperationsFile;
 
     $this->fileSystem->dumpFile(
-      $operationsFile,
+      $absoluteOperationsFile,
       json_encode([$extraDest => $docroot . '/sites/default/default.settings.php'])
     );
     $this->fileSystem->dumpFile(
-      $this->drupalRoot . '/composer.json',
+      $this->projectRoot . '/composer.json',
       json_encode([
         'extra' => [
           'drupal-recommended-settings' => [
-            'operations-file' => $operationsFile,
+            'operations-file' => $relativeOperationsFile,
           ],
         ],
       ])
@@ -217,24 +218,25 @@ CONTENT;
    * Test non-empty inline operations causes operations-file to be ignored.
    */
   public function testCombineProjectOperationsInlineOperationsTakePrecedenceOverFile(): void {
-    $docroot = $this->drupalRoot . '/docroot';
+    $docroot = $this->projectRoot . '/docroot';
     $inlineDest = $docroot . '/sites/default/settings/inline-extra.settings.php';
     $fileDest = $docroot . '/sites/default/settings/file-extra.settings.php';
-    $operationsFile = $this->drupalRoot . '/custom-operations.json';
+    $relativeOperationsFile = 'custom-operations.json';
+    $absoluteOperationsFile = $this->projectRoot . '/' . $relativeOperationsFile;
 
     $this->fileSystem->dumpFile(
-      $operationsFile,
+      $absoluteOperationsFile,
       json_encode([$fileDest => $docroot . '/sites/default/default.settings.php'])
     );
     $this->fileSystem->dumpFile(
-      $this->drupalRoot . '/composer.json',
+      $this->projectRoot . '/composer.json',
       json_encode([
         'extra' => [
           'drupal-recommended-settings' => [
             'operations' => [
               $inlineDest => $docroot . '/sites/default/default.settings.php',
             ],
-            'operations-file' => $operationsFile,
+            'operations-file' => $relativeOperationsFile,
           ],
         ],
       ])
@@ -262,15 +264,15 @@ CONTENT;
    * Test that SettingsException is thrown when operations-file does not exist.
    */
   public function testCombineProjectOperationsThrowsForMissingOperationsFile(): void {
-    $docroot = $this->drupalRoot . '/docroot';
-    $missingFile = $this->drupalRoot . '/nonexistent-operations.json';
+    $docroot = $this->projectRoot . '/docroot';
+    $relativeOperationsFile = 'nonexistent-operations.json';
 
     $this->fileSystem->dumpFile(
-      $this->drupalRoot . '/composer.json',
+      $this->projectRoot . '/composer.json',
       json_encode([
         'extra' => [
           'drupal-recommended-settings' => [
-            'operations-file' => $missingFile,
+            'operations-file' => $relativeOperationsFile,
           ],
         ],
       ])
@@ -298,7 +300,7 @@ CONTENT;
    * Test that a custom event handler can modify the operations list.
    */
   public function testPrepareOperationsHandlerModifiesOperations(): void {
-    $docroot = $this->drupalRoot . '/docroot';
+    $docroot = $this->projectRoot . '/docroot';
     $extraDest = $docroot . '/sites/default/settings/handler-added.settings.php';
     $source = $docroot . '/sites/default/default.settings.php';
 
@@ -335,7 +337,7 @@ CONTENT;
    * Test that all handlers run when none stop propagation.
    */
   public function testPrepareOperationsAllHandlersCalledWithoutPropagationStop(): void {
-    $docroot = $this->drupalRoot . '/docroot';
+    $docroot = $this->projectRoot . '/docroot';
     $destA = $docroot . '/sites/default/settings/handler-a.settings.php';
     $destB = $docroot . '/sites/default/settings/handler-b.settings.php';
     $source = $docroot . '/sites/default/default.settings.php';
@@ -383,7 +385,7 @@ CONTENT;
    * Test that stopping propagation skips subsequent handlers.
    */
   public function testPrepareOperationsStopPropagationSkipsSubsequentHandlers(): void {
-    $docroot = $this->drupalRoot . '/docroot';
+    $docroot = $this->projectRoot . '/docroot';
     $destA = $docroot . '/sites/default/settings/propagation-a.settings.php';
     $destB = $docroot . '/sites/default/settings/propagation-b.settings.php';
     $source = $docroot . '/sites/default/default.settings.php';
@@ -432,16 +434,17 @@ CONTENT;
    * Test that SettingsException is thrown when operations have invalid JSON.
    */
   public function testCombineProjectOperationsThrowsForInvalidJsonInOperationsFile(): void {
-    $docroot = $this->drupalRoot . '/docroot';
-    $invalidJsonFile = $this->drupalRoot . '/invalid-operations.json';
+    $docroot = $this->projectRoot . '/docroot';
+    $relativeOperationsFile = 'invalid-operations.json';
+    $absoluteOperationsFile = $this->projectRoot . '/' . $relativeOperationsFile;
 
-    $this->fileSystem->dumpFile($invalidJsonFile, 'this is not valid json {');
+    $this->fileSystem->dumpFile($absoluteOperationsFile, 'this is not valid json {');
     $this->fileSystem->dumpFile(
-      $this->drupalRoot . '/composer.json',
+      $this->projectRoot . '/composer.json',
       json_encode([
         'extra' => [
           'drupal-recommended-settings' => [
-            'operations-file' => $invalidJsonFile,
+            'operations-file' => $relativeOperationsFile,
           ],
         ],
       ])
@@ -468,8 +471,8 @@ CONTENT;
    * {@inheritdoc}
    */
   public function tearDown(): void {
-    $this->fileSystem->chmod($this->drupalRoot, 0777, 0o000, TRUE);
-    $this->fileSystem->remove($this->drupalRoot . '/docroot');
+    $this->fileSystem->chmod($this->projectRoot, 0777, 0o000, TRUE);
+    $this->fileSystem->remove($this->projectRoot);
   }
 
 }

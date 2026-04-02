@@ -73,7 +73,7 @@ so you only need to declare what you want to change or override.
   "extra": {
     "drupal-recommended-settings": {
       "operations": {
-        "${docroot}/sites/${site}/local.settings.php": false
+        "${docroot}/sites/${site}/settings/local.settings.php": false
       }
     }
   }
@@ -96,7 +96,7 @@ so you only need to declare what you want to change or override.
 
 **Skip a file — prevent DRS from copying or modifying it:**
 ```json
-"${docroot}/sites/${site}/local.settings.php": false
+"${docroot}/sites/${site}/settings/local.settings.php": false
 ```
 
 **Copy a file from a custom source path (skips if destination already exists):**
@@ -145,7 +145,7 @@ so you only need to declare what you want to change or override.
 
 **Combine multiple actions on the same file (copy then append/prepend):**
 > ```json
-> "${docroot}/sites/${site}/local.settings.php": {
+> "${docroot}/sites/${site}/settings/local.settings.php": {
 >   "copy": {
 >     "path": "${drs.root}/assets/local.settings.php"
 >   },

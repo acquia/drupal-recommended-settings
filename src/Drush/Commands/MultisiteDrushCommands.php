@@ -6,7 +6,6 @@ namespace Acquia\Drupal\RecommendedSettings\Drush\Commands;
 
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
 use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
-use Acquia\Drupal\RecommendedSettings\Settings;
 use Consolidation\AnnotatedCommand\CommandData;
 use Consolidation\AnnotatedCommand\Events\CustomEventAwareInterface;
 use Consolidation\AnnotatedCommand\Events\CustomEventAwareTrait;
@@ -63,8 +62,7 @@ class MultisiteDrushCommands extends BaseDrushCommands implements CustomEventAwa
             "mysql://" . $db['username'] . ":" . $db['password'] . "@" . $db['host'] . ":" . $db['port'] . "/" . $db['database']
           );
         }
-        $settings = new Settings();
-        $settings->setConfig($this->getConfig());
+        $settings = $this->buildSettings();
         try {
           // Generate settings files with db specs.
           $settings->generate($dbSpec);

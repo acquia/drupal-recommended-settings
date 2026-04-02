@@ -58,7 +58,7 @@ class ExampleDrushCommands extends DrushCommands {
     $operations = $event->getOperations();
 
     // 1. Skip a file entirely.
-    $operations['${docroot}/sites/${site}/local.settings.php'] = FALSE;
+    $operations['${docroot}/sites/${site}/settings/local.settings.php'] = FALSE;
 
     // 2. Change the source file for a copy operation.
     $operations['${docroot}/sites/${site}/settings.php'] = '${drs.root}/assets/settings.php';

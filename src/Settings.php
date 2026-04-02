@@ -274,9 +274,9 @@ DRS_REQUIRE;
     $json = $this->readJsonFile($project_json_file);
     $project_operations = $json['extra']['drupal-recommended-settings']['operations'] ?? [];
     if (!$project_operations) {
-      $project_operations_file = $json['extra']['drupal-recommended-settings']['operations-file'] ?? [];
+      $project_operations_file = $json['extra']['drupal-recommended-settings']['operations-file'] ?? '';
       if ($project_operations_file) {
-        $project_operations = $this->readJsonFile($project_operations_file);
+        $project_operations = $this->readJsonFile($project . DIRECTORY_SEPARATOR . $project_operations_file);
       }
     }
     return array_merge($operations, $project_operations);
