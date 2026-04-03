@@ -61,7 +61,11 @@ class ExampleDrushCommands extends DrushCommands {
     $operations['${docroot}/sites/${site}/settings/local.settings.php'] = FALSE;
 
     // 2. Change the source file for a copy operation.
-    $operations['${docroot}/sites/${site}/settings.php'] = '${drs.root}/assets/settings.php';
+    $operations['${docroot}/sites/${site}/settings.php'] = [
+      'copy' => [
+        'path' => '${drs.root}/assets/settings.php',
+      ],
+    ];
 
     // 3. Add a new custom settings and overwrite if content differs.
     $operations['${docroot}/sites/${site}/custom.settings.php'] = [
