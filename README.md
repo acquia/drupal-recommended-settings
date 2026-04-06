@@ -17,6 +17,7 @@ and deployable on Acquia Cloud.
 ```
 composer require acquia/drupal-recommended-settings
 ```
+
 ### Multi-site features with Acquia DRS
 The Drupal Recommended Settings offer the multi-site feature out of the box.
 To configure a multi-site, run the following command, and the plugin will
@@ -31,7 +32,7 @@ implementations from [here](examples).
 
 # Quick examples
 ### Generate settings with default credentials for the default site:
- ```
+```
 ./vendor/bin/drush init:settings
 ```
 
@@ -39,6 +40,17 @@ implementations from [here](examples).
 ```
 ./vendor/bin/drush init:settings --database=site1 --username=myuser --password=mypass --host=127.0.0.1 --port=1234 --uri=site1
 ```
+
+---
+
+## Customizing File Operations
+
+By default, DRS copies a set of opinionated settings files into your project.
+You can now take full control of which files get copied, what content gets
+added to them, and even skip files you do not want.
+
+> **To learn more about customizing operations, including advanced usage, schema details, and more examples, see [docs/how-to-use-operations.md](docs/how-to-use-operations.md).**
+
 
 # License
 

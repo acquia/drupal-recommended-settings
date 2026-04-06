@@ -144,7 +144,7 @@ class ConfigInitializer {
   /**
    * Add/Overrides the config data.
    *
-   * @param string[] $data
+   * @param array[] $data
    *   An array of data.
    */
   public function addConfig(array $data): DrushConfig {

@@ -2,6 +2,7 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Config;
 
+use Acquia\Drupal\RecommendedSettings\Settings;
 use Drush\Config\DrushConfig;
 
 /**
@@ -25,18 +26,8 @@ class DefaultDrushConfig extends DrushConfig {
         $this->set('drush.ansi', $config->get("options.ansi"));
       }
       $this->set('drush.bin', $config->get("runtime.drush-script"));
-      $this->setDefault('drush.alias', "self");
-      $this->setDefault('drush.uri', $config->get('options.uri'));
-      $this->combine($config->export());
+      $this->set('drs.root', Settings::getPluginPath());
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function combine($data) {
-    $this->getContext(self::PROCESS_CONTEXT)->combine($data);
-    return $this;
   }
 
   /**

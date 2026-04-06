@@ -3,7 +3,6 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Helpers;
 
 use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
-use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem as DrsFilesystem;
 use Acquia\Drupal\RecommendedSettings\Plugin;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 use Composer\Composer;
@@ -11,6 +10,7 @@ use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\Package\RootPackage;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Functional test for the EnvironmentDetectorTest class.
@@ -154,9 +154,9 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
   #[RunInSeparateProcess]
   public function testIsAcsfInited(): void {
     // Generate folder/files for ACSF.
-    $drsFileSystem = new DrsFilesystem();
-    $drsFileSystem->ensureDirectoryExists($this->drupalRoot . '/sites/g');
-    $drsFileSystem->dumpFile($this->drupalRoot . '/sites/g/random.php', "<?php echo 'hello';");
+    $file_system = new Filesystem();
+    mkdir($this->drupalRoot . '/sites/g', 0777, TRUE);
+    $file_system->dumpFile($this->drupalRoot . '/sites/g/random.php', "<?php echo 'hello';");
     $this->assertTrue(EnvironmentDetector::isAcsfInited());
   }
 
@@ -228,9 +228,9 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
       // @todo Revisit on why it's not working & fix it.
       $this->copyFixtureFiles($this->getFixtureDirectory(), $this->getProjectRoot());
     }
-    $drsFileSystem = new DrsFilesystem();
-    $drsFileSystem->ensureDirectoryExists($this->drupalRoot . '/sites/g');
-    $drsFileSystem->dumpFile($this->drupalRoot . '/sites/g/random.php', "<?php echo 'hello';");
+    $file_system = new Filesystem();
+    mkdir($this->drupalRoot . '/sites/g', 0777, TRUE);
+    $file_system->dumpFile($this->drupalRoot . '/sites/g/random.php', "<?php echo 'hello';");
     $this->assertFileExists($this->drupalRoot . '/sites/g/random.php');
     $ci_updated = $host_updated = FALSE;
     if (getenv("CI")) {

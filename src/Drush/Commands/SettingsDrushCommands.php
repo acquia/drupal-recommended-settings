@@ -5,19 +5,16 @@ declare(strict_types=1);
 namespace Acquia\Drupal\RecommendedSettings\Drush\Commands;
 
 use Acquia\Drupal\RecommendedSettings\Common\RandomString;
-use Acquia\Drupal\RecommendedSettings\Drush\Traits\SiteUriTrait;
 use Acquia\Drupal\RecommendedSettings\Exceptions\SettingsException;
-use Acquia\Drupal\RecommendedSettings\Settings;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drush\Attributes as Cli;
+use Drush\Boot\DrupalBootLevels;
 use Robo\ResultData;
 
 /**
  * The DRS Drush commands.
  */
 class SettingsDrushCommands extends BaseDrushCommands {
-
-  use SiteUriTrait;
 
   /**
    * Command name for settings.php generation.
@@ -46,6 +43,7 @@ class SettingsDrushCommands extends BaseDrushCommands {
     name: 'drush ' . self::SETTINGS_COMMAND . ' --database=mydb --username=myuser --password=mypass --host=127.0.0.1 --port=1234 --uri=site1',
     description: 'Generates the settings.php for site2 passing db credentials.',
   )]
+  #[CLI\Bootstrap(level: DrupalBootLevels::NONE)]
   public function initSettings(
     array $options = [
       'database' => NULL,
@@ -62,8 +60,7 @@ class SettingsDrushCommands extends BaseDrushCommands {
       ARRAY_FILTER_USE_BOTH
     );
     try {
-      $site_directory = $this->getSitesSubdirFromUri($this->getConfigValue("docroot"), $this->getConfigValue("drush.uri"));
-      $settings = new Settings($this->getConfigValue("docroot"), $site_directory);
+      $settings = $this->buildSettings();
       $settings->generate($db);
       if (!$this->output()->isQuiet()) {
         $this->print(
@@ -95,26 +92,29 @@ class SettingsDrushCommands extends BaseDrushCommands {
    * Writes a hash salt to ${repo.root}/salt.txt if one does not exist.
    */
   #[CLI\Hook(type: HookManager::POST_COMMAND_HOOK, target: self::SETTINGS_COMMAND)]
-  public function postInitSettings(): int {
-    $hash_salt_file = $this->getConfigValue('repo.root') . '/salt.txt';
-    if (!file_exists($hash_salt_file)) {
-      $this->say("Generating hash salt...");
-      $result = $this->taskWriteToFile($hash_salt_file)
-        ->line(RandomString::string(55))
-        ->run();
+  public function postInitSettings(int $status = ResultData::EXITCODE_OK): int {
+    if (!$status) {
+      $hash_salt_file = $this->getConfigValue('repo.root') . '/salt.txt';
+      if (!file_exists($hash_salt_file)) {
+        $this->say("Generating hash salt...");
+        $result = $this->taskWriteToFile($hash_salt_file)
+          ->line(RandomString::string(55))
+          ->run();
 
-      if (!$result->wasSuccessful()) {
-        $this->print(
-          sprintf("Unable to write hash salt at `%s`.", $hash_salt_file), "error",
-        );
+        if (!$result->wasSuccessful()) {
+          $this->print(
+            sprintf("Unable to write hash salt at `%s`.", $hash_salt_file), "error",
+          );
+        }
+
+        return $result->getExitCode();
       }
-
-      return $result->getExitCode();
+      else {
+        $this->print("Hash salt already exists.", "notice");
+      }
+      return ResultData::EXITCODE_OK;
     }
-    else {
-      $this->print("Hash salt already exists.", "notice");
-    }
-    return ResultData::EXITCODE_OK;
+    return ResultData::EXITCODE_ERROR;
   }
 
 }
