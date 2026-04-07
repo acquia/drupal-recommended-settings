@@ -5,7 +5,6 @@ namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Filesystem\Operatio
 use Acquia\Drupal\RecommendedSettings\Filesystem\Operation\AppendOperation;
 use Acquia\Drupal\RecommendedSettings\Filesystem\Operation\OperationKey;
 use Acquia\Drupal\RecommendedSettings\Filesystem\Operation\OperationStatus;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 

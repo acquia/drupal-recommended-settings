@@ -39,6 +39,7 @@ enum OperationType: string {
    *   TRUE if this operation is destructive, FALSE otherwise.
    */
   public function isDestructive(): bool {
+    // phpcs:ignore PHPCompatibility.Variables.ForbiddenThisUseContexts.OutsideObjectContext
     return match ($this) {
       self::Copy => TRUE,
       self::Append, self::Prepend => FALSE,
@@ -58,6 +59,7 @@ enum OperationType: string {
    *   An array of supported OperationKey values for this operation type.
    */
   public function supportedKeys(): array {
+    // phpcs:ignore PHPCompatibility.Variables.ForbiddenThisUseContexts.OutsideObjectContext
     return match ($this) {
       self::Copy => [
         OperationKey::Path->value,

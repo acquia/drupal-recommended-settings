@@ -38,6 +38,7 @@ enum OperationKey: string {
    *   for this operation key.
    */
   public function getSchemaDefinition(): array {
+    // phpcs:ignore PHPCompatibility.Variables.ForbiddenThisUseContexts.OutsideObjectContext
     return match ($this) {
       self::Overwrite, self::Placeholder => [
         'type' => 'bool',
