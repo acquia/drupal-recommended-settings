@@ -35,7 +35,7 @@ class HooksDrushCommands extends DrushCommands {
     // Check settings.php file exists in the sub directory.
     $settingsFileExist = DRUPAL_ROOT . "/sites/$sitesSubdir/settings.php";
 
-    // Return FALSE if settings.php exists;
+    // Return FALSE if settings.php exists;.
     if (file_exists($settingsFileExist)) {
       return FALSE;
     }
@@ -49,7 +49,7 @@ class HooksDrushCommands extends DrushCommands {
     }
 
     // Site sub directory is equal to site uri and uri is not default.
-    if (($sitesSubdir == $uri || !empty($sitesSubdir)) && $sitesSubdir != "default" ) {
+    if (($sitesSubdir == $uri || !empty($sitesSubdir)) && $sitesSubdir != "default") {
       // Setting the sites sub directory to the command data object.
       $commandData->input()->setOption('sites-subdir', $sitesSubdir);
       return TRUE;

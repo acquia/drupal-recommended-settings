@@ -40,7 +40,7 @@ abstract class CommandsTestBase extends TestCase {
   /**
    * Initialize the Container.
    *
-   * @param ContainerInterface|null $container
+   * @param \League\Container\ContainerInterface|null $container
    *   An instance of container object or NULL.
    */
   protected function createContainer(?ContainerInterface $container = NULL): void {
@@ -52,7 +52,7 @@ abstract class CommandsTestBase extends TestCase {
       $config = new DrushConfig();
       $this->setConfig($config);
       $logger = new Logger($this->getOutput());
-      $null_log_output = new NullLogOutputStylers;
+      $null_log_output = new NullLogOutputStylers();
       $logger->setLogOutputStyler($null_log_output);
       $container->add("logger", $logger);
 

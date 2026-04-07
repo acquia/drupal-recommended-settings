@@ -7,8 +7,7 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Custom OutputAwareTrait defined by the DRS without defining
- * method output() as it throws error with PHPUnit 10.
+ * Custom OutputAwareTrait defined by the DRS without defining method output().
  *
  * @see \Robo\Common\OutputAwareTrait
  */
@@ -20,6 +19,7 @@ trait OutputAwareTrait {
   protected OutputInterface $output;
 
   /**
+   * Sets the output interface.
    *
    * @return $this
    *
@@ -31,6 +31,7 @@ trait OutputAwareTrait {
   }
 
   /**
+   * {@inheritdoc}
    */
   protected function stderr(): OutputInterface {
     $output = $this->getOutput();
@@ -42,6 +43,7 @@ trait OutputAwareTrait {
 
   /**
    * Returns an instance of OutputInterface object.
+   *
    * This method is deprecated in Robo IO.php, hence defined here.
    */
   protected function getOutput(): OutputInterface {
@@ -52,14 +54,16 @@ trait OutputAwareTrait {
   }
 
   /**
+   * Magic method to handle undefined method calls.
+   *
    * We are using our own IO (DrsIO) instead of the IO trait provided by Robo.
    * The PHPUnit 9 doesn't have output() method, so when DrsIO's logConfig
    * method calls output(), it throws a "Call to undefined method" error.
    * We are handling that case here.
    *
-   * @todo: Remove the method below once support for the PHPUnit 9 is dropped.
+   * @todo Remove the method below once support for the PHPUnit 9 is dropped.
    *
-   * @param string name
+   * @param string $name
    *   The method name to call.
    * @param array<string> $arguments
    *   An array of arguments to pass to method.

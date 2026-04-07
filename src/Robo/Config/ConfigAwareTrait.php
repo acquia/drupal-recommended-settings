@@ -2,7 +2,6 @@
 
 namespace Acquia\Drupal\RecommendedSettings\Robo\Config;
 
-use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
 use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
 use Drush\Config\ConfigAwareTrait as DrushConfigAwareTrait;
 use Drush\Config\DrushConfig;

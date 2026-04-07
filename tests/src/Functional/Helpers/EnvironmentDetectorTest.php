@@ -3,13 +3,14 @@
 namespace Acquia\Drupal\RecommendedSettings\Tests\Functional\Helpers;
 
 use Acquia\Drupal\RecommendedSettings\Helpers\EnvironmentDetector;
-use Acquia\Drupal\RecommendedSettings\Helpers\Filesystem as DrsFilesystem;
 use Acquia\Drupal\RecommendedSettings\Plugin;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 use Composer\Composer;
 use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\Package\RootPackage;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Functional test for the EnvironmentDetectorTest class.
@@ -41,6 +42,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Set up test environment.
+   *
    * @throws \ReflectionException
    */
   public function setUp(): void {
@@ -50,7 +52,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
     $package->setExtra([
       "drupal-scaffold" => [
         "locations" => [
-          "web-root" => "docroot"
+          "web-root" => "docroot",
         ],
       ],
     ]);
@@ -72,8 +74,13 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
   /**
    * Tests EnvironmentDetector::getCiEnv().
    *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
+   *
    * @throws \ReflectionException
    */
+  #[RunInSeparateProcess]
   public function testGetCiEnv(): void {
 
     putenv("PIPELINE_ENV=TRUE");
@@ -86,6 +93,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
     putenv("PIPELINE_ENV=");
     putenv("GITLAB_CI_TOKEN=");
+    putenv("CI=");
     $this->assertFalse(EnvironmentDetector::isCiEnv());
     putenv("CI=TRUE");
     $this->assertTrue(EnvironmentDetector::isCiEnv());
@@ -94,8 +102,13 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
   /**
    * Verify Ci settings file suggestion exists.
    *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
+   *
    * @throws \ReflectionException
    */
+  #[RunInSeparateProcess]
   public function testGetCiSettingsFile(): void {
     putenv("PIPELINE_ENV=TRUE");
     $this->assertStringEndsWith('/acquia/drupal-recommended-settings/settings/pipelines.settings.php', EnvironmentDetector::getCiSettingsFile());
@@ -104,8 +117,13 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
   /**
    * Verify multiple environment.
    *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
+   *
    * @throws \ReflectionException
    */
+  #[RunInSeparateProcess]
   public function testMultipleEnv(): void {
     putenv("PIPELINE_ENV=");
     putenv("CI=");
@@ -128,18 +146,24 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Test EnvironmentDetector::isAcsfInited().
+   *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
    */
+  #[RunInSeparateProcess]
   public function testIsAcsfInited(): void {
     // Generate folder/files for ACSF.
-    $drsFileSystem = new DrsFilesystem();
-    $drsFileSystem->ensureDirectoryExists($this->drupalRoot . '/sites/g');
-    $drsFileSystem->dumpFile($this->drupalRoot . '/sites/g/random.php', "<?php echo 'hello';");
+    $file_system = new Filesystem();
+    mkdir($this->drupalRoot . '/sites/g', 0777, TRUE);
+    $file_system->dumpFile($this->drupalRoot . '/sites/g/random.php', "<?php echo 'hello';");
     $this->assertTrue(EnvironmentDetector::isAcsfInited());
   }
 
   /**
    * Test EnvironmentDetector OS related methods.
    */
+  // phpcs:ignore
   public function testOS(): void {
     $os_name = EnvironmentDetector::getOsName();
 
@@ -155,8 +179,14 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Test EnvironmentDetector::getSiteName().
+   *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
+   *
    * @throws \ReflectionException
    */
+  #[RunInSeparateProcess]
   public function testGetSiteName(): void {
     $sitePath = "sites/site1";
     $this->assertSame('site1', EnvironmentDetector::getSiteName($sitePath));
@@ -167,7 +197,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
     // directory/file manually running commands:
     // sudo mkdir -p /var/www/site-php/test.prod/
     // sudo touch /var/www/site-php/test.prod/multisite-config.json,
-    // This is important, or else we won't be able to test this functionality
+    // This is important, or else we won't be able to test this functionality.
     if (!is_dir("/var/www/site-php/test.prod/")) {
       if (!@mkdir("/var/www/site-php/test.prod/", "0777", TRUE)
         || !@touch("/var/www/site-php/test.prod/multisite-config.json")) {
@@ -185,17 +215,22 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Test EnvironmentDetector::getSiteName().
+   *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
    */
+  #[RunInSeparateProcess]
   public function testGetSiteNameForLocalAcsf(): void {
     if (getenv("ORCA_FIXTURE_DIR")) {
       // Due to some reasons, we've to manually copy fixture directories to
       // project directory.
-      // @todo: Revisit on why it's not working & fix it.
+      // @todo Revisit on why it's not working & fix it.
       $this->copyFixtureFiles($this->getFixtureDirectory(), $this->getProjectRoot());
     }
-    $drsFileSystem = new DrsFilesystem();
-    $drsFileSystem->ensureDirectoryExists($this->drupalRoot . '/sites/g');
-    $drsFileSystem->dumpFile($this->drupalRoot . '/sites/g/random.php', "<?php echo 'hello';");
+    $file_system = new Filesystem();
+    mkdir($this->drupalRoot . '/sites/g', 0777, TRUE);
+    $file_system->dumpFile($this->drupalRoot . '/sites/g/random.php', "<?php echo 'hello';");
     $this->assertFileExists($this->drupalRoot . '/sites/g/random.php');
     $ci_updated = $host_updated = FALSE;
     if (getenv("CI")) {
@@ -224,8 +259,14 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
 
   /**
    * Test EnvironmentDetector::getEnvironments().
+   *
+   * Below DocBlock added for legacy fallback for PHPUnit < 10.
+   *
+   * @runInSeparateProcess
+   *
    * @throws \ReflectionException
    */
+  #[RunInSeparateProcess]
   public function testGetEnvironments(): void {
     $ci_updated = FALSE;
     if (getenv("CI")) {
@@ -239,7 +280,7 @@ class EnvironmentDetectorTest extends FunctionalTestBase {
       'prod' => FALSE,
       'ci' => FALSE,
       'ode' => FALSE,
-      'ah_other' => FALSE
+      'ah_other' => FALSE,
     ], EnvironmentDetector::getEnvironments());
     if ($ci_updated) {
       putenv("CI=true");

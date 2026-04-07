@@ -6,9 +6,10 @@ namespace Acquia\Drupal\RecommendedSettings\Drush\Commands;
 
 use Acquia\Drupal\RecommendedSettings\Common\IO;
 use Acquia\Drupal\RecommendedSettings\Config\ConfigInitializer;
-use Acquia\Drupal\RecommendedSettings\Config\DefaultDrushConfig;
+use Acquia\Drupal\RecommendedSettings\Drush\Traits\SiteUriTrait;
 use Acquia\Drupal\RecommendedSettings\Robo\Config\ConfigAwareTrait;
 use Acquia\Drupal\RecommendedSettings\Robo\Tasks\LoadTasks;
+use Acquia\Drupal\RecommendedSettings\Settings;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drush\Attributes as Cli;
 use Drush\Commands\DrushCommands;
@@ -33,13 +34,20 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
   use ConfigAwareTrait;
   use LoadTasks;
   use IO;
+  use SiteUriTrait;
 
   /**
    * {@inheritdoc}
    */
   #[CLI\Hook(type: HookManager::INITIALIZE)]
   public function init(): void {
-    $this->initializeConfig();
+    $input = $this->input();
+    $uri = $input->getOption("uri");
+    if ($uri) {
+      $site = $this->getSitesSubdirFromUri($input->getOption("root"), $uri);
+    }
+    $site ??= "default";
+    $this->initializeConfig($site);
   }
 
   /**
@@ -74,7 +82,7 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    * @param string[] $options
    *   An array of options to pass to the command.
    * @param bool $display_command
-   *   Decides if command should be displayed on terminal or not. Default is TRUE.
+   *   Decides if command should be displayed on terminal or not.
    */
   protected function invokeCommand(string $command_name, array $args = [], array $options = [], bool $display_command = TRUE): void {
     $process = Drush::drush(Drush::aliasManager()->getSelf(), $command_name, $args, $options);
@@ -111,14 +119,32 @@ class BaseDrushCommands extends DrushCommands implements ConfigAwareInterface, L
    * @param string $site_name
    *   Given site name.
    */
-  protected function initializeConfig(string $site_name = ""): void {
-    $config = new DefaultDrushConfig($this->getConfig());
+  protected function initializeConfig(string $site_name): void {
+    $config = $this->getConfig();
     $configInitializer = new ConfigInitializer($config);
-    if ($site_name) {
-      $configInitializer->setSite($site_name);
-    }
+    $configInitializer->setSite($site_name);
     $config = $configInitializer->initialize()->loadAllConfig()->processConfig();
     $this->setConfig($config);
+  }
+
+  /**
+   * Creates and returns a fully wired Settings instance.
+   *
+   * Ensures the HookManager is always injected so that listeners registered
+   * via #[CLI\Hook(ON_EVENT, PreSettingsFileGenerateEvent::NAME)] are
+   * discovered and invoked regardless of which command path triggers
+   * settings generation.
+   *
+   * @return \Acquia\Drupal\RecommendedSettings\Settings
+   *   A Settings instance with config and HookManager set.
+   */
+  protected function buildSettings(): Settings {
+    $settings = new Settings();
+    $hookManager = $this->getContainer()->get('hookManager');
+    assert($hookManager instanceof HookManager);
+    $settings->setHookManager($hookManager);
+    $settings->setConfig($this->getConfig());
+    return $settings;
   }
 
 }

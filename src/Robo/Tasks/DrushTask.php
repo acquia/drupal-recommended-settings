@@ -340,14 +340,14 @@ class DrushTask extends CommandStack {
    *
    * @param string $option
    *   An option key.
-   * @param string $value
+   * @param string|null $value
    *   Value for option.
    * @param string $separator
    *   The separator for options.
    *
    * @return $this
    */
-  public function option(string $option, string $value = NULL, string $separator = '=') {
+  public function option(string $option, ?string $value = NULL, string $separator = '=') {
     return $this->traitOption($option, $value, $separator);
   }
 

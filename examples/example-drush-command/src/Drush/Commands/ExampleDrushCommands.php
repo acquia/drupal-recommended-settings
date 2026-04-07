@@ -4,6 +4,7 @@ namespace Example\Drush\Commands;
 
 use Acquia\Drupal\RecommendedSettings\Drush\Commands\MultisiteDrushCommands;
 use Acquia\Drupal\RecommendedSettings\Drush\Commands\SettingsDrushCommands;
+use Acquia\Drupal\RecommendedSettings\Event\PreSettingsFileGenerateEvent;
 use Consolidation\AnnotatedCommand\CommandData;
 use Consolidation\AnnotatedCommand\Hooks\HookManager;
 use Drush\Attributes as CLI;
@@ -47,6 +48,50 @@ class ExampleDrushCommands extends DrushCommands {
     }
     $this->io()->info("Skip settings.php generation for CI environment.");
     return new ResultData(ResultData::EXITCODE_OK);
+  }
+
+  /**
+   * Alter the file operations.
+   */
+  #[CLI\Hook(type: HookManager::ON_EVENT, target: PreSettingsFileGenerateEvent::NAME)]
+  public function alterSettingsOperations(PreSettingsFileGenerateEvent $event): void {
+    $operations = $event->getOperations();
+
+    // 1. Skip a file entirely.
+    $operations['${docroot}/sites/${site}/settings/local.settings.php'] = FALSE;
+
+    // 2. Change the source file for a copy operation.
+    $operations['${docroot}/sites/${site}/settings.php'] = [
+      'copy' => [
+        'path' => '${drs.root}/assets/settings.php',
+      ],
+    ];
+
+    // 3. Add a new custom settings and overwrite if content differs.
+    $operations['${docroot}/sites/${site}/custom.settings.php'] = [
+      'copy' => [
+        'path'      => '${drs.root}/assets/custom.settings.php',
+        'overwrite' => TRUE,
+      ],
+    ];
+
+    // 4. Copy with placeholder resolution enabled.
+    $operations['${docroot}/sites/${site}/placeholders.settings.php'] = [
+      'copy' => [
+        'path' => '${drs.root}/assets/placeholders.settings.php',
+        'with-placeholder' => TRUE,
+      ],
+    ];
+
+    // 5. Append content from another file and from an inline string.
+    $operations['${docroot}/sites/${site}/settings.php']['append'][] = [
+      'path' => '${drs.root}/assets/additional.settings.php',
+    ];
+    $operations['${docroot}/sites/${site}/settings.php']['append'][] = [
+      'content' => "// Added by my module.\n",
+    ];
+
+    $event->setOperations($operations);
   }
 
 }

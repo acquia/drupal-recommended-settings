@@ -51,13 +51,16 @@ class StringManipulator {
    * @return mixed
    *   Safe string.
    */
-  public static function convertStringToMachineSafe(string $identifier, array $filter = [
-    ' ' => '_',
-    '-' => '_',
-    '/' => '_',
-    '[' => '_',
-    ']' => '',
-  ]): mixed {
+  public static function convertStringToMachineSafe(
+    string $identifier,
+    array $filter = [
+      ' ' => '_',
+      '-' => '_',
+      '/' => '_',
+      '[' => '_',
+      ']' => '',
+    ],
+  ): mixed {
     $identifier = str_replace(array_keys($filter), array_values($filter), $identifier);
     // Valid characters are:
     // - a-z (U+0030 - U+0039)

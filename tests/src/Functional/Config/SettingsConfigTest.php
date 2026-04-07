@@ -6,6 +6,7 @@ use Acquia\Drupal\RecommendedSettings\Common\RandomString;
 use Acquia\Drupal\RecommendedSettings\Config\SettingsConfig;
 use Acquia\Drupal\RecommendedSettings\Tests\FunctionalTestBase;
 use Acquia\Drupal\RecommendedSettings\Tests\Traits\FileCreationTrait;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Functional test for the SettingsConfig class.
@@ -31,7 +32,10 @@ class SettingsConfigTest extends FunctionalTestBase {
 
   /**
    * Tests the set() method.
+   *
+   * @ignoreDeprecations
    */
+  #[IgnoreDeprecations]
   public function testSetMethod(): void {
     $settings_config = new SettingsConfig();
     $settings_config->set("a.b.c", "true");
@@ -56,7 +60,10 @@ class SettingsConfigTest extends FunctionalTestBase {
 
   /**
    * Tests the get() method.
+   *
+   * @ignoreDeprecations
    */
+  #[IgnoreDeprecations]
   public function testGetMethod(): void {
     $settings_config = new SettingsConfig();
     $settings_config->set("a.b.c", "true");
@@ -73,7 +80,10 @@ class SettingsConfigTest extends FunctionalTestBase {
 
   /**
    * Tests the replaceFileVariables() method.
+   *
+   * @ignoreDeprecations
    */
+  #[IgnoreDeprecations]
   public function testReplaceFileVariables(): void {
     $content = <<<Content
 My name is '\${name.firstname} \${name.lastname}'.

@@ -29,7 +29,7 @@ class RandomString {
    * @param bool $unique
    *   (optional) If TRUE ensures that the random string returned is unique.
    *   Defaults to FALSE.
-   * @param callable $validator
+   * @param callable|null $validator
    *   (optional) A callable to validate the string. Defaults to NULL.
    * @param string $characters
    *   (optional) A string containing all possible characters that may be used
@@ -40,7 +40,7 @@ class RandomString {
    *
    * @see \Drupal\Component\Utility\Random::name()
    */
-  public static function string(int $length = 8, bool $unique = FALSE, callable $validator = NULL, string $characters = ''): string {
+  public static function string(int $length = 8, bool $unique = FALSE, ?callable $validator = NULL, string $characters = ''): string {
     $counter = 0;
     static $strings = [];
     $characters_array = $characters ? str_split($characters) : [];
