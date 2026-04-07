@@ -4,7 +4,6 @@ namespace Acquia\Drupal\RecommendedSettings\Tests\Unit\Filesystem\Operation;
 
 use Acquia\Drupal\RecommendedSettings\Filesystem\Operation\OperationKey;
 use Acquia\Drupal\RecommendedSettings\Filesystem\Operation\OperationType;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
